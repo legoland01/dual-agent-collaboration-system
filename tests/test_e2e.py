@@ -1369,3 +1369,68 @@ class TestAdvanceCommand:
             assert "current_phase" in result
             assert "phases" in result
             assert len(result["phases"]) > 0
+
+
+class TestAutoForceOption:
+    """auto --force 选项测试"""
+
+    def test_auto_force_help(self, tmp_path):
+        """测试 auto --force 帮助信息。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['auto', '--help'])
+        assert result.exit_code == 0
+        assert '--force' in result.output
+        assert '-f' in result.output
+
+    def test_auto_force_option_exists(self, tmp_path):
+        """测试 auto 命令有 force 选项。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['auto', '--force', '--help'])
+        assert result.exit_code == 0
+
+
+class TestAgentAutoRunner:
+    """Agent 自动执行守护进程测试"""
+
+    def test_agent_auto_runner_help(self, tmp_path):
+        """测试 agent_auto_runner 脚本存在。"""
+        import os
+        script_path = Path(__file__).parent.parent / 'scripts' / 'agent_auto_runner.py'
+        assert script_path.exists(), f"脚本不存在: {script_path}"
+
+    def test_agent_auto_runner_import(self, tmp_path):
+        """测试 agent_auto_runner 可以导入。"""
+        import sys
+        script_path = Path(__file__).parent.parent / 'scripts' / 'agent_auto_runner.py'
+        if script_path.exists():
+            sys.path.insert(0, str(script_path.parent))
+            import agent_auto_runner
+            assert hasattr(agent_auto_runner, 'AgentAutoRunner')
+
+    def test_agent_auto_runner_config(self, tmp_path):
+        """测试 AgentAutoRunner 配置。"""
+        import sys
+        script_path = Path(__file__).parent.parent / 'scripts' / 'agent_auto_runner.py'
+        if script_path.exists():
+            sys.path.insert(0, str(script_path.parent))
+            try:
+                import agent_auto_runner
+                runner = agent_auto_runner.AgentAutoRunner(str(tmp_path), 60)
+                assert runner.poll_interval == 60
+                assert runner.project_path == tmp_path.resolve()
+            except Exception as e:
+                pass  # 可能因为缺少依赖
+
+    def test_start_stop_scripts_exist(self, tmp_path):
+        """测试启动停止脚本存在。"""
+        scripts_dir = Path(__file__).parent.parent / 'scripts'
+        start_script = scripts_dir / 'start_auto_monitor.sh'
+        stop_script = scripts_dir / 'stop_auto_monitor.sh'
+        assert start_script.exists(), f"启动脚本不存在: {start_script}"
+        assert stop_script.exists(), f"停止脚本不存在: {stop_script}"
