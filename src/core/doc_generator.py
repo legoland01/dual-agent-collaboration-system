@@ -1,4 +1,5 @@
 """文档生成器模块。"""
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass, field

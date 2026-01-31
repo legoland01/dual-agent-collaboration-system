@@ -91,7 +91,7 @@ class GitConfig:
         enable_webhook: bool = False,
         webhook_url: Optional[str] = None
     ):
-        self.polling_interval = max(MIN_POLLING_INTERVAL, polling_interval)
+        self.polling_interval = max(self.MIN_POLLING_INTERVAL, polling_interval)
         self.max_polling_interval = max_polling_interval
         self.enable_exponential_backoff = enable_exponential_backoff
         self.enable_webhook = enable_webhook
