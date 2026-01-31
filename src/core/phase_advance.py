@@ -139,7 +139,8 @@ class PhaseAdvanceEngine:
 
         condition = transition.get("condition")
         if callable(condition):
-            return condition(state)
+            result = condition(state)
+            return bool(result) if result is not None else False
 
         return False
 
@@ -208,7 +209,7 @@ class PhaseAdvanceEngine:
             "message": f"无法自动推进: 条件未满足"
         }
 
-    def manual_advance(self, target_phase: str = None, force: bool = False) -> Dict[str, Any]:
+    def manual_advance(self, target_phase: Optional[str] = None, force: bool = False) -> Dict[str, Any]:
         """
         手动推进阶段
 
@@ -245,6 +246,11 @@ class PhaseAdvanceEngine:
                     }
 
         try:
+            if target_phase is None:
+                return {
+                    "success": False,
+                    "error": "目标阶段不能为空"
+                }
             self.state_manager.update_phase(target_phase)
 
             self.state_manager.add_history_entry(

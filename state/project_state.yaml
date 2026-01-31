@@ -1,13 +1,25 @@
+deployment:
+  status: pending
 design:
   status: pending
 development:
   status: pending
 history:
+- id: e7e856c7
+  timestamp: '2026-02-01T00:04:17.793354'
+  action: signoff
+  agent_id: unknown
+  details: '签署requirements阶段: AI 签署：同意实现 oc-collab agent 功能'
 - action: signoff
   agent_id: agent1
   details: '签署需求: 需求清晰，同意实现'
-  id: req_signoff_20260131235235
-  timestamp: '2026-01-31T23:52:35.897200'
+  id: req_signoff_20260201000236
+  timestamp: '2026-02-01T00:02:36.420370'
+- action: review_start
+  agent_id: agent1
+  details: '启动需求评审: Bug触发Agent2自动修复功能'
+  id: req_review_20260201000226
+  timestamp: '2026-02-01T00:02:26.409515'
 phase: requirements_review
 project:
   agents:
@@ -18,8 +30,11 @@ project:
       current: false
       role: 开发
 requirements:
-  dev_signoff: false
+  dev_signoff: true
   pm_signoff: true
-  status: review
+  status: approved
+  unknown_signoff: true
 test:
   status: pending
+version: 2.0.0
+updated_at: '2026-02-01T00:26:19.043114'
