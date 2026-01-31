@@ -1,4 +1,4 @@
-phase: requirements_review
+phase: design_review
 
 requirements:
   version: "v3"
@@ -10,11 +10,12 @@ requirements:
   review_type: "cli_improvement"
 
 design:
-  version: ""
+  version: "v1"
   pm_signoff: false
   dev_signoff: false
-  status: pending
-  last_updated: ""
+  status: in_progress
+  last_updated: "2026-01-31"
+  review_cycles: 0
 
 test:
   version: ""
