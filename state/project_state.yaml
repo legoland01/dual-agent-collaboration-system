@@ -1,10 +1,22 @@
 deployment:
   status: pending
 design:
-  status: pending
+  dev_signoff: true
+  pm_signoff: false
+  status: review
 development:
   status: pending
 history:
+- id: 8aab1e08
+  timestamp: '2026-02-01T00:33:31.027633'
+  action: manual_phase_advance
+  agent_id: user
+  details: '手动推进: requirements_review → design_draft'
+- id: 3dccec08
+  timestamp: '2026-02-01T00:33:31.023289'
+  action: phase_update
+  agent_id: system
+  details: 阶段从 requirements_review 更新为 design_draft
 - id: e7e856c7
   timestamp: '2026-02-01T00:04:17.793354'
   action: signoff
@@ -20,7 +32,7 @@ history:
   details: '启动需求评审: Bug触发Agent2自动修复功能'
   id: req_review_20260201000226
   timestamp: '2026-02-01T00:02:26.409515'
-phase: requirements_review
+phase: design_draft
 project:
   agents:
     agent1:
@@ -37,4 +49,4 @@ requirements:
 test:
   status: pending
 version: 2.0.0
-updated_at: '2026-02-01T00:26:19.043114'
+updated_at: '2026-02-01T00:33:31.027639'
