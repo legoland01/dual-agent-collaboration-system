@@ -1,4 +1,4 @@
-phase: requirements_review
+phase: design_draft
 
 requirements:
   version: "v2"
@@ -7,14 +7,14 @@ requirements:
   status: approved
   last_updated: "2026-01-31"
   review_cycles: 2
-  current_review_cycle: 2
 
 design:
   version: ""
   pm_signoff: false
   dev_signoff: false
-  status: pending
+  status: draft
   last_updated: ""
+  test_cases_writing: true
 
 test:
   version: ""
