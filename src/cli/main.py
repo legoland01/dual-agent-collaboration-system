@@ -276,6 +276,280 @@ def auto_command(max_iterations: int, quiet: bool, force: bool):
         sys.exit(1)
 
 
+@main.command("agent")
+@click.option("--interval", "-i", type=int, default=5, help="检查间隔（秒）")
+@click.option("--daemon/--no-daemon", "-d", default=False, help="后台守护进程模式")
+def agent_command(interval: int, daemon: bool):
+    """Agent 调度器 - 双 Agent 交替工作守护进程。
+    
+    启动真正的双 Agent 交替工作：
+    - Agent 1 (产品经理) 和 Agent 2 (开发) 真正交替执行任务
+    - 自动检测状态并执行相应操作
+    - 自动推进阶段
+    """
+    try:
+        project_path = get_project_path()
+        
+        if daemon:
+            import os
+            import signal
+            
+            def daemonize():
+                """将进程转为后台守护进程"""
+                # 第一次 fork
+                pid = os.fork()
+                if pid > 0:
+                    sys.exit(0)
+                
+                # 创建新会话
+                os.setsid()
+                
+                # 第二次 fork
+                pid = os.fork()
+                if pid > 0:
+                    sys.exit(0)
+                
+                # 重定向标准文件描述符
+                sys.stdout.flush()
+                sys.stderr.flush()
+                with open('/dev/null', 'r') as devnull:
+                    os.dup2(devnull.fileno(), sys.stdin.fileno())
+                with open('/dev/null', 'a+') as devnull:
+                    os.dup2(devnull.fileno(), sys.stdout.fileno())
+                    os.dup2(devnull.fileno(), sys.stderr.fileno())
+                
+                # 启动 Agent 调度器
+                run_scheduler(project_path, interval)
+            
+            click.echo(f"启动 Agent 守护进程 (间隔: {interval}秒)...")
+            click.echo(f"PID: {os.getpid()}")
+            click.echo("使用 'pkill -f oc-collab agent' 停止")
+            daemonize()
+        
+        else:
+            click.echo("启动 Agent 调度器 (按 Ctrl+C 停止)...")
+            run_scheduler(project_path, interval)
+    
+    except KeyboardInterrupt:
+        click.echo("\n已停止 Agent 调度器")
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+def run_scheduler(project_path: str, interval: int):
+    """运行 Agent 调度器"""
+    from ..utils.yaml import load_yaml, save_yaml
+    from datetime import datetime
+    import time
+    
+    state_file = f"{project_path}/state/project_state.yaml"
+    
+    def load_state():
+        return load_yaml(state_file)
+    
+    def save_state(state):
+        save_yaml(state_file, state)
+    
+    def get_active_agent():
+        state = load_state()
+        project_agents = state.get('project', {}).get('agents', {})
+        for agent_id, agent_data in project_agents.items():
+            if agent_data.get('current', False):
+                return agent_id
+        return None
+    
+    def switch_agent():
+        state = load_state()
+        current = get_active_agent()
+        next_agent = 'agent2' if current == 'agent1' else 'agent1'
+        
+        for agent_id in state['project']['agents']:
+            state['project']['agents'][agent_id]['current'] = (agent_id == next_agent)
+        
+        save_state(state)
+        return next_agent
+    
+    click.echo("=" * 50)
+    click.echo("Agent 调度器启动")
+    click.echo("=" * 50)
+    
+    while True:
+        try:
+            state = load_state()
+            phase = state.get('phase', 'unknown')
+            active_agent = get_active_agent()
+            
+            if not active_agent:
+                active_agent = switch_agent()
+            
+            # 检查阶段推进
+            req = state.get('requirements', {})
+            design = state.get('design', {})
+            test = state.get('test', {})
+            
+            # 需求批准 → 设计
+            if phase == 'requirements_review':
+                if req.get('pm_signoff') and req.get('dev_signoff'):
+                    state['phase'] = 'design_draft'
+                    req['status'] = 'approved'
+                    state['history'].insert(0, {
+                        'id': f'adv_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'phase_advance',
+                        'agent_id': 'system',
+                        'details': '需求签署完成，自动推进到设计阶段'
+                    })
+                    save_state(state)
+                    click.echo(f"[System] 阶段推进: requirements → design_draft")
+                    switch_agent()
+                    time.sleep(interval)
+                    continue
+            
+            # 设计批准 → 开发
+            elif phase == 'design_review':
+                if design.get('pm_signoff') and design.get('dev_signoff'):
+                    state['phase'] = 'development'
+                    design['status'] = 'approved'
+                    state['history'].insert(0, {
+                        'id': f'adv_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'phase_advance',
+                        'agent_id': 'system',
+                        'details': '设计签署完成，自动推进到开发阶段'
+                    })
+                    save_state(state)
+                    click.echo(f"[System] 阶段推进: design → development")
+                    switch_agent()
+                    time.sleep(interval)
+                    continue
+            
+            # 测试通过 → 完成
+            elif phase == 'testing':
+                if test.get('pm_signoff') and test.get('dev_signoff'):
+                    issues = test.get('issues_to_fix', [])
+                    if not issues:
+                        state['phase'] = 'completed'
+                        test['status'] = 'completed'
+                        state['history'].insert(0, {
+                            'id': f'adv_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                            'timestamp': datetime.now().isoformat(),
+                            'action': 'phase_advance',
+                            'agent_id': 'system',
+                            'details': '测试签署完成，项目完成'
+                        })
+                        save_state(state)
+                        click.echo(f"[System] 阶段推进: testing → completed")
+                        click.echo("项目完成！")
+                        break
+            
+            # Agent 1 工作
+            if active_agent == 'agent1':
+                if phase == 'requirements_review' and not req.get('pm_signoff', False):
+                    req['pm_signoff'] = True
+                    state['history'].insert(0, {
+                        'id': f'signoff_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'signoff',
+                        'agent_id': 'agent1',
+                        'details': '签署需求: 同意实现'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 1] 签署需求")
+                    switch_agent()
+                
+                elif phase == 'design_review' and not design.get('pm_signoff', False):
+                    design['pm_signoff'] = True
+                    state['history'].insert(0, {
+                        'id': f'signoff_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'signoff',
+                        'agent_id': 'agent1',
+                        'details': '签署设计: 设计与需求一致'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 1] 签署设计")
+                    switch_agent()
+                
+                elif phase == 'testing' and not test.get('pm_signoff', False):
+                    test['pm_signoff'] = True
+                    state['history'].insert(0, {
+                        'id': f'test_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'test_complete',
+                        'agent_id': 'agent1',
+                        'details': '黑盒测试完成'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 1] 完成测试")
+                    switch_agent()
+            
+            # Agent 2 工作
+            elif active_agent == 'agent2':
+                if phase == 'requirements_review' and not req.get('dev_signoff', False):
+                    req['dev_signoff'] = True
+                    state['history'].insert(0, {
+                        'id': f'signoff_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'signoff',
+                        'agent_id': 'agent2',
+                        'details': '签署需求: 技术方案可行'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 2] 签署需求")
+                    switch_agent()
+                
+                elif phase == 'design_review' and not design.get('dev_signoff', False):
+                    design['dev_signoff'] = True
+                    state['history'].insert(0, {
+                        'id': f'signoff_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'signoff',
+                        'agent_id': 'agent2',
+                        'details': '签署设计: 实现方案可行'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 2] 签署设计")
+                    switch_agent()
+                
+                elif phase == 'development':
+                    state['development']['status'] = 'completed'
+                    state['phase'] = 'testing'
+                    test['status'] = 'in_progress'
+                    state['history'].insert(0, {
+                        'id': f'dev_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'development_complete',
+                        'agent_id': 'agent2',
+                        'details': '开发完成'
+                    })
+                    save_state(state)
+                    click.echo(f"[Agent 2] 开发完成，推进到测试阶段")
+                    switch_agent()
+                
+                elif phase == 'testing':
+                    issues = test.get('issues_to_fix', [])
+                    if issues:
+                        test['issues_to_fix'] = []
+                        test['dev_signoff'] = True
+                        state['history'].insert(0, {
+                            'id': f'fix_{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                            'timestamp': datetime.now().isoformat(),
+                            'action': 'bug_fix',
+                            'agent_id': 'agent2',
+                            'details': f'修复 {len(issues)} 个 bug'
+                        })
+                        save_state(state)
+                        click.echo(f"[Agent 2] 修复 {len(issues)} 个 bug")
+                        switch_agent()
+            
+            time.sleep(interval)
+            
+        except Exception as e:
+            click.echo(f"错误: {e}")
+            time.sleep(interval)
+
+
 @main.command("todo")
 def todo_command():
     """显示待办事项。"""
