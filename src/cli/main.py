@@ -15,6 +15,7 @@ from ..core.signoff import SignoffEngine
 from ..core.auto_engine import AutoCollaborationEngine, TodoCommandExecutor, WorkCommandExecutor
 from ..core.auto_retry import AutoRetry, AutoRetryConfig
 from ..core.auto_docs import AutoDocs, AutoDocsConfig
+from ..core.phase_advance import PhaseAdvanceEngine
 from ..utils.lock import LockExistsError
 
 
@@ -569,6 +570,188 @@ def docs_command(action: str, message: str, auto: bool):
             if results.get("changelog") or results.get("manual"):
                 console.print(f"\n提交信息: {message}")
         
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("project")
+@click.argument("action", type=click.Choice([
+    "update", "set-phase", "status", "complete", "info"
+]))
+@click.option("--type", "-t", type=click.Choice([
+    "test", "development", "deployment"
+]), help="更新类型")
+@click.option("--value", "-v", help="更新值")
+@click.option("--cases", type=int, help="测试用例数")
+@click.option("--passed", type=int, help="通过数")
+@click.option("--branch", "-b", help="分支名")
+@click.option("--phase", help="目标阶段")
+def project_command(action: str, type: str, value: str, cases: int,
+                    passed: int, branch: str, phase: str):
+    """项目管理命令（用于子项目状态更新）。"""
+    try:
+        project_path = get_project_path()
+        state_manager = StateManager(project_path)
+        state = state_manager.load_state()
+
+        if action == "update":
+            if type == "test":
+                if cases is not None or passed is not None:
+                    test = state.get('test', {})
+                    if cases is not None:
+                        test['blackbox_cases'] = cases
+                    if passed is not None:
+                        test['blackbox_passed'] = passed
+                    test['status'] = 'in_progress'
+                    if passed is not None and cases is not None and passed >= cases:
+                        test['status'] = 'passed'
+                    state['test'] = test
+                    state_manager.save_state(state)
+                    click.echo(f"✓ 测试统计已更新: 用例={cases}, 通过={passed}")
+                else:
+                    click.echo("错误: 测试更新需要提供 --cases 或 --passed")
+                    sys.exit(1)
+            elif type == "development":
+                if value:
+                    dev = state.get('development', {})
+                    dev['status'] = value
+                    if branch:
+                        dev['branch'] = branch
+                    state['development'] = dev
+                    state_manager.save_state(state)
+                    click.echo(f"✓ 开发状态已更新: {value}")
+                else:
+                    click.echo("错误: 开发更新需要提供 --value")
+                    sys.exit(1)
+            elif type == "deployment":
+                if value:
+                    deploy = state.get('deployment', {})
+                    deploy['status'] = value
+                    state['deployment'] = deploy
+                    state_manager.save_state(state)
+                    click.echo(f"✓ 部署状态已更新: {value}")
+                else:
+                    click.echo("错误: 部署更新需要提供 --value")
+                    sys.exit(1)
+
+        elif action == "set-phase":
+            if phase:
+                state_manager.update_phase(phase)
+                click.echo(f"✓ 阶段已设置为: {phase}")
+            else:
+                click.echo("错误: 需要提供 --phase 参数")
+                sys.exit(1)
+
+        elif action == "complete":
+            dev = state.get('development', {})
+            dev['status'] = 'completed'
+            state['development'] = dev
+            state['phase'] = 'testing'
+            state_manager.save_state(state)
+            click.echo("✓ 开发任务已标记为完成")
+            click.echo("✓ 阶段已推进到: testing")
+            click.echo("提示: 运行 'oc-collab advance' 同步到 Git")
+
+        elif action == "status":
+            phase_info = state.get('phase', 'unknown')
+            test = state.get('test', {})
+            dev = state.get('development', {})
+            deploy = state.get('deployment', {})
+
+            console.print("\n[bold]项目状态[/bold]")
+
+            table = Table(show_header=False)
+            table.add_column("项目")
+            table.add_column("值")
+
+            table.add_row("当前阶段", phase_info)
+            table.add_row("测试状态", test.get('status', 'unknown'))
+            table.add_row("测试用例数", str(test.get('blackbox_cases', 0)))
+            table.add_row("测试通过数", str(test.get('blackbox_passed', 0)))
+            table.add_row("开发状态", dev.get('status', 'unknown'))
+            table.add_row("部署状态", deploy.get('status', 'unknown'))
+
+            console.print(table)
+
+        elif action == "info":
+            phase_engine = PhaseAdvanceEngine(project_path)
+            phases = phase_engine.list_phases()
+
+            console.print("\n[bold]阶段列表[/bold]")
+
+            table = Table(show_header=False)
+            table.add_column("阶段")
+            table.add_column("状态")
+            table.add_column("条件")
+
+            for p in phases['phases']:
+                status = "← 已完成" if p['is_past'] else ("★ 当前" if p['is_current'] else "待推进")
+                condition = p['condition_description'] if not p['is_past'] else "-"
+                table.add_row(p['phase'], status, condition)
+
+            console.print(table)
+            console.print(f"\n当前阶段: {phases['current_phase']}")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("advance")
+@click.option("--phase", "-p", help="目标阶段")
+@click.option("--force", "-f", is_flag=True, help="强制推进")
+@click.option("--check", "-c", is_flag=True, help="仅检查条件")
+def advance_command(phase: str, force: bool, check: bool):
+    """推进到下一阶段。"""
+    try:
+        project_path = get_project_path()
+        phase_engine = PhaseAdvanceEngine(project_path)
+
+        if check:
+            result = phase_engine.check_and_advance()
+            if result["advanced"]:
+                console.print(Panel(
+                    f"可以自动推进\n从: {result['from_phase']}\n到: {result['to_phase']}\n原因: {result['reason']}",
+                    title="阶段检查",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"无法自动推进\n当前: {result['from_phase']}\n原因: {result['reason']}",
+                    title="阶段检查",
+                    style="yellow"
+                ))
+        elif phase:
+            result = phase_engine.manual_advance(phase, force=force)
+            if result["success"]:
+                console.print(Panel(
+                    result["message"],
+                    title="阶段推进",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"推进失败\n原因: {result.get('error', '未知')}",
+                    title="错误",
+                    style="red"
+                ))
+                sys.exit(1)
+        else:
+            result = phase_engine.check_and_advance()
+            if result["advanced"]:
+                console.print(Panel(
+                    result["message"],
+                    title="自动推进",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"{result['message']}\n\n使用 'oc-collab advance --check' 查看详情\n使用 'oc-collab advance --force --phase <阶段名>' 强制推进",
+                    title="无法自动推进",
+                    style="yellow"
+                ))
+
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)

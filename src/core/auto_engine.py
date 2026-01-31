@@ -7,6 +7,7 @@ from .state_manager import StateManager
 from .git import GitHelper
 from .workflow import WorkflowEngine
 from .signoff import SignoffEngine
+from .phase_advance import PhaseAdvanceEngine
 from ..utils.lock import LockManager, LockExistsError
 from ..utils.date import get_current_time
 
@@ -85,50 +86,65 @@ class AutoCollaborationEngine:
         self.git_helper = GitHelper(project_path)
         self.workflow_engine = WorkflowEngine(self.state_manager)
         self.signoff_engine = SignoffEngine(self.state_manager, self.workflow_engine)
+        self.phase_advance_engine = PhaseAdvanceEngine(project_path)
         self.lock_manager = LockManager(project_path)
         self.current_iteration = 0
         self.is_running = False
         self.execution_history = []
     
-    def run(self, max_iterations: int = None) -> Dict[str, Any]:
+    def run(self, max_iterations: Optional[int] = None) -> Dict[str, Any]:
         """执行自动协作流程。"""
         if max_iterations is None:
             max_iterations = self.MAX_ITERATIONS
-        
+
         self.is_running = True
         self.current_iteration = 0
         self.execution_history = []
-        
+
         try:
             self.lock_manager.check_and_cleanup()
             self.lock_manager.acquire("auto command execution")
-            
+
             if self.git_helper.has_local_changes():
                 return {
                     "success": False,
                     "error": "存在未提交的本地修改，请先执行 git add 和 commit"
                 }
-            
+
             for i in range(max_iterations):
                 self.current_iteration = i + 1
-                
+
                 if not self.is_running:
                     break
-                
+
+                # 1. 检查并自动推进阶段
+                phase_result = self.phase_advance_engine.check_and_advance()
+                if phase_result["advanced"]:
+                    self.execution_history.append({
+                        "action": "phase_advance",
+                        "from": phase_result["from_phase"],
+                        "to": phase_result["to_phase"],
+                        "reason": phase_result["reason"]
+                    })
+
+                # 2. 检测状态
                 state = self.detect_state()
                 if state.get("completed"):
                     break
-                
+
+                # 3. 执行任务
                 agent = self.get_active_agent()
                 result = self.execute_task(state, agent)
                 self.execution_history.append(result)
-                
+
+                # 4. 同步 Git
                 if result.get("git_synced"):
                     self.sync_git()
-                
+
+                # 5. 检查完成
                 if self.check_completion():
                     break
-            
+
             return self._generate_summary()
             
         except LockExistsError as e:

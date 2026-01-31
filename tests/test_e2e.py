@@ -1242,3 +1242,130 @@ class TestAutoDocsFeature:
         
         assert auto_docs._extract_scope("feat(core): new feature") == "core"
         assert auto_docs._extract_scope("fix: bug fix") == "系统"
+
+
+class TestProjectCommand:
+    """项目管理命令测试。"""
+
+    def test_project_status(self, tmp_path):
+        """测试project status命令。"""
+        from src.cli.main import init_command, project_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(project_command, ['status'])
+            assert result.exit_code == 0
+            assert '项目状态' in result.output
+
+    def test_project_update_test(self, tmp_path):
+        """测试project update --type test命令。"""
+        from src.cli.main import init_command, project_command
+        from click.testing import CliRunner
+        import yaml
+        from pathlib import Path
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(project_command, ['update', '--type', 'test', '--cases', '100', '--passed', '95'])
+            assert result.exit_code == 0
+            assert '测试统计已更新' in result.output
+
+            state_file = Path('state/project_state.yaml')
+            with open(state_file, 'r') as f:
+                state = yaml.safe_load(f)
+            assert state['test']['blackbox_cases'] == 100
+            assert state['test']['blackbox_passed'] == 95
+
+    def test_project_complete(self, tmp_path):
+        """测试project complete命令。"""
+        from src.cli.main import init_command, project_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(project_command, ['complete'])
+            assert result.exit_code == 0
+            assert '开发任务已标记为完成' in result.output
+
+    def test_project_info(self, tmp_path):
+        """测试project info命令。"""
+        from src.cli.main import init_command, project_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(project_command, ['info'])
+            assert result.exit_code == 0
+            assert '阶段列表' in result.output
+
+
+class TestAdvanceCommand:
+    """阶段推进命令测试。"""
+
+    def test_advance_help(self, tmp_path):
+        """测试advance命令帮助信息。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['advance', '--help'])
+        assert result.exit_code == 0
+        assert '--phase' in result.output
+        assert '--force' in result.output
+        assert '--check' in result.output
+
+    def test_advance_check(self, tmp_path):
+        """测试advance --check命令。"""
+        from src.cli.main import init_command, advance_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(advance_command, ['--check'])
+            assert result.exit_code == 0
+
+    def test_phase_advance_engine_init(self, tmp_path):
+        """测试阶段推进引擎初始化。"""
+        from src.core.phase_advance import PhaseAdvanceEngine
+
+        engine = PhaseAdvanceEngine(str(tmp_path))
+        assert engine is not None
+
+    def test_phase_advance_check_condition(self, tmp_path):
+        """测试阶段条件检查。"""
+        from src.core.phase_advance import PhaseAdvanceEngine
+
+        engine = PhaseAdvanceEngine(str(tmp_path))
+
+        result = engine.check_condition("development", {"development": {"status": "completed"}})
+        assert result is True
+
+        result = engine.check_condition("development", {"development": {"status": "in_progress"}})
+        assert result is False
+
+    def test_phase_advance_list_phases(self, tmp_path):
+        """测试阶段列表。"""
+        from src.core.phase_advance import PhaseAdvanceEngine
+        from src.core.state_manager import StateManager
+
+        with tempfile.TemporaryDirectory() as td:
+            Path(td, 'state').mkdir()
+            StateManager(td).init_state('TestProject', 'PYTHON')
+
+            engine = PhaseAdvanceEngine(td)
+            result = engine.list_phases()
+
+            assert "current_phase" in result
+            assert "phases" in result
+            assert len(result["phases"]) > 0
