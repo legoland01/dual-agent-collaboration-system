@@ -981,3 +981,120 @@ class TestCLIHelp:
         result = runner.invoke(main, ['work', '--help'])
         assert result.exit_code == 0
         assert '--execute' in result.output
+
+
+class TestRemoteCommand:
+    """远程仓库管理命令测试。"""
+
+    def test_remote_list(self, tmp_path):
+        """测试列出远程仓库。"""
+        from src.cli.main import init_command, remote_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(remote_command, ['list'])
+            assert result.exit_code == 0
+            assert '远程仓库' in result.output or '未配置' in result.output
+
+    def test_remote_add(self, tmp_path):
+        """测试添加远程仓库。"""
+        from src.cli.main import init_command, remote_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(remote_command, ['add', 'gitee', 'https://gitee.com/test/project.git'])
+            assert result.exit_code == 0
+            assert '已添加' in result.output or 'gitee' in result.output.lower()
+
+    def test_remote_add_missing_args(self, tmp_path):
+        """测试添加远程仓库缺少参数。"""
+        from src.cli.main import init_command, remote_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(remote_command, ['add'])
+            assert result.exit_code != 0
+
+
+class TestSyncAllCommand:
+    """全平台同步命令测试。"""
+
+    def test_sync_all_help(self, tmp_path):
+        """测试sync-all命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['sync-all', '--help'])
+        assert result.exit_code == 0
+        assert '--message' in result.output
+
+    def test_sync_all_no_changes(self, tmp_path):
+        """测试sync-all无变化情况。"""
+        from src.cli.main import init_command, sync_all_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(sync_all_command, ['--message', 'test: no changes'])
+            assert result.exit_code == 0
+            assert '没有需要提交的本地修改' in result.output or '已提交' in result.output
+
+
+class TestConfigCompatibilityFix:
+    """配置兼容性修复测试。"""
+
+    def test_status_with_project_name_only_in_metadata(self, tmp_path):
+        """测试项目名称仅在metadata中。"""
+        from src.cli.main import init_command, status_command
+        from click.testing import CliRunner
+        import yaml
+        from pathlib import Path
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            state_file = Path('state/project_state.yaml')
+            with open(state_file, 'r') as f:
+                state = yaml.safe_load(f)
+            state['metadata']['project_name'] = 'TestProjectMetadata'
+            with open(state_file, 'w') as f:
+                yaml.dump(state, f)
+            result = runner.invoke(status_command)
+            assert result.exit_code == 0
+            assert 'TestProjectMetadata' in result.output
+
+    def test_status_with_project_info_structure(self, tmp_path):
+        """测试project结构（兼容性）。"""
+        from src.cli.main import init_command, status_command
+        from click.testing import CliRunner
+        import yaml
+        from pathlib import Path
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            state_file = Path('state/project_state.yaml')
+            with open(state_file, 'r') as f:
+                state = yaml.safe_load(f)
+            state['project']['name'] = 'TestProjectFromProject'
+            if 'metadata' in state:
+                state['metadata'].pop('project_name', None)
+            with open(state_file, 'w') as f:
+                yaml.dump(state, f)
+            result = runner.invoke(status_command)
+            assert result.exit_code == 0
+            assert 'TestProjectFromProject' in result.output

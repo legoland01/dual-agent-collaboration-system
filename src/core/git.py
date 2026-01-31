@@ -84,11 +84,44 @@ class GitHelper:
         except GitOperationError:
             return False
     
-    def push(self, message: str) -> None:
+    def push(self, message: str, push_all: bool = False) -> None:
         """提交并推送。"""
         self._run_git_command("add", "-A")
         self._run_git_command("commit", "-m", message)
-        self._run_git_command("push")
+        if push_all:
+            self._run_git_command("push", "--all")
+            self._run_git_command("push", "--tags")
+        else:
+            self._run_git_command("push")
+
+    def push_to_remote(self, remote: str, branches: bool = True, tags: bool = True) -> None:
+        """推送到指定远程仓库。"""
+        if branches:
+            self._run_git_command("push", remote, "--all")
+        if tags:
+            self._run_git_command("push", remote, "--tags")
+
+    def push_all_remotes(self, message: str) -> None:
+        """提交并推送到所有远程仓库（支持 GitHub + Gitee 双同步）。"""
+        self._run_git_command("add", "-A")
+        self._run_git_command("commit", "-m", message)
+        for remote in self.get_all_remotes():
+            self.push_to_remote(remote)
+
+    def add_remote(self, name: str, url: str) -> None:
+        """添加远程仓库。"""
+        self._run_git_command("remote", "add", name, url)
+
+    def get_all_remotes(self) -> List[str]:
+        """获取所有远程仓库名称。"""
+        result = self._run_git_command("remote", "-v")
+        remote_names = set()
+        for line in result.stdout.strip().split('\n'):
+            if line.strip():
+                parts = line.split()
+                if parts:
+                    remote_names.add(parts[0])
+        return list(remote_names)
     
     def create_branch(self, branch_name: str) -> None:
         """创建分支。"""

@@ -12,6 +12,8 @@
 |-----|------|---------|---------|---------|--------|
 | v0.1 | 2026-01-31 | 新建 | 初始化协作框架项目 | 项目启动 | Agent 1 |
 | v1.0 | 2026-01-31 | 发布 | 完成全部开发并测试通过 | 首个稳定版本 | Agent 1 |
+| v1.1 | 2026-01-31 | 功能新增 | 新增多远程仓库管理功能 | 支持 GitHub + Gitee 双同步 | Agent 1 |
+| v1.1 | 2026-01-31 | 缺陷修复 | 修复 status 命令配置兼容性问题 | 提升用户体验 | Agent 1 |
 
 ## 经验教训
 
@@ -50,18 +52,23 @@
 
 ## 功能清单
 
-| 功能模块 | 状态 | 说明 |
-|---------|------|------|
-| 项目初始化 | ✓ 完成 | oc-collab init 命令 |
-| 查看状态 | ✓ 完成 | oc-collab status 命令 |
-| 切换Agent | ✓ 完成 | oc-collab switch 命令 |
-| 需求评审 | ✓ 完成 | oc-collab review 命令 |
-| 设计评审 | ✓ 完成 | oc-collab review 命令 |
-| 签署确认 | ✓ 完成 | oc-collab signoff 命令 |
-| 协作历史 | ✓ 完成 | oc-collab history 命令 |
-| 同步变更 | ✓ 完成 | oc-collab sync 命令 |
-| 项目检测 | ✓ 完成 | 自动识别Python/TS/Mixed |
-| 帮助信息 | ✓ 完成 | oc-collab --help |
+| 功能模块 | 状态 | 版本 | 说明 |
+|---------|------|------|------|
+| 项目初始化 | ✓ 完成 | v1.0 | oc-collab init 命令 |
+| 查看状态 | ✓ 完成 | v1.1 | oc-collab status 命令（支持配置兼容） |
+| 切换Agent | ✓ 完成 | v1.0 | oc-collab switch 命令 |
+| 需求评审 | ✓ 完成 | v1.0 | oc-collab review 命令 |
+| 设计评审 | ✓ 完成 | v1.0 | oc-collab review 命令 |
+| 签署确认 | ✓ 完成 | v1.0 | oc-collab signoff 命令 |
+| 协作历史 | ✓ 完成 | v1.0 | oc-collab history 命令 |
+| 同步变更 | ✓ 完成 | v1.1 | oc-collab sync/sync-all 命令 |
+| 项目检测 | ✓ 完成 | v1.0 | 自动识别Python/TS/Mixed |
+| 帮助信息 | ✓ 完成 | v1.0 | oc-collab --help |
+| 远程仓库管理 | ✓ 完成 | v1.1 | oc-collab remote 命令（GitHub + Gitee） |
+| 一键全平台同步 | ✓ 完成 | v1.1 | oc-collab sync-all 命令 |
+| 自动协作 | ✓ 完成 | v1.0 | oc-collab auto 命令 |
+| 待办事项 | ✓ 完成 | v1.0 | oc-collab todo 命令 |
+| 智能工作流 | ✓ 完成 | v1.0 | oc-collab work 命令 |
 
 ## 签署确认
 - **产品经理**: Agent 1  日期: 2026-01-31

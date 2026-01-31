@@ -90,28 +90,39 @@ def status_command():
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         state = state_manager.load_state()
-        
+
         console.print("\n[bold]项目状态[/bold]")
-        
+
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("项目")
         table.add_column("值")
-        
-        table.add_row("项目名称", state["project"]["name"])
-        table.add_row("项目类型", state["project"]["type"])
-        table.add_row("当前阶段", state["phase"])
-        
+
+        metadata = state.get("metadata", {})
+        project_info = state.get("project", {})
+
+        project_name = metadata.get("project_name") or project_info.get("name", "未配置")
+        project_type = metadata.get("project_type") or project_info.get("type", "未知")
+
+        table.add_row("项目名称", project_name)
+        table.add_row("项目类型", project_type)
+        table.add_row("当前阶段", state.get("phase", "未知"))
+
         active_agent = state_manager.get_active_agent()
-        table.add_row("当前Agent", f"Agent {active_agent} ({state['agents'][active_agent]['role']})")
-        
+        agents = state.get("agents", {})
+        agent_role = agents.get(active_agent, {}).get("role", "未知")
+        table.add_row("当前Agent", f"Agent {active_agent} ({agent_role})")
+
         console.print(table)
-        
+
         console.print("\n[bold]签署状态[/bold]")
         req_status = state_manager.get_signoff_status("requirements")
         console.print(f"需求签署 - 产品经理: {'✓' if req_status['pm_signoff'] else '✗'}, 开发: {'✓' if req_status['dev_signoff'] else '✗'}")
-        
+
     except StateFileNotFoundError:
         click.echo("错误: 未找到项目状态文件，请先初始化项目")
+        sys.exit(1)
+    except KeyError as e:
+        click.echo(f"错误: 状态文件缺少必要字段 '{e}'，请检查配置文件")
         sys.exit(1)
     except Exception as e:
         click.echo(f"错误: {e}")
@@ -342,6 +353,62 @@ def work_command(execute: bool):
         else:
             console.print("  无建议操作")
         
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("remote")
+@click.argument("action", type=click.Choice(["add", "list", "push-all"]))
+@click.argument("name", default=None, required=False)
+@click.argument("url", default=None, required=False)
+def remote_command(action: str, name: str, url: str):
+    """管理远程仓库（支持 GitHub + Gitee 双同步）。"""
+    try:
+        project_path = get_project_path()
+        git_helper = GitHelper(project_path)
+
+        if action == "list":
+            remotes = git_helper.get_all_remotes()
+            console.print("\n[bold]远程仓库列表[/bold]")
+            for remote in remotes:
+                console.print(f"  - {remote}")
+            if not remotes:
+                console.print("  未配置远程仓库")
+
+        elif action == "add":
+            if not name or not url:
+                click.echo("错误: 使用 'oc-collab remote add <名称> <URL>' 添加远程仓库")
+                sys.exit(1)
+            git_helper.add_remote(name, url)
+            click.echo(f"已添加远程仓库 {name}: {url}")
+
+        elif action == "push-all":
+            message = click.prompt("请输入提交信息", default="auto-sync: 更新")
+            git_helper.push_all_remotes(message)
+            remotes = git_helper.get_all_remotes()
+            click.echo(f"已推送到所有远程仓库: {', '.join(remotes)}")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("sync-all")
+@click.option("--message", "-m", default="auto-sync: 更新", help="提交信息")
+def sync_all_command(message: str):
+    """同步到所有远程平台（GitHub + Gitee）。"""
+    try:
+        project_path = get_project_path()
+        git_helper = GitHelper(project_path)
+
+        if git_helper.has_local_changes():
+            git_helper.push_all_remotes(message)
+            remotes = git_helper.get_all_remotes()
+            click.echo(f"已提交并推送到所有平台: {', '.join(remotes)}")
+        else:
+            click.echo("没有需要提交的本地修改")
+
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
