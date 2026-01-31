@@ -18,7 +18,7 @@ design:
 
 test:
   version: "v1"
-  blackbox_cases: 58
+  blackbox_cases: 77
   whitebox_passed: 0
   blackbox_passed: 0
   status: "in_progress"
