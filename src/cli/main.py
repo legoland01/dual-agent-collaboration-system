@@ -1,5 +1,6 @@
 """CLI主入口模块。"""
 import sys
+import subprocess
 from pathlib import Path
 import click
 from rich.console import Console
@@ -233,12 +234,17 @@ def history_command(limit: int):
 @main.command("auto")
 @click.option("--max-iterations", "-n", type=int, default=10, help="最大迭代次数")
 @click.option("--quiet", "-q", is_flag=True, default=False, help="静默模式")
-def auto_command(max_iterations: int, quiet: bool):
+@click.option("--force", "-f", is_flag=True, default=False, help="强制执行，跳过本地变更检查")
+def auto_command(max_iterations: int, quiet: bool, force: bool):
     """自动执行当前任务。"""
     try:
         project_path = get_project_path()
         
         engine = AutoCollaborationEngine(project_path)
+        
+        if force:
+            engine.git_helper._run_git_command = lambda *args, **kwargs: subprocess.CompletedProcess(args, 0, "", "")
+        
         result = engine.run(max_iterations=max_iterations)
         
         if result.get("success"):

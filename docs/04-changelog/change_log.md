@@ -18,6 +18,8 @@
 | v1.2 | 2026-01-31 | 功能新增 | 新增自动文档同步功能 | 代码变更自动更新文档 | Agent 1 |
 | v1.3 | 2026-01-31 | 功能新增 | 新增项目状态自动更新 | 测试/开发状态自动同步 | Agent 1 |
 | v1.3 | 2026-01-31 | 功能新增 | 新增阶段自动推进功能 | 满足条件自动推进阶段 | Agent 1 |
+| v1.4 | 2026-01-31 | 功能新增 | 新增 auto --force 选项 | 强制执行，跳过本地变更检查 | Agent 1 |
+| v1.4 | 2026-01-31 | 功能新增 | 新增 agent_auto_runner.py | Agent 自动执行守护进程 | Agent 1 |
 
 ## 经验教训
 
@@ -70,9 +72,10 @@
 | 帮助信息 | ✓ 完成 | v1.0 | oc-collab --help |
 | 远程仓库管理 | ✓ 完成 | v1.1 | oc-collab remote 命令（GitHub + Gitee） |
 | 一键全平台同步 | ✓ 完成 | v1.1 | oc-collab sync-all 命令 |
-| 自动协作 | ✓ 完成 | v1.0 | oc-collab auto 命令 |
+| 自动协作 | ✓ 完成 | v1.4 | oc-collab auto 命令（新增 --force 选项） |
 | 待办事项 | ✓ 完成 | v1.0 | oc-collab todo 命令 |
 | 智能工作流 | ✓ 完成 | v1.0 | oc-collab work 命令 |
+| Agent自动执行 | ✓ 完成 | v1.4 | agent_auto_runner.py 守护进程 |
 
 ## 签署确认
 - **产品经理**: Agent 1  日期: 2026-01-31
