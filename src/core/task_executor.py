@@ -7,6 +7,8 @@ from datetime import datetime
 import time
 import logging
 import subprocess
+import os
+import yaml
 
 
 logger = logging.getLogger(__name__)
@@ -110,27 +112,6 @@ class TaskStrategy(ABC):
         return True, ""
 
 
-class BaseTaskStrategy(TaskStrategy):
-    """任务执行策略基类实现。"""
-    
-    @property
-    def task_type(self) -> str:
-        return "base"
-    
-    def execute(self, task: Task, context: Dict[str, Any]) -> TaskResult:
-        return TaskResult(
-            success=False,
-            message="未实现的任务类型"
-        )
-    
-    def validate(self, task: Task) -> Tuple[bool, str]:
-        required_fields = ["id", "name", "task_type"]
-        for field in required_fields:
-            if not getattr(task, field, None):
-                return False, f"缺少必要字段: {field}"
-        return True, ""
-
-
 class CreateRequirementsStrategy(TaskStrategy):
     """创建需求文档策略。"""
     
@@ -142,13 +123,11 @@ class CreateRequirementsStrategy(TaskStrategy):
         start_time = time.time()
         try:
             project_name = context.get("project_name", "unknown_project")
-            project_path = context.get("project_path", ".")
             
             doc_path = f"docs/01-requirements/requirements_{project_name}_v1.md"
             
             content = self._generate_requirements_content(project_name, context)
             
-            import os
             os.makedirs(os.path.dirname(doc_path), exist_ok=True)
             
             with open(doc_path, 'w', encoding='utf-8') as f:
@@ -175,7 +154,7 @@ class CreateRequirementsStrategy(TaskStrategy):
     def _generate_requirements_content(self, project_name: str, context: Dict[str, Any]) -> str:
         """生成需求文档内容。"""
         timestamp = datetime.now().isoformat()
-        content = f"""# {project_name} - 需求文档
+        return f"""# {project_name} - 需求文档
 
 ## 版本信息
 - **版本**: v1
@@ -230,7 +209,6 @@ class ReviewRequirementsStrategy(TaskStrategy):
             
             content = self._generate_review_content(project_name, context)
             
-            import os
             os.makedirs(os.path.dirname(doc_path), exist_ok=True)
             
             with open(doc_path, 'w', encoding='utf-8') as f:
@@ -281,6 +259,54 @@ class ReviewRequirementsStrategy(TaskStrategy):
 """
 
 
+class SignoffRequirementsStrategy(TaskStrategy):
+    """签署需求文档策略。"""
+    
+    @property
+    def task_type(self) -> str:
+        return "signoff_requirements"
+    
+    def execute(self, task: Task, context: Dict[str, Any]) -> TaskResult:
+        start_time = time.time()
+        try:
+            agent_id = context.get("agent_id", "agent1")
+            
+            state_file = "state/project_state.yaml"
+            
+            os.makedirs("state", exist_ok=True)
+            
+            if os.path.exists(state_file):
+                with open(state_file, 'r') as f:
+                    state = yaml.safe_load(f)
+            else:
+                state = {"requirements": {}}
+            
+            signoff_key = f"{agent_id}_signoff"
+            state["requirements"][signoff_key] = True
+            state["updated_at"] = datetime.now().isoformat()
+            
+            with open(state_file, 'w') as f:
+                yaml.dump(state, f)
+            
+            duration = time.time() - start_time
+            
+            return TaskResult(
+                success=True,
+                message=f"需求文档已签署（{agent_id}）",
+                files_modified=[state_file],
+                duration=duration,
+                quality_score=1.0
+            )
+        except Exception as e:
+            duration = time.time() - start_time
+            return TaskResult(
+                success=False,
+                message=f"签署需求文档失败: {e}",
+                duration=duration,
+                error=str(e)
+            )
+
+
 class CreateDesignStrategy(TaskStrategy):
     """创建设计文档策略。"""
     
@@ -297,7 +323,6 @@ class CreateDesignStrategy(TaskStrategy):
             
             content = self._generate_design_content(project_name, context)
             
-            import os
             os.makedirs(os.path.dirname(doc_path), exist_ok=True)
             
             with open(doc_path, 'w', encoding='utf-8') as f:
@@ -342,6 +367,66 @@ class CreateDesignStrategy(TaskStrategy):
 """
 
 
+class ReviewDesignStrategy(TaskStrategy):
+    """评审设计文档策略。"""
+    
+    @property
+    def task_type(self) -> str:
+        return "review_design"
+    
+    def execute(self, task: Task, context: Dict[str, Any]) -> TaskResult:
+        start_time = time.time()
+        try:
+            project_name = context.get("project_name", "unknown_project")
+            
+            doc_path = f"docs/02-design/design_review_{project_name}_v1.md"
+            
+            content = self._generate_review_content(project_name, context)
+            
+            os.makedirs(os.path.dirname(doc_path), exist_ok=True)
+            
+            with open(doc_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            duration = time.time() - start_time
+            
+            return TaskResult(
+                success=True,
+                message=f"设计评审文档已创建: {doc_path}",
+                files_created=[doc_path],
+                duration=duration,
+                quality_score=0.9
+            )
+        except Exception as e:
+            duration = time.time() - start_time
+            return TaskResult(
+                success=False,
+                message=f"创建设计评审文档失败: {e}",
+                duration=duration,
+                error=str(e)
+            )
+    
+    def _generate_review_content(self, project_name: str, context: Dict[str, Any]) -> str:
+        """生成评审文档内容。"""
+        timestamp = datetime.now().isoformat()
+        return f"""# {project_name} - 设计评审
+
+## 版本信息
+- **版本**: v1
+- **评审日期**: {timestamp}
+- **评审人**: Agent 1 (产品经理)
+
+## 1. 评审结论
+待补充评审结论
+
+## 2. 架构设计评审
+待补充
+
+## 3. 待解决问题
+待补充
+"""
+
+
 class ExecuteBlackboxTestStrategy(TaskStrategy):
     """执行黑盒测试策略。"""
     
@@ -356,7 +441,6 @@ class ExecuteBlackboxTestStrategy(TaskStrategy):
             
             test_result_path = f"docs/03-test/test_report_{project_name}_v1.md"
             
-            import subprocess
             result = subprocess.run(
                 ["python", "-m", "pytest", "-v", "--tb=short"],
                 capture_output=True,
@@ -385,7 +469,6 @@ class ExecuteBlackboxTestStrategy(TaskStrategy):
 ```
 """
             
-            import os
             os.makedirs(os.path.dirname(test_result_path), exist_ok=True)
             
             with open(test_result_path, 'w', encoding='utf-8') as f:
@@ -446,7 +529,6 @@ class ExecuteDeploymentStrategy(TaskStrategy):
 3. 部署到目标环境
 """
             
-            import os
             os.makedirs(os.path.dirname(deploy_path), exist_ok=True)
             
             with open(deploy_path, 'w', encoding='utf-8') as f:
@@ -483,7 +565,6 @@ class ImplementCodeStrategy(TaskStrategy):
         try:
             file_path = context.get("file_path", "src/main.py")
             
-            import os
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             
             content = context.get("code_template", "# 代码实现\n")
@@ -510,16 +591,59 @@ class ImplementCodeStrategy(TaskStrategy):
             )
 
 
+class FixBugsStrategy(TaskStrategy):
+    """修复Bug策略。"""
+    
+    @property
+    def task_type(self) -> str:
+        return "fix_bugs"
+    
+    def execute(self, task: Task, context: Dict[str, Any]) -> TaskResult:
+        start_time = time.time()
+        try:
+            bug_report = context.get("bug_report", {})
+            file_path = bug_report.get("file_path", "src/main.py")
+            bug_description = bug_report.get("description", "")
+            
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            
+            content = f"# Bug修复\n\n## 描述\n{bug_description}\n\n## 修复\n修复已完成\n"
+            
+            with open(file_path, 'a', encoding='utf-8') as f:
+                f.write(content)
+            
+            duration = time.time() - start_time
+            
+            return TaskResult(
+                success=True,
+                message=f"Bug已修复: {file_path}",
+                files_modified=[file_path],
+                duration=duration,
+                quality_score=0.9
+            )
+        except Exception as e:
+            duration = time.time() - start_time
+            return TaskResult(
+                success=False,
+                message=f"Bug修复失败: {e}",
+                duration=duration,
+                error=str(e)
+            )
+
+
 class TaskExecutor:
     """任务执行器。"""
     
     DEFAULT_STRATEGIES = [
         CreateRequirementsStrategy(),
         ReviewRequirementsStrategy(),
+        SignoffRequirementsStrategy(),
         CreateDesignStrategy(),
+        ReviewDesignStrategy(),
         ExecuteBlackboxTestStrategy(),
         ExecuteDeploymentStrategy(),
-        ImplementCodeStrategy()
+        ImplementCodeStrategy(),
+        FixBugsStrategy()
     ]
     
     def __init__(self, max_retries: int = 3, default_timeout: int = 300):

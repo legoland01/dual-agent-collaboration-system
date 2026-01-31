@@ -136,15 +136,6 @@ class BrainEngine:
                 description="当阶段为project_init时，创建需求文档"
             ),
             Rule(
-                id="agent1-review-requirements",
-                name="评审需求文档",
-                agent_type=AgentType.AGENT_1,
-                conditions=[Condition("phase_equals", {"value": "requirements_review"})],
-                action=ActionType.REVIEW_REQUIREMENTS,
-                priority=90,
-                description="当阶段为requirements_review时，评审需求文档"
-            ),
-            Rule(
                 id="agent1-signoff-requirements",
                 name="签署需求文档",
                 agent_type=AgentType.AGENT_1,
@@ -153,7 +144,7 @@ class BrainEngine:
                     Condition("signoff_complete", {"stage": "requirements"})
                 ],
                 action=ActionType.SIGNOFF_REQUIREMENTS,
-                priority=85,
+                priority=90,
                 description="当阶段为requirements_review且双方签署后，签署需求"
             ),
             Rule(
@@ -193,6 +184,18 @@ class BrainEngine:
                 action=ActionType.REVIEW_REQUIREMENTS,
                 priority=100,
                 description="当阶段为requirements_draft时，评审需求文档"
+            ),
+            Rule(
+                id="agent2-signoff-requirements",
+                name="签署需求文档",
+                agent_type=AgentType.AGENT_2,
+                conditions=[
+                    Condition("phase_equals", {"value": "requirements_review"}),
+                    Condition("signoff_complete", {"stage": "requirements"})
+                ],
+                action=ActionType.SIGNOFF_REQUIREMENTS,
+                priority=95,
+                description="当阶段为requirements_review且双方签署后，签署需求"
             ),
             Rule(
                 id="agent2-create-design",
