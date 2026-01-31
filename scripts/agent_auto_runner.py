@@ -38,10 +38,10 @@ class AgentAutoRunner:
     def run_auto_command(self) -> bool:
         """执行 oc-collab auto 命令"""
         try:
-            logger.info("执行 oc-collab auto...")
+            logger.info("执行 oc-collab auto --force...")
             
             result = subprocess.run(
-                ["python3", "-m", "src.cli.main", "auto", "--max-iterations", "3"],
+                ["oc-collab", "auto", "--force", "--max-iterations", "3"],
                 cwd=str(self.project_path),
                 capture_output=True,
                 text=True,
@@ -68,6 +68,45 @@ class AgentAutoRunner:
         """检查是否应该执行"""
         state_file = self.project_path / "state" / "project_state.yaml"
         if not state_file.exists():
+            return False
+
+        try:
+            import yaml
+            with open(state_file, 'r') as f:
+                state = yaml.safe_load(f)
+
+            if not state:
+                return False
+
+            phase = state.get('phase', '')
+            test = state.get('test', {})
+            dev = state.get('development', {})
+            deploy = state.get('deployment', {})
+
+            # 如果项目未完成，就应该执行
+            if phase == "completed":
+                return False
+
+            # testing 阶段：测试未完成，应该执行
+            if phase == "testing":
+                if test.get('status') != 'passed':
+                    return True
+
+            # development 阶段：开发未完成，应该执行
+            if phase == "development":
+                if dev.get('status') != 'completed':
+                    return True
+
+            # deployment 阶段：部署未完成，应该执行
+            if phase == "deployment":
+                if deploy.get('status') != 'completed':
+                    return True
+
+            # 其他阶段都应该执行
+            return True
+
+        except Exception as e:
+            logger.warning(f"检查状态失败: {e}")
             return False
 
         try:

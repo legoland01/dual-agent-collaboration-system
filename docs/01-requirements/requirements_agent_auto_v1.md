@@ -84,14 +84,18 @@ oc-collab auto [OPTIONS]
 Options:
   --max-iterations, -n  最大迭代次数（默认 10）
   --quiet, -q           静默模式
-  --force, -f           强制执行，跳过本地变更检查
+  --force, -f           强制执行，跳过本地变更检查（重要！）
 ```
+
+**注意**：`--force` 选项用于守护进程场景，跳过本地变更检查。
 
 ### 3.2 守护进程脚本
 
 ```bash
-# 启动
-python3 scripts/agent_auto_runner.py --path /path/to/project --interval 60
+# 启动（每30秒检查一次）
+nohup python3 scripts/agent_auto_runner.py \
+    --path /path/to/project \
+    --interval 30 > /tmp/agent_auto.log 2>&1 &
 
 # 停止
 pkill -f agent_auto_runner.py
@@ -99,6 +103,16 @@ pkill -f agent_auto_runner.py
 # 查看日志
 tail -f /tmp/agent_auto.log
 ```
+
+### 3.3 自动执行的行为
+
+| 阶段 | 自动执行的内容 | 手动执行的内容 |
+|------|--------------|--------------|
+| testing | - 自动检查阶段推进条件<br>- 条件满足时自动推进阶段 | - 执行黑盒测试<br>- 修复测试发现的问题 |
+| development | - 自动执行分配的任务<br>- 自动同步 Git | - 编写代码<br>- 实现功能 |
+| deployment | - 自动检查阶段推进条件 | - 部署操作<br>- 版本发布 |
+
+**关键点**：守护进程会定期执行 `oc-collab auto --force`，但只会自动处理状态推进和签署，无法自动修复代码或执行测试。
 
 ---
 
