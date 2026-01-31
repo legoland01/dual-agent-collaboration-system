@@ -1,9 +1,10 @@
 deployment:
   status: pending
 design:
-  dev_signoff: true
+  dev_signoff: false
   pm_signoff: false
-  status: review
+  status: draft
+  version: "v1"
 development:
   status: pending
 history:
