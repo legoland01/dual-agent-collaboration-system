@@ -1,28 +1,29 @@
-phase: project_init
+phase: design_draft
 
 requirements:
   version: "v2"
-  pm_signoff: false
-  dev_signoff: false
-  status: "draft"
+  pm_signoff: true
+  dev_signoff: true
+  status: "approved"
   last_updated: "2026-01-31"
-  review_cycles: 0
+  review_cycles: 1
   review_type: "fully_automated"
 
 design:
   version: ""
   pm_signoff: false
   dev_signoff: false
-  status: pending
-  last_updated: ""
+  status: "in_progress"
+  last_updated: "2026-01-31"
 
 test:
-  version: ""
-  blackbox_cases: 0
+  version: "v1"
+  blackbox_cases: 58
   whitebox_passed: 0
   blackbox_passed: 0
-  status: pending
-  last_updated: ""
+  status: "in_progress"
+  last_updated: "2026-01-31"
+  test_type: "blackbox"
 
 development:
   status: not_started
