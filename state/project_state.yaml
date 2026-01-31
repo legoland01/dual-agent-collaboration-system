@@ -1,13 +1,13 @@
 phase: requirements_review
 
 requirements:
-  version: "v1"
+  version: "v2"
   pm_signoff: true
-  dev_signoff: false
-  status: pending_dev_review
+  dev_signoff: true
+  status: approved
   last_updated: "2026-01-31"
-  review_cycles: 1
-  current_review_cycle: 1
+  review_cycles: 2
+  current_review_cycle: 2
 
 design:
   version: ""

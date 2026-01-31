@@ -1,10 +1,11 @@
 # 双Agent协作框架 - 系统设计
 
 ## 版本信息
-- **版本**: v1
-- **关联需求版本**: v1
+- **版本**: v2（根据 Agent 2 评审意见更新）
+- **关联需求版本**: v2
 - **创建日期**: 2026-01-31
 - **作者**: Agent 1 (产品经理)
+- **更新日期**: 2026-01-31
 
 ## 1. 系统架构
 
@@ -116,17 +117,53 @@ project_init
 
 **分支策略**：
 ```
-main
-├── requirements-v1     (需求版本标签)
-├── design-v1           (设计版本标签)
-├── test-v1-passed      (测试通过标签)
-└── release-v1.0.0      (发布标签)
-
-feature/*              (功能开发分支)
-requirements-review-*  (需求评审分支)
-design-review-*        (设计评审分支)
-fix/*                  (修复分支)
+main (主分支，长期存在)
+│
+├─ feature/*              (功能开发分支，从 main 创建)
+│   ├─ feature/cli-commands
+│   └─ feature/state-manager
+│
+├─ requirements-review-*  (需求评审分支)
+│   ├─ requirements-review-1
+│   └─ requirements-review-2
+│
+├─ design-review-*        (设计评审分支)
+│   ├─ design-review-1
+│   └─ design-review-2
+│
+└─ fix/*                  (修复分支，从 main 创建)
+    ├─ fix/correct-spelling
+    └─ fix/resolve-conflict
 ```
+
+**标签策略**（语义化版本）：
+
+| 阶段 | 标签格式 | 示例 | 说明 |
+|-----|---------|------|------|
+| 需求确认 | `requirements-v{版本}` | `requirements-v1` | 需求评审通过 |
+| 设计确认 | `design-v{版本}` | `design-v1` | 设计评审通过 |
+| 测试通过 | `test-v{版本}` | `test-v1` | 测试用例全部通过 |
+| 发布版本 | `v{主版本}.{次版本}.{修订版本}` | `v1.0.0` | 正式发布版本 |
+| 预发布 | `v{版本}-{预发布标签}` | `v1.0.0-rc1` | 候选发布版本 |
+
+**版本号规则**：
+- **主版本 (MAJOR)**: 不兼容的重大变更
+- **次版本 (MINOR)**: 向后兼容的功能新增
+- **修订版本 (PATCH)**: 向后兼容的问题修复
+
+**签署确认标签**：
+当某一阶段双方签署确认后，创建对应的里程碑标签，如：
+```bash
+git tag requirements-v1
+git tag design-v1
+git tag test-v1
+```
+
+**Git 操作安全机制**：
+1. 所有关键操作前强制执行 `git pull`
+2. 检测到本地修改时，提示用户先提交或暂存
+3. 冲突检测：Git pull 后检查状态，如有冲突提示用户解决
+4. 降级方案：当 GitPython 不可用时，使用 subprocess 调用 git 命令
 
 ## 3. 数据设计
 
@@ -212,32 +249,63 @@ deployment:
 - 依赖 Git 仓库的访问控制
 - 支持私有仓库
 
+### 4.3 审计日志
+记录所有关键操作，便于追溯：
+
+| 操作类型 | 记录内容 | 示例 |
+|---------|---------|------|
+| 状态变更 | 操作人、时间、新状态 | "Agent 1 将状态从 draft 改为 review" |
+| 签署操作 | 签署人、时间、阶段 | "Agent 2 签署需求确认" |
+| 文件修改 | 操作人、时间、文件 | "Agent 1 更新 requirements_v1.md" |
+| Git 操作 | 操作人、时间、操作 | "Agent 1 git push 到 main" |
+
+审计日志存储位置：`docs/04-changelog/audit_log.md`
+
 ## 5. 部署方案
 
-### 5.1 部署模式
-- 本地开发环境
-- CI/CD 环境
-
-### 5.2 安装方式
-```bash
-# 方式1: pip 安装
-pip install opencode-collaboration
-
-# 方式2: 源码安装
-git clone <repo>
-cd opencode-collaboration
-pip install -e .
+### 5.1 部署流程
+```
+测试通过 (test-v1)
+    │
+    ├─> 创建发布分支 (release/v1.0.0)
+    │         │
+    │         ├─> 最后的修复和完善
+    │         │
+    ├─> 合并到 main
+    │         │
+    │         └─> 打标签 (v1.0.0)
+    │
+    └─> 创建 GitHub Release
 ```
 
-## 6. 未来扩展
+### 5.2 部署检查清单
+- [ ] 所有测试用例通过
+- [ ] 双方签署确认完成
+- [ ] 文档更新完成
+- [ ] 版本号更新
+- [ ] CHANGELOG 更新
 
-### 6.1 计划中的功能
+### 5.3 部署模式
+- **本地开发环境**: 直接使用源码
+- **pip 安装**: `pip install opencode-collaboration`
+- **CI/CD 环境**: 通过 GitHub Actions 自动构建和测试
+
+## 6. 变更历史
+
+| 版本 | 日期 | 变更内容 | 变更人 |
+|-----|------|---------|--------|
+| v1 | 2026-01-31 | 初始版本 | Agent 1 |
+| v2 | 2026-01-31 | 补充分支/标签策略、Git安全机制、审计日志 | Agent 1 |
+
+## 7. 未来扩展
+
+### 7.1 计划中的功能
 - Web UI 管理界面
 - 通知集成（邮件、Slack、飞书）
 - AI 辅助生成测试用例
 - 模板市场
 
-### 6.2 扩展点
+### 7.2 扩展点
 - 插件系统支持自定义工作流
 - 多语言支持
 - 导出报告功能
