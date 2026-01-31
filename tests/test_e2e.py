@@ -389,7 +389,7 @@ class TestStateMachineIntegration:
 
 
 class TestBrainEngineIntegration:
-    """脑引擎集成测试。"""
+    """脑引擎集成测试类。"""
 
     def test_brain_engine_initialization(self, tmp_path):
         """测试脑引擎初始化。"""
@@ -403,7 +403,7 @@ class TestBrainEngineIntegration:
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('产品经理', 'project_init')
+        action, rule = engine.get_action('agent1', 'project_init')
         assert action is not None
 
     def test_get_action_agent2(self, tmp_path):
@@ -411,7 +411,7 @@ class TestBrainEngineIntegration:
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('开发', 'project_init')
+        action, rule = engine.get_action('agent2', 'project_init')
         assert action is not None
 
 
@@ -436,27 +436,29 @@ class TestTaskExecutorIntegration:
 
 
 class TestDocGeneratorIntegration:
-    """文档生成器集成测试。"""
+    """文档生成器集成测试类。"""
 
     def test_doc_generator_initialization(self, tmp_path):
         """测试文档生成器初始化。"""
         from src.core.doc_generator import DocGenerator
 
-        generator = DocGenerator()
-        assert generator is not None
+        with tempfile.TemporaryDirectory() as td:
+            generator = DocGenerator(td)
+            assert generator is not None
 
     def test_generate_requirements_document(self, tmp_path):
         """测试生成需求文档。"""
         from src.core.doc_generator import DocGenerator
 
         with tempfile.TemporaryDirectory() as td:
-            generator = DocGenerator()
+            generator = DocGenerator(td)
             context = {
                 'project_name': 'TestProject',
                 'project_type': 'PYTHON',
                 'timestamp': datetime.now().isoformat()
             }
-            doc_path = generator.generate_requirements(td, context)
+            success, doc_path = generator.generate_document('requirements', context, 'TestProject', 'v1')
+            assert success
             assert Path(doc_path).exists()
 
 
@@ -581,12 +583,12 @@ class TestFullWorkflowIntegration:
         sm.transition_to(State.REQUIREMENTS_DRAFT)
         sm.transition_to(State.REQUIREMENTS_REVIEW)
 
-        history = sm.get_history()
+        history = sm.history
         assert len(history) == 2
 
     def test_workflow_state_info(self, tmp_path):
         """测试工作流状态信息。"""
-        from src.core.state_machine import StateMachine
+        from src.core.state_machine import StateMachine, State
 
         sm = StateMachine()
         info = sm.STATE_INFO[State.PROJECT_INIT]
@@ -750,55 +752,67 @@ class TestStatePersistence:
 
 
 class TestAgentBehaviorRules:
-    """Agent行为规则测试。"""
+    """Agent行为规则测试类。"""
 
     def test_agent1_create_requirements(self, tmp_path):
         """测试Agent 1创建需求。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('产品经理', 'project_init')
-        assert action.value in ['create_requirements', 'wait']
+        action, rule = engine.get_action('agent1', 'project_init')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['create_requirements', 'wait']
 
     def test_agent1_signoff_requirements(self, tmp_path):
         """测试Agent 1签署需求。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('产品经理', 'requirements_review')
-        assert action.value in ['signoff_requirements', 'wait']
+        action, rule = engine.get_action('agent1', 'requirements_review')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['signoff_requirements', 'wait']
 
     def test_agent1_review_design(self, tmp_path):
         """测试Agent 1评审设计。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('产品经理', 'design_review')
-        assert action.value in ['review_design', 'wait']
+        action, rule = engine.get_action('agent1', 'design_review')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['review_design', 'wait']
 
     def test_agent2_review_requirements(self, tmp_path):
         """测试Agent 2评审需求。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('开发', 'requirements_draft')
-        assert action.value in ['review_requirements', 'wait']
+        action, rule = engine.get_action('agent2', 'requirements_draft')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['review_requirements', 'wait']
 
     def test_agent2_create_design(self, tmp_path):
         """测试Agent 2创建设计。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('开发', 'requirements_approved')
-        assert action.value in ['create_design', 'wait']
+        action, rule = engine.get_action('agent2', 'requirements_approved')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['create_design', 'wait']
 
     def test_agent2_implement_code(self, tmp_path):
         """测试Agent 2实现代码。"""
         from src.core.brain_engine import BrainEngine
 
         engine = BrainEngine()
-        action, rule = engine.get_action('开发', 'development')
-        assert action.value in ['implement_code', 'wait']
+        action, rule = engine.get_action('agent2', 'design_approved')
+        assert action is not None
+        action_value = action.value if action else 'wait'
+        assert action_value in ['implement_code', 'wait']
 
 
 class TestNotificationSystem:
