@@ -1,0 +1,36 @@
+phase: requirements_review
+
+requirements:
+  version: "v1"
+  pm_signoff: true
+  dev_signoff: false
+  status: pending_dev_review
+  last_updated: "2026-01-31"
+  review_cycles: 1
+  current_review_cycle: 1
+
+design:
+  version: ""
+  pm_signoff: false
+  dev_signoff: false
+  status: pending
+  last_updated: ""
+
+test:
+  version: ""
+  blackbox_cases: 0
+  whitebox_passed: 0
+  blackbox_passed: 0
+  status: pending
+  last_updated: ""
+
+development:
+  status: not_started
+  branch: ""
+  last_updated: ""
+
+metadata:
+  project_name: "双Agent协作框架"
+  created_date: "2026-01-31"
+  last_updated: "2026-01-31"
+  current_agent: "1"
