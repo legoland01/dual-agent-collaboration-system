@@ -277,59 +277,87 @@ def auto_command(max_iterations: int, quiet: bool, force: bool):
 
 
 @main.command("agent")
-@click.option("--interval", "-i", type=int, default=5, help="检查间隔（秒）")
+@click.option("--interval", "-i", type=int, default=30, help="检查间隔（秒）")
 @click.option("--daemon/--no-daemon", "-d", default=False, help="后台守护进程模式")
-def agent_command(interval: int, daemon: bool):
-    """Agent 调度器 - 双 Agent 交替工作守护进程。
-    
+@click.option("--supervise", "-s", is_flag=True, default=False, help="监管模式（自动重启）")
+@click.option("--status", is_flag=True, default=False, help="查看守护进程状态")
+@click.option("--stop", is_flag=True, default=False, help="停止守护进程")
+def agent_command(interval: int, daemon: bool, supervise: bool, status: bool, stop: bool):
+    """Agent 守护进程 - 双 Agent 交替工作守护进程。
+
     启动真正的双 Agent 交替工作：
     - Agent 1 (产品经理) 和 Agent 2 (开发) 真正交替执行任务
     - 自动检测状态并执行相应操作
     - 自动推进阶段
+    - 支持后台模式和监管模式
     """
+    from ..core.daemon import AgentDaemon, ProcessExistsError
+    from ..core.supervisor import ProcessSupervisor
+
     try:
         project_path = get_project_path()
-        
-        if daemon:
-            import os
-            import signal
-            
-            def daemonize():
-                """将进程转为后台守护进程"""
-                # 第一次 fork
-                pid = os.fork()
-                if pid > 0:
-                    sys.exit(0)
-                
-                # 创建新会话
-                os.setsid()
-                
-                # 第二次 fork
-                pid = os.fork()
-                if pid > 0:
-                    sys.exit(0)
-                
-                # 重定向标准文件描述符
-                sys.stdout.flush()
-                sys.stderr.flush()
-                with open('/dev/null', 'r') as devnull:
-                    os.dup2(devnull.fileno(), sys.stdin.fileno())
-                with open('/dev/null', 'a+') as devnull:
-                    os.dup2(devnull.fileno(), sys.stdout.fileno())
-                    os.dup2(devnull.fileno(), sys.stderr.fileno())
-                
-                # 启动 Agent 调度器
+
+        if status:
+            daemon_mgr = AgentDaemon(project_path)
+            daemon_status = daemon_mgr.get_status()
+            console.print("\n[bold]守护进程状态[/bold]")
+            from rich.table import Table
+            table = Table(show_header=False)
+            table.add_column("项目")
+            table.add_column("值")
+            table.add_row("运行中", "✓" if daemon_status["running"] else "✗")
+            if daemon_status.get("pid"):
+                table.add_row("PID", str(daemon_status["pid"]))
+            if daemon_status.get("log_lines"):
+                table.add_row("日志行数", str(daemon_status["log_lines"]))
+            console.print(table)
+            return
+
+        if stop:
+            daemon_mgr = AgentDaemon(project_path)
+            if daemon_mgr.stop():
+                click.echo("守护进程已停止")
+            else:
+                click.echo("守护进程停止失败或未运行")
+            return
+
+        if supervise:
+            supervisor = ProcessSupervisor(project_path)
+
+            def main_func():
                 run_scheduler(project_path, interval)
-            
-            click.echo(f"启动 Agent 守护进程 (间隔: {interval}秒)...")
-            click.echo(f"PID: {os.getpid()}")
-            click.echo("使用 'pkill -f oc-collab agent' 停止")
-            daemonize()
-        
+
+            click.echo(f"启动 Agent 监管模式 (间隔: {interval}秒)...")
+            click.echo("按 Ctrl+C 停止")
+            result = supervisor.start(main_func)
+            if result["success"]:
+                click.echo(f"监管进程正常退出")
+            else:
+                click.echo(f"监管进程退出 - 错误: {result.get('error')}")
+            click.echo(f"重启次数: {result['total_restarts']}")
+            return
+
+        if daemon:
+            from ..core.state_manager import StateManager
+            state_manager = StateManager(project_path)
+
+            def main_loop():
+                run_scheduler(project_path, interval)
+
+            daemon_mgr = AgentDaemon(project_path)
+            try:
+                pid = daemon_mgr.daemonize(main_loop)
+                click.echo(f"守护进程已启动 (PID: {pid})")
+                click.echo(f"日志: {daemon_mgr.log_file}")
+                click.echo("使用 'oc-collab agent --status' 查看状态")
+                click.echo("使用 'oc-collab agent --stop' 停止")
+            except ProcessExistsError as e:
+                click.echo(f"错误: {e}")
+                sys.exit(1)
         else:
             click.echo("启动 Agent 调度器 (按 Ctrl+C 停止)...")
             run_scheduler(project_path, interval)
-    
+
     except KeyboardInterrupt:
         click.echo("\n已停止 Agent 调度器")
     except Exception as e:

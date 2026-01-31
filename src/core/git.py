@@ -1,7 +1,8 @@
 """Git集成模块。"""
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
+from dataclasses import dataclass
 
 
 class GitError(Exception):
@@ -29,32 +30,94 @@ class GitConflictError(GitError):
     pass
 
 
+class GitTimeoutError(GitError):
+    """Git操作超时异常。"""
+    pass
+
+
+@dataclass
+class GitTimeoutConfig:
+    """Git超时配置。"""
+    status: float = 10.0
+    add: float = 5.0
+    commit: float = 10.0
+    push: float = 60.0
+    pull: float = 30.0
+    log: float = 10.0
+    diff: float = 10.0
+    default: float = 10.0
+
+
 class GitHelper:
     """Git操作助手。"""
-    
-    def __init__(self, project_path: str):
-        """初始化Git助手。"""
+
+    DEFAULT_TIMEOUTS = {
+        'status': 10.0,
+        'add': 5.0,
+        'commit': 10.0,
+        'push': 60.0,
+        'pull': 30.0,
+        'log': 10.0,
+        'diff': 10.0
+    }
+
+    def __init__(
+        self,
+        project_path: str,
+        timeouts: Optional[Dict[str, float]] = None
+    ):
+        """初始化Git助手。
+
+        Args:
+            project_path: 项目路径
+            timeouts: 超时配置（可选）
+        """
         self.project_path = Path(project_path)
+        self.timeouts = {**self.DEFAULT_TIMEOUTS, **(timeouts or {})}
         self._ensure_git_installed()
-    
+
     def _ensure_git_installed(self) -> None:
         """检查Git是否已安装。"""
         try:
             subprocess.run(["git", "--version"], check=True, capture_output=True)
         except (subprocess.CalledProcessError, FileNotFoundError):
             raise GitNotInstalledError("Git未安装或无法访问")
-    
-    def _run_git_command(self, *args, check: bool = True) -> subprocess.CompletedProcess:
-        """运行Git命令。"""
+
+    def _run_git_command(
+        self,
+        *args,
+        check: bool = True,
+        timeout: Optional[float] = None
+    ) -> subprocess.CompletedProcess:
+        """运行Git命令。
+
+        Args:
+            *args: Git命令参数
+            check: 是否检查返回码
+            timeout: 超时时间（秒）
+
+        Returns:
+            subprocess.CompletedProcess: 命令执行结果
+
+        Raises:
+            GitTimeoutError: 命令超时
+            GitOperationError: 命令执行失败
+        """
+        if timeout is None:
+            timeout = self.timeouts.get('default', 10.0)
+
         try:
             result = subprocess.run(
                 ["git"] + list(args),
                 cwd=str(self.project_path),
                 capture_output=True,
                 text=True,
-                check=check
+                check=check,
+                timeout=timeout
             )
             return result
+        except subprocess.TimeoutExpired:
+            raise GitTimeoutError(f"Git命令超时 ({timeout}s): git {' '.join(args)}")
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr.strip() if e.stderr else str(e)
             if "conflict" in error_msg.lower():
@@ -75,36 +138,38 @@ class GitHelper:
             self._run_git_command("init")
     
     def pull(self) -> bool:
-        """拉取远程变更。"""
+        """拉取远程变更（带超时）。"""
         try:
-            self._run_git_command("pull")
+            self._run_git_command("pull", timeout=self.timeouts.get('pull', 30.0))
             return True
         except GitConflictError:
             raise
+        except GitTimeoutError:
+            raise
         except GitOperationError:
             return False
-    
+
     def push(self, message: str, push_all: bool = False) -> None:
-        """提交并推送。"""
-        self._run_git_command("add", "-A")
-        self._run_git_command("commit", "-m", message)
+        """提交并推送（带超时）。"""
+        self._run_git_command("add", "-A", timeout=self.timeouts.get('add', 5.0))
+        self._run_git_command("commit", "-m", message, timeout=self.timeouts.get('commit', 10.0))
         if push_all:
-            self._run_git_command("push", "--all")
-            self._run_git_command("push", "--tags")
+            self._run_git_command("push", "--all", timeout=self.timeouts.get('push', 60.0))
+            self._run_git_command("push", "--tags", timeout=self.timeouts.get('push', 60.0))
         else:
-            self._run_git_command("push")
+            self._run_git_command("push", timeout=self.timeouts.get('push', 60.0))
 
     def push_to_remote(self, remote: str, branches: bool = True, tags: bool = True) -> None:
-        """推送到指定远程仓库。"""
+        """推送到指定远程仓库（带超时）。"""
         if branches:
-            self._run_git_command("push", remote, "--all")
+            self._run_git_command("push", remote, "--all", timeout=self.timeouts.get('push', 60.0))
         if tags:
-            self._run_git_command("push", remote, "--tags")
+            self._run_git_command("push", remote, "--tags", timeout=self.timeouts.get('push', 60.0))
 
     def push_all_remotes(self, message: str) -> None:
-        """提交并推送到所有远程仓库（支持 GitHub + Gitee 双同步）。"""
-        self._run_git_command("add", "-A")
-        self._run_git_command("commit", "-m", message)
+        """提交并推送到所有远程仓库（带超时）。"""
+        self._run_git_command("add", "-A", timeout=self.timeouts.get('add', 5.0))
+        self._run_git_command("commit", "-m", message, timeout=self.timeouts.get('commit', 10.0))
         for remote in self.get_all_remotes():
             self.push_to_remote(remote)
 
@@ -160,28 +225,28 @@ class GitHelper:
             return None
     
     def has_local_changes(self) -> bool:
-        """检查是否有未提交的本地修改。"""
-        result = self._run_git_command("status", "--porcelain", check=False)
+        """检查是否有未提交的本地修改（带超时）。"""
+        result = self._run_git_command("status", "--porcelain", check=False, timeout=self.timeouts.get('status', 10.0))
         return bool(result.stdout.strip())
-    
+
     def get_commit_hash(self, branch: str = "HEAD") -> str:
-        """获取提交哈希。"""
-        result = self._run_git_command("rev-parse", branch)
+        """获取提交哈希（带超时）。"""
+        result = self._run_git_command("rev-parse", branch, timeout=self.timeouts.get('log', 10.0))
         return result.stdout.strip()
-    
+
     def get_commit_message(self, commit_hash: str = "HEAD") -> str:
-        """获取提交信息。"""
-        result = self._run_git_command("log", "-1", "--format=%s", commit_hash)
+        """获取提交信息（带超时）。"""
+        result = self._run_git_command("log", "-1", "--format=%s", commit_hash, timeout=self.timeouts.get('log', 10.0))
         return result.stdout.strip()
-    
+
     def get_all_branches(self) -> List[str]:
-        """获取所有本地分支。"""
-        result = self._run_git_command("branch", "--list")
+        """获取所有本地分支（带超时）。"""
+        result = self._run_git_command("branch", "--list", timeout=self.timeouts.get('log', 10.0))
         return [line.strip() for line in result.stdout.strip().split('\n') if line.strip()]
-    
+
     def get_all_tags(self) -> List[str]:
-        """获取所有标签。"""
-        result = self._run_git_command("tag", "-l")
+        """获取所有标签（带超时）。"""
+        result = self._run_git_command("tag", "-l", timeout=self.timeouts.get('log', 10.0))
         return [line.strip() for line in result.stdout.strip().split('\n') if line.strip()]
     
     def delete_branch(self, branch_name: str) -> None:
