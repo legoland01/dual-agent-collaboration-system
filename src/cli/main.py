@@ -4,12 +4,16 @@ from pathlib import Path
 import click
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
 
 from ..core.state_manager import StateManager, StateFileNotFoundError
 from ..core.detector import detect_project_type
 from ..core.git import GitHelper, GitNotInstalledError
 from ..core.workflow import WorkflowEngine
 from ..core.signoff import SignoffEngine
+from ..core.auto_engine import AutoCollaborationEngine, TodoCommandExecutor, WorkCommandExecutor
+from ..utils.lock import LockExistsError
 
 
 console = Console()
@@ -228,6 +232,116 @@ def sync_command():
         else:
             click.echo("同步失败")
             
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("auto")
+@click.option("--max-iterations", "-n", type=int, default=10, help="最大迭代次数")
+@click.option("--quiet", "-q", is_flag=True, default=False, help="静默模式")
+def auto_command(max_iterations: int, quiet: bool):
+    """自动执行当前任务。"""
+    try:
+        project_path = get_project_path()
+        
+        engine = AutoCollaborationEngine(project_path)
+        result = engine.run(max_iterations=max_iterations)
+        
+        if result.get("success"):
+            phase = result.get("current_phase", "unknown")
+            iterations = result.get("total_iterations", 0)
+            
+            if not quiet:
+                console.print(Panel(
+                    Text(f"自动协作执行完成\n当前阶段: {phase}\n执行轮次: {iterations}", justify="center"),
+                    title="✓ 执行成功",
+                    style="green"
+                ))
+            else:
+                click.echo(f"完成: {phase} ({iterations}轮)")
+        else:
+            error = result.get("error", "未知错误")
+            console.print(Panel(
+                Text(f"执行失败: {error}", justify="center"),
+                title="✗ 执行失败",
+                style="red"
+            ))
+            sys.exit(1)
+            
+    except LockExistsError as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("todo")
+def todo_command():
+    """显示待办事项。"""
+    try:
+        project_path = get_project_path()
+        executor = TodoCommandExecutor(project_path)
+        
+        todo_list = executor.get_todo_list()
+        progress = executor.get_progress()
+        blockers = executor.get_blockers()
+        
+        console.print("\n[bold]待办事项[/bold]")
+        
+        if blockers:
+            console.print("\n[red]阻塞项:[/red]")
+            for blocker in blockers:
+                console.print(f"  ⚠ {blocker['blocker']}")
+        
+        if todo_list:
+            console.print("\n[green]待办任务:[/green]")
+            for i, item in enumerate(todo_list, 1):
+                console.print(f"  {i}. {item['task']}")
+        else:
+            console.print("\n[cyan]暂无待办事项[/cyan]")
+        
+        console.print(f"\n进度: {progress['progress_percentage']:.1f}% - 当前阶段: {progress['current_phase']}")
+        
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("work")
+@click.option("--execute", "-e", is_flag=True, default=False, help="一键执行建议操作")
+def work_command(execute: bool):
+    """智能工作流引导。"""
+    try:
+        project_path = get_project_path()
+        executor = WorkCommandExecutor(project_path)
+        
+        summary = executor.get_status_summary()
+        suggestions = executor.get_suggestions()
+        
+        console.print("\n[bold]状态摘要[/bold]")
+        
+        table = Table(show_header=False)
+        table.add_column("项目", style="cyan")
+        table.add_column("值")
+        
+        table.add_row("当前阶段", summary["current_phase"])
+        table.add_row("当前Agent", f"Agent {summary['current_agent']}")
+        table.add_row("待办数量", str(summary["todo_count"]))
+        table.add_row("进度", f"{summary['progress']['progress_percentage']:.1f}%")
+        
+        console.print(table)
+        
+        console.print("\n[bold]操作建议[/bold]")
+        
+        if suggestions:
+            for i, suggestion in enumerate(suggestions, 1):
+                priority_icon = "🔴" if suggestion["priority"] == "high" else "🟡"
+                console.print(f"  {priority_icon} {i}. {suggestion['description']}")
+        else:
+            console.print("  无建议操作")
+        
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
