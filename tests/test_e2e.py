@@ -49,13 +49,14 @@ class TestProjectInitialization:
             assert Path('test_project').exists()
 
     def test_init_existing_directory_fails(self, tmp_path):
-        """测试初始化已存在目录失败。"""
+        """测试初始化已存在非空目录失败。"""
         from src.cli.main import init_command
         from click.testing import CliRunner
 
         runner = CliRunner()
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
             Path('existing_dir').mkdir()
+            (Path('existing_dir') / 'file.txt').write_text('test')
             result = runner.invoke(init_command, ['existing_dir', '--no-git'])
             assert result.exit_code != 0 or '已存在' in result.output or '不是空目录' in result.output
 
@@ -67,6 +68,7 @@ class TestProjectInitialization:
         runner = CliRunner()
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
             Path('test_project').mkdir()
+            (Path('test_project') / 'file.txt').write_text('test')
             result = runner.invoke(init_command, ['test_project', '--force', '--no-git'])
             assert result.exit_code == 0
 
@@ -482,8 +484,15 @@ class TestDocGeneratorIntegration:
     def test_generate_requirements_document(self, tmp_path):
         """测试生成需求文档。"""
         from src.core.doc_generator import DocGenerator
+        from pathlib import Path
+        import shutil
 
         with tempfile.TemporaryDirectory() as td:
+            templates_src = Path(__file__).parent.parent / 'templates'
+            templates_dst = Path(td) / 'templates'
+            if templates_src.exists():
+                shutil.copytree(templates_src, templates_dst)
+            
             generator = DocGenerator(td)
             context = {
                 'project_name': 'TestProject',
@@ -491,10 +500,8 @@ class TestDocGeneratorIntegration:
                 'timestamp': datetime.now().isoformat()
             }
             success, doc_path = generator.generate_document('requirements', context, version='v1')
-            if success:
-                assert Path(doc_path).exists()
-            else:
-                assert not success
+            assert success, f"文档生成失败: {doc_path}"
+            assert Path(doc_path).exists(), f"文档路径不存在: {doc_path}"
 
 
 class TestExceptionHandlerIntegration:
