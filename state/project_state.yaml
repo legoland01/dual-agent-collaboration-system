@@ -1,43 +1,44 @@
-phase: completed
+phase: requirements_review
 
 requirements:
-  version: "v2"
-  pm_signoff: true
-  dev_signoff: true
-  status: approved
-  last_updated: "2026-01-31"
-  review_cycles: 2
-
-design:
-  version: "v1"
+  version: "v3"
   pm_signoff: true
   dev_signoff: true
   status: approved
   last_updated: "2026-01-31"
   review_cycles: 1
+  review_type: "cli_improvement"
+
+design:
+  version: ""
+  pm_signoff: false
+  dev_signoff: false
+  status: pending
+  last_updated: ""
 
 test:
-  version: "v1"
-  blackbox_cases: 15
-  whitebox_passed: 51
-  blackbox_passed: 15
-  status: passed
-  last_updated: "2026-01-31"
-  whitebox_coverage: "100%"
-  blackbox_coverage: "100%"
+  version: ""
+  blackbox_cases: 0
+  whitebox_passed: 0
+  blackbox_passed: 0
+  status: pending
+  last_updated: ""
 
 development:
-  status: completed
-  branch: "main"
-  last_updated: "2026-01-31"
+  status: not_started
+  branch: ""
+  last_updated: ""
 
 deployment:
-  status: completed
-  version: "v1.0.0"
-  last_updated: "2026-01-31"
+  status: pending
+  version: ""
+  last_updated: ""
 
 metadata:
   project_name: "双Agent协作框架"
+  project_type: "CLI"
   created_date: "2026-01-31"
   last_updated: "2026-01-31"
-  current_agent: "1"
+  current_agent: "2"
+  change_type: "enhancement"
+  change_description: "新增自动协作功能"
