@@ -15,6 +15,16 @@ history:
 - action: test_complete
   agent_id: agent1
   details: 测试通过
+  id: test_20260131233858
+  timestamp: '2026-01-31T23:38:58.329366'
+- action: test_complete
+  agent_id: agent1
+  details: 测试通过
+  id: test_20260131233848
+  timestamp: '2026-01-31T23:38:48.285725'
+- action: test_complete
+  agent_id: agent1
+  details: 测试通过
   id: test_20260131233838
   timestamp: '2026-01-31T23:38:38.240130'
 - action: test_complete
