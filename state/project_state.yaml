@@ -29,7 +29,7 @@ development:
   status: "in_progress"
   branch: ""
   last_updated: "2026-01-31"
-  current_milestone: "M1"
+  current_milestone: "M2"
   milestone_status: "completed"
 
 deployment:
