@@ -1,6 +1,6 @@
 """阶段自动推进模块。"""
 from pathlib import Path
-from typing import Dict, Any, Callable, Optional
+from typing import Dict, Any, Callable, Optional, List, Tuple
 from datetime import datetime
 import logging
 
@@ -45,6 +45,82 @@ class PhaseAdvanceEngine:
         self.project_path = Path(project_path)
         self.state_manager = StateManager(project_path)
         self.workflow_engine = WorkflowEngine(self.state_manager)
+
+    def detect_test_activate_agent_bugs_and2(self) -> Dict[str, Any]:
+        """
+        检测测试阶段的 bug 并激活 Agent 2
+
+        当测试阶段发现 issues_to_fix 时：
+        1. 激活 Agent 2
+        2. 将阶段回退到 development
+
+        Returns:
+            Dict: 处理结果
+        """
+        state = self.state_manager.load_state()
+        phase = state.get("phase", "")
+
+        # 只在测试阶段检测
+        if phase != "testing":
+            return {
+                "triggered": False,
+                "reason": "当前不在 testing 阶段",
+                "message": f"阶段为 {phase}，无需处理"
+            }
+
+        test_data = state.get("test", {})
+        issues = test_data.get("issues_to_fix", [])
+
+        # 没有发现 bug，不触发
+        if not issues or len(issues) == 0:
+            return {
+                "triggered": False,
+                "reason": "无待修复的 bug",
+                "message": "测试通过，无 bug 需要修复"
+            }
+
+        # 检测到 bug，激活 Agent 2 并回退到开发阶段
+        try:
+            project_agents = state.get("project", {}).get("agents", {})
+            for agent_id in project_agents:
+                project_agents[agent_id]["current"] = (agent_id == "agent2")
+
+            state["project"]["agents"] = project_agents
+            state["phase"] = "development"
+            state["updated_at"] = datetime.now().isoformat()
+
+            self.state_manager.save_state(state)
+
+            self.state_manager.add_history_entry(
+                action="bug_detected_agent2_activated",
+                agent_id="system",
+                details=f"测试发现 {len(issues)} 个 bug，激活 Agent 2 回退到开发阶段修复"
+            )
+
+            return {
+                "triggered": True,
+                "bugs_found": len(issues),
+                "bugs": issues,
+                "reason": "测试发现 bug，触发 Agent 2 修复",
+                "message": f"✓ 检测到 {len(issues)} 个 bug，激活 Agent 2 并回退到 development 阶段"
+            }
+
+        except Exception as e:
+            return {
+                "triggered": False,
+                "error": str(e),
+                "message": f"处理失败: {e}"
+            }
+
+    def get_pending_bugs(self) -> List[str]:
+        """
+        获取待修复的 bug 列表
+
+        Returns:
+            List[str]: bug 列表
+        """
+        state = self.state_manager.load_state()
+        return state.get("test", {}).get("issues_to_fix", [])
 
     def check_condition(self, phase: str, state: Dict[str, Any]) -> bool:
         """

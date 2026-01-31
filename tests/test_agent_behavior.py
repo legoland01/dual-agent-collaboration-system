@@ -1,3 +1,4 @@
+import pytest
 """Agent行为集成测试。"""
 import tempfile
 import os

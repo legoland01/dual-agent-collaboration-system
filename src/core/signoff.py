@@ -69,7 +69,7 @@ class SignoffEngine:
         }
         
         current_status = stage_data.get("status", "")
-        if current_status not in [required_status.get(stage, ""), "approved"]:
+        if current_status not in [required_status.get(stage, ""), "approved", "passed"]:
             return False, f"当前阶段状态不允许签署: {current_status}"
         
         signoff_key = f"{agent}_signoff"

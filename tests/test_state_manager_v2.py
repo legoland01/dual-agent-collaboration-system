@@ -1,3 +1,4 @@
+import pytest
 """状态管理器与状态机集成测试。"""
 import tempfile
 import os

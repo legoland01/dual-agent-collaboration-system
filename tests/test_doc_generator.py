@@ -1,3 +1,4 @@
+import pytest
 """文档生成器测试。"""
 import tempfile
 import os

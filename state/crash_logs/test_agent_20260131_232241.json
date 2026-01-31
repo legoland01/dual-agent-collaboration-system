@@ -1,0 +1,19 @@
+{
+  "crash_id": "test_agent_20260131_232241",
+  "timestamp": "2026-01-31T23:22:41.337664",
+  "agent_id": "test_agent",
+  "phase": "unknown",
+  "last_action": "unknown",
+  "state_version": 0,
+  "pending_tasks": [],
+  "exception": {
+    "type": "recoverable",
+    "severity": 2,
+    "message": "test error",
+    "class": "ValueError",
+    "stack_trace": "Traceback (most recent call last):\n  File \"/Users/liuzhen/Documents/河广/Product Development/chatGPT/Digital Law/Digital court/金融法院/法官数字助手/案卷材料样例/融资租赁/(2024)沪74民初721号/OpenCode Trial/dual-agent-collaboration-system/tests/test_exception_handler.py\", line 718, in test_context_manager_exception\n    raise ValueError(\"test error\")\nValueError: test error\n",
+    "recovery_attempts": 0
+  },
+  "recovery_status": "pending",
+  "recovery_attempts": 0
+}

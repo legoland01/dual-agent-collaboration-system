@@ -127,6 +127,15 @@ class AutoCollaborationEngine:
                         "reason": phase_result["reason"]
                     })
 
+                # 1.5 检测测试阶段的 bug 并激活 Agent 2
+                bug_result = self.phase_advance_engine.detect_test_activate_agent_bugs_and2()
+                if bug_result.get("triggered"):
+                    self.execution_history.append({
+                        "action": "bug_detected_agent2_activated",
+                        "bugs_count": bug_result.get("bugs_found"),
+                        "bugs": bug_result.get("bugs", [])
+                    })
+
                 # 2. 检测状态
                 state = self.detect_state()
                 if state.get("completed"):
