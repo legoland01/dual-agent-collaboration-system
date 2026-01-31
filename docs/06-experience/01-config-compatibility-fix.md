@@ -90,81 +90,84 @@ metadata:
 
 ---
 
-# GitHub + Gitee 双平台同步功能
+# 智能重试与自动文档同步功能
 
 ## 功能描述
 
-添加多远程仓库管理支持，实现一键同步到 GitHub 和 Gitee。
+新增两个自动化功能：
+1. **智能重试机制** - Git 操作失败时自动重试直到成功
+2. **自动文档同步** - 代码变更时自动更新相关文档
 
-## 新增需求
+## 需求与设计
 
-- **需求文档**: `docs/01-requirements/requirements_cli_improvement_v1.md`
-- **设计文档**: `docs/02-design/detailed_design_cli_improvement_v1.md`
-- **测试用例**: `tests/test_e2e.py` - `TestRemoteCommand`, `TestSyncAllCommand`
+- **需求文档**: `docs/01-requirements/requirements_auto_features_v1.md`
+- **设计文档**: `docs/02-design/detailed_design_auto_features_v1.md`
 
 ## 新增命令
 
-### 1. `oc-collab remote` - 远程仓库管理
+### 1. `oc-collab sync --retry` - 智能同步
 
 ```bash
-# 列出所有远程仓库
-oc-collab remote list
+# 启用智能重试
+oc-collab sync --retry
 
-# 添加 Gitee 远程仓库
-oc-collab remote add gitee <your-gitee-repo-url>
-
-# 推送到所有远程仓库
-oc-collab remote push-all
+# 自定义重试参数
+oc-collab sync --retry --max-retries 20 --interval 60
 ```
 
-### 2. `oc-collab sync-all` - 一键全平台同步
+### 2. `oc-collab push --retry` - 智能推送
 
 ```bash
-# 提交并推送到所有平台（GitHub + Gitee）
-oc-collab sync-all -m "提交信息"
+# 带智能重试的推送
+oc-collab push --retry -m "feat: 新功能"
 ```
 
-## 使用示例
+### 3. `oc-collab docs` - 文档自动同步
 
 ```bash
-# 1. 初始化项目（已有 GitHub origin）
-cd dual-agent-collaboration-system
+# 检查需要更新的文档
+oc-collab docs check
 
-# 2. 添加 Gitee 为第二个远程仓库
-oc-collab remote add gitee https://gitee.com/yourname/dual-agent-collaboration-system.git
+# 预览更新
+oc-collab docs preview
 
-# 3. 查看远程仓库列表
-oc-collab remote list
-
-# 4. 一键同步到两个平台
-oc-collab sync-all -m "feat: 添加 Gitee 双同步支持"
+# 应用更新
+oc-collab docs apply -m "docs: 更新文档"
 ```
 
 ## 实现原理
 
-### GitHelper 新增方法
+### AutoRetry 核心逻辑
 
-| 方法 | 功能 |
-|------|------|
-| `get_all_remotes()` | 获取所有远程仓库名称 |
-| `add_remote(name, url)` | 添加远程仓库 |
-| `push_to_remote(remote)` | 推送到指定远程 |
-| `push_all_remotes(message)` | 推送到所有远程 |
-
-### 原理说明
-
-Git 本身支持添加多个远程仓库：
-```bash
-git remote add gitee <url>
-git push --all gitee
-git push --tags gitee
+```python
+class AutoRetry:
+    def push_with_retry(self, message: str, remotes: List[str]) -> Dict:
+        # 1. 首次尝试推送
+        # 2. 失败时检查错误类型
+        # 3. 可重试错误：等待后重试
+        # 4. 不可重试错误：立即返回失败
+        # 5. 达到最大重试次数：返回失败
 ```
 
-CLI 封装了这些操作，提供统一的跨平台同步体验。
+### AutoDocs 核心逻辑
+
+```python
+class AutoDocs:
+    def detect_changes(self) -> Dict:
+        # 1. 获取变更文件列表
+        # 2. 匹配文件与文档映射
+        # 3. 返回影响范围
+
+    def update_changelog(self, change_type: str, message: str):
+        # 1. 读取变更记录
+        # 2. 追加新条目
+        # 3. 保存
+```
 
 ## 相关文件
 
-- 核心实现：`src/core/git.py`
+- 核心实现：`src/core/auto_retry.py`
+- 核心实现：`src/core/auto_docs.py`
 - CLI 命令：`src/cli/main.py`
 - 测试用例：`tests/test_e2e.py`
 - 使用手册：`docs/使用手册.md`
@@ -174,11 +177,11 @@ CLI 封装了这些操作，提供统一的跨平台同步体验。
 
 | 文档 | 状态 | 说明 |
 |------|------|------|
-| `docs/04-changelog/change_log.md` | ✅ 已更新 | v1.1 新增功能 |
-| `docs/使用手册.md` | ✅ 已更新 | 4.8, 4.9 章节 |
+| `docs/04-changelog/change_log.md` | ✅ 已更新 | v1.2 新增功能 |
+| `docs/使用手册.md` | ✅ 已更新 | 4.7-4.9 章节 |
 | `tests/test_e2e.py` | ✅ 已更新 | 新增测试类 |
-| `docs/01-requirements/*.md` | ⏳ 建议更新 | 重大功能变更 |
-| `docs/02-design/*.md` | ⏳ 建议更新 | 重大功能变更 |
+| `docs/01-requirements/requirements_auto_features_v1.md` | ✅ 已创建 | 需求文档 |
+| `docs/02-design/detailed_design_auto_features_v1.md` | ✅ 已创建设计文档 |
 
 ## 日期
 

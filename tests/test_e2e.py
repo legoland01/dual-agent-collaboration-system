@@ -1098,3 +1098,147 @@ class TestConfigCompatibilityFix:
             result = runner.invoke(status_command)
             assert result.exit_code == 0
             assert 'TestProjectFromProject' in result.output
+
+
+class TestAutoRetryFeature:
+    """智能重试功能测试。"""
+
+    def test_sync_retry_help(self, tmp_path):
+        """测试sync --retry帮助信息。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['sync', '--help'])
+        assert result.exit_code == 0
+        assert '--retry' in result.output
+        assert '--max-retries' in result.output
+
+    def test_push_retry_help(self, tmp_path):
+        """测试push --retry帮助信息。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['push', '--help'])
+        assert result.exit_code == 0
+        assert '--retry' in result.output
+        assert '--message' in result.output
+
+    def test_auto_retry_config_creation(self, tmp_path):
+        """测试智能重试配置创建。"""
+        from src.core.auto_retry import AutoRetryConfig
+
+        config = AutoRetryConfig(
+            max_retries=5,
+            retry_interval=10,
+            exponential_backoff=True
+        )
+        assert config.max_retries == 5
+        assert config.retry_interval == 10
+        assert config.exponential_backoff is True
+
+    def test_auto_retry_should_retry_network_error(self, tmp_path):
+        """测试网络错误应重试。"""
+        from src.core.auto_retry import AutoRetry
+
+        auto_retry = AutoRetry(str(tmp_path))
+        error = Exception("Connection timeout")
+        assert auto_retry._should_retry(error) is True
+
+    def test_auto_retry_should_not_retry_auth_error(self, tmp_path):
+        """测试认证错误不应重试。"""
+        from src.core.auto_retry import AutoRetry
+
+        auto_retry = AutoRetry(str(tmp_path))
+        error = Exception("Authentication failed")
+        assert auto_retry._should_retry(error) is False
+
+    def test_auto_retry_calculate_delay(self, tmp_path):
+        """测试延迟计算。"""
+        from src.core.auto_retry import AutoRetry, AutoRetryConfig
+
+        config = AutoRetryConfig(
+            max_retries=10,
+            retry_interval=30,
+            exponential_backoff=True,
+            max_interval=300
+        )
+        auto_retry = AutoRetry(str(tmp_path), config)
+        
+        assert auto_retry._calculate_delay(0) == 30
+        assert auto_retry._calculate_delay(1) == 60
+        assert auto_retry._calculate_delay(2) == 120
+
+
+class TestAutoDocsFeature:
+    """自动文档同步功能测试。"""
+
+    def test_docs_help(self, tmp_path):
+        """测试docs命令帮助信息。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['docs', '--help'])
+        assert result.exit_code == 0
+        assert 'check' in result.output
+        assert 'preview' in result.output
+        assert 'apply' in result.output
+
+    def test_docs_check(self, tmp_path):
+        """测试docs check命令。"""
+        from src.cli.main import init_command, docs_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(docs_command, ['check'])
+            assert result.exit_code == 0
+            assert '变更检测' in result.output
+
+    def test_docs_preview(self, tmp_path):
+        """测试docs preview命令。"""
+        from src.cli.main import init_command, docs_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(docs_command, ['preview'])
+            assert result.exit_code == 0
+
+    def test_auto_docs_config_creation(self, tmp_path):
+        """测试自动文档配置创建。"""
+        from src.core.auto_docs import AutoDocsConfig
+
+        config = AutoDocsConfig(
+            enabled=True,
+            update_changelog=True,
+            update_manual=True,
+            require_confirm=False
+        )
+        assert config.enabled is True
+        assert config.update_changelog is True
+
+    def test_auto_docs_detect_change_type(self, tmp_path):
+        """测试变更类型检测。"""
+        from src.core.auto_docs import AutoDocs
+
+        auto_docs = AutoDocs(str(tmp_path))
+        
+        assert auto_docs._detect_change_type("feat: new feature") == "新功能"
+        assert auto_docs._detect_change_type("fix: bug fix") == "缺陷修复"
+        assert auto_docs._detect_change_type("docs: update docs") == "文档更新"
+
+    def test_auto_docs_extract_scope(self, tmp_path):
+        """测试范围提取。"""
+        from src.core.auto_docs import AutoDocs
+
+        auto_docs = AutoDocs(str(tmp_path))
+        
+        assert auto_docs._extract_scope("feat(core): new feature") == "core"
+        assert auto_docs._extract_scope("fix: bug fix") == "系统"

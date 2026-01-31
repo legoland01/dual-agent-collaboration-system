@@ -13,6 +13,8 @@ from ..core.git import GitHelper, GitNotInstalledError
 from ..core.workflow import WorkflowEngine
 from ..core.signoff import SignoffEngine
 from ..core.auto_engine import AutoCollaborationEngine, TodoCommandExecutor, WorkCommandExecutor
+from ..core.auto_retry import AutoRetry, AutoRetryConfig
+from ..core.auto_docs import AutoDocs, AutoDocsConfig
 from ..utils.lock import LockExistsError
 
 
@@ -227,27 +229,6 @@ def history_command(limit: int):
         sys.exit(1)
 
 
-@main.command("sync")
-def sync_command():
-    """同步远程变更。"""
-    try:
-        project_path = get_project_path()
-        git_helper = GitHelper(project_path)
-        
-        if git_helper.has_local_changes():
-            click.echo("警告: 有未提交的本地修改，请先提交或暂存")
-            sys.exit(1)
-        
-        if git_helper.pull():
-            click.echo("已同步远程变更")
-        else:
-            click.echo("同步失败")
-            
-    except Exception as e:
-        click.echo(f"错误: {e}")
-        sys.exit(1)
-
-
 @main.command("auto")
 @click.option("--max-iterations", "-n", type=int, default=10, help="最大迭代次数")
 @click.option("--quiet", "-q", is_flag=True, default=False, help="静默模式")
@@ -409,6 +390,185 @@ def sync_all_command(message: str):
         else:
             click.echo("没有需要提交的本地修改")
 
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("sync")
+@click.option("--retry/--no-retry", "-r", default=False, help="启用智能重试")
+@click.option("--max-retries", "-n", type=int, default=10, help="最大重试次数")
+@click.option("--interval", "-i", type=int, default=30, help="重试间隔（秒）")
+@click.option("--no-backoff", is_flag=True, default=False, help="禁用指数退避")
+def sync_command(retry: bool, max_retries: int, interval: int, no_backoff: bool):
+    """同步远程变更，支持智能重试。"""
+    try:
+        project_path = get_project_path()
+        git_helper = GitHelper(project_path)
+        
+        if git_helper.has_local_changes():
+            click.echo("警告: 有未提交的本地修改，请先提交或暂存")
+            sys.exit(1)
+        
+        if retry:
+            config = AutoRetryConfig(
+                max_retries=max_retries,
+                retry_interval=interval,
+                exponential_backoff=not no_backoff,
+                verbose=True
+            )
+            auto_retry = AutoRetry(project_path, config)
+            
+            remotes = git_helper.get_all_remotes()
+            if not remotes:
+                remotes = ["origin"]
+            
+            result = auto_retry.pull_with_retry(remotes[0])
+            
+            if result["success"]:
+                console.print(Panel(
+                    f"✓ 同步成功\n重试次数: {result['attempts']}\n耗时: {result['duration']}秒",
+                    title="同步完成",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"✗ 同步失败\n已重试: {result['attempts']}次\n耗时: {result['duration']}秒",
+                    title="同步失败",
+                    style="red"
+                ))
+                sys.exit(1)
+        else:
+            if git_helper.pull():
+                click.echo("已同步远程变更")
+            else:
+                click.echo("同步失败")
+                
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("push")
+@click.option("--message", "-m", default="auto-sync: 更新", help="提交信息")
+@click.option("--retry/--no-retry", "-r", default=False, help="启用智能重试")
+@click.option("--max-retries", "-n", type=int, default=10, help="最大重试次数")
+@click.option("--interval", "-i", type=int, default=30, help="重试间隔（秒）")
+@click.option("--no-backoff", is_flag=True, default=False, help="禁用指数退避")
+def push_command(message: str, retry: bool, max_retries: int, interval: int, no_backoff: bool):
+    """推送代码，支持智能重试和全平台同步。"""
+    try:
+        project_path = get_project_path()
+        git_helper = GitHelper(project_path)
+        
+        if not git_helper.has_local_changes():
+            click.echo("没有需要提交的本地修改")
+            return
+        
+        remotes = git_helper.get_all_remotes()
+        
+        if retry:
+            config = AutoRetryConfig(
+                max_retries=max_retries,
+                retry_interval=interval,
+                exponential_backoff=not no_backoff,
+                verbose=True
+            )
+            auto_retry = AutoRetry(project_path, config)
+            
+            if not remotes:
+                git_helper._run_git_command("add", "-A")
+                git_helper._run_git_command("commit", "-m", message)
+                git_helper._run_git_command("push")
+                click.echo("已推送到默认远程仓库")
+            else:
+                result = auto_retry.push_with_retry(message, remotes)
+                
+                if result["success"]:
+                    console.print(Panel(
+                        f"✓ 推送成功\n已推送到: {', '.join(result['remotes'])}\n重试次数: {result['attempts']}\n耗时: {result['duration']}秒",
+                        title="推送完成",
+                        style="green"
+                    ))
+                else:
+                    console.print(Panel(
+                        f"✗ 推送失败\n已推送到: {', '.join(result['remotes'])}\n已重试: {result['attempts']}次\n耗时: {result['duration']}秒",
+                        title="推送失败",
+                        style="red"
+                    ))
+                    sys.exit(1)
+        else:
+            git_helper.push(message)
+            click.echo(f"已推送")
+            
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("docs")
+@click.argument("action", type=click.Choice(["check", "preview", "apply"]), default="check")
+@click.option("--message", "-m", default="docs: 更新文档", help="提交信息")
+@click.option("--auto/--no-auto", default=None, help="是否启用自动同步")
+def docs_command(action: str, message: str, auto: bool):
+    """自动同步文档。"""
+    try:
+        project_path = get_project_path()
+        
+        config = AutoDocsConfig(
+            enabled=(auto is not False),
+            update_changelog=True,
+            update_manual=True,
+            update_tests=False,
+            require_confirm=(action != "apply")
+        )
+        auto_docs = AutoDocs(project_path, config)
+        
+        if action == "check":
+            changes = auto_docs.detect_changes()
+            console.print("\n[bold]变更检测结果[/bold]")
+            
+            table = Table(show_header=False)
+            table.add_column("项目")
+            table.add_column("值")
+            
+            table.add_row("变更文件数", str(len(changes['changed_files'])))
+            table.add_row("影响文档数", str(len(changes['impacted_docs'])))
+            table.add_row("影响命令数", str(len(changes['impacted_commands'])))
+            table.add_row("变更类型", changes['change_type'])
+            
+            console.print(table)
+            
+            if changes['changed_files']:
+                console.print("\n[bold]变更文件[/bold]")
+                for f in changes['changed_files'][:10]:
+                    console.print(f"  - {f}")
+            
+            console.print("\n[bold]操作建议[/bold]")
+            console.print("  运行 'oc-collab docs preview' 预览更新")
+            console.print("  运行 'oc-collab docs apply --message \"...\"' 应用更新")
+        
+        elif action == "preview":
+            preview = auto_docs.preview_updates()
+            console.print(Panel(preview, title="文档更新预览", style="cyan"))
+        
+        elif action == "apply":
+            results = auto_docs.apply_updates(message, confirmed=True)
+            
+            console.print("\n[bold]文档更新结果[/bold]")
+            
+            table = Table(show_header=False)
+            table.add_column("项目")
+            table.add_column("状态")
+            
+            table.add_row("变更记录", "✓" if results.get("changelog") else "✗")
+            table.add_row("使用手册", "✓" if results.get("manual") else "✗")
+            
+            console.print(table)
+            
+            if results.get("changelog") or results.get("manual"):
+                console.print(f"\n提交信息: {message}")
+        
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
