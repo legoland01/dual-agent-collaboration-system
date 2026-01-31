@@ -7,6 +7,11 @@ design:
 development:
   status: pending
 history:
+- id: agent_daemon_review_20260201010000
+  timestamp: '2026-02-01T01:00:00.000000'
+  action: review_start
+  agent_id: agent2
+  details: '启动 oc-collab agent 守护进程需求评审'
 - id: 8aab1e08
   timestamp: '2026-02-01T00:33:31.027633'
   action: manual_phase_advance
@@ -43,8 +48,8 @@ project:
       role: 开发
 requirements:
   dev_signoff: true
-  pm_signoff: true
-  status: approved
+  pm_signoff: false
+  status: review
   unknown_signoff: true
 test:
   status: pending
