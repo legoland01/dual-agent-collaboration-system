@@ -1,4 +1,4 @@
-phase: design_draft
+phase: development
 
 requirements:
   version: "v2"
@@ -9,24 +9,29 @@ requirements:
   review_cycles: 2
 
 design:
-  version: ""
-  pm_signoff: false
-  dev_signoff: false
-  status: draft
-  last_updated: ""
-  test_cases_writing: true
+  version: "v1"
+  pm_signoff: true
+  dev_signoff: true
+  status: approved
+  last_updated: "2026-01-31"
+  review_cycles: 1
 
 test:
-  version: ""
-  blackbox_cases: 0
+  version: "v1"
+  blackbox_cases: 15
   whitebox_passed: 0
   blackbox_passed: 0
   status: pending
-  last_updated: ""
+  last_updated: "2026-01-31"
 
 development:
-  status: not_started
-  branch: ""
+  status: in_progress
+  branch: "main"
+  last_updated: "2026-01-31"
+
+deployment:
+  status: pending
+  version: ""
   last_updated: ""
 
 metadata:
