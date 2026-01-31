@@ -41,11 +41,12 @@ dev = [
 ]
 
 [project.scripts]
-oc-collab = "cli.main:main"
+oc-collab = "src.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = ["src"]
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
