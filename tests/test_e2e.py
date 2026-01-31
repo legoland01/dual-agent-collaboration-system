@@ -1,0 +1,929 @@
+"""E2E黑盒测试用例。"""
+import pytest
+import sys
+import os
+import tempfile
+import shutil
+import json
+from pathlib import Path
+from datetime import datetime
+
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+
+class TestProjectInitialization:
+    """项目初始化测试。"""
+
+    def test_init_python_project(self, tmp_path):
+        """测试初始化Python项目。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            result = runner.invoke(init_command, ['test_project', '--type', 'python', '--no-git'])
+            assert result.exit_code == 0
+            assert Path('test_project').exists()
+
+    def test_init_typescript_project(self, tmp_path):
+        """测试初始化TypeScript项目。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            result = runner.invoke(init_command, ['test_project', '--type', 'typescript', '--no-git'])
+            assert result.exit_code == 0
+            assert Path('test_project').exists()
+
+    def test_init_mixed_project(self, tmp_path):
+        """测试初始化混合项目。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            result = runner.invoke(init_command, ['test_project', '--type', 'mixed', '--no-git'])
+            assert result.exit_code == 0
+            assert Path('test_project').exists()
+
+    def test_init_existing_directory_fails(self, tmp_path):
+        """测试初始化已存在目录失败。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            Path('existing_dir').mkdir()
+            result = runner.invoke(init_command, ['existing_dir', '--no-git'])
+            assert result.exit_code != 0
+            assert '已存在' in result.output
+
+    def test_init_force_overwrite(self, tmp_path):
+        """测试强制覆盖初始化。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            Path('test_project').mkdir()
+            result = runner.invoke(init_command, ['test_project', '--force', '--no-git'])
+            assert result.exit_code == 0
+
+
+class TestStatusCommand:
+    """状态命令测试。"""
+
+    def test_status_no_project(self, tmp_path):
+        """测试无项目时查看状态。"""
+        from src.cli.main import status_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            result = runner.invoke(status_command)
+            assert result.exit_code != 0
+            assert '未找到项目状态文件' in result.output
+
+    def test_status_with_project(self, tmp_path):
+        """测试有项目时查看状态。"""
+        from src.cli.main import init_command, status_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(status_command)
+            assert result.exit_code == 0
+            assert '项目状态' in result.output
+            assert 'test_project' in result.output
+
+
+class TestSwitchCommand:
+    """切换命令测试。"""
+
+    def test_switch_to_agent1(self, tmp_path):
+        """测试切换到Agent 1。"""
+        from src.cli.main import init_command, switch_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(switch_command, ['1'])
+            assert result.exit_code == 0
+            assert 'Agent 1' in result.output
+
+    def test_switch_to_agent2(self, tmp_path):
+        """测试切换到Agent 2。"""
+        from src.cli.main import init_command, switch_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(switch_command, ['2'])
+            assert result.exit_code == 0
+            assert 'Agent 2' in result.output
+
+    def test_switch_already_current(self, tmp_path):
+        """测试切换到当前Agent。"""
+        from src.cli.main import init_command, switch_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(switch_command, ['1'])
+            assert '已经是 Agent 1' in result.output
+
+
+class TestReviewCommand:
+    """评审命令测试。"""
+
+    def test_review_requirements_new(self, tmp_path):
+        """测试发起需求评审。"""
+        from src.cli.main import init_command, review_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(review_command, ['requirements', '--new'])
+            assert result.exit_code == 0
+            assert '评审' in result.output
+
+    def test_review_list(self, tmp_path):
+        """测试查看评审历史。"""
+        from src.cli.main import init_command, review_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(review_command, ['requirements', '--list'])
+            assert result.exit_code == 0
+
+
+class TestSignoffCommand:
+    """签署命令测试。"""
+
+    def test_signoff_requirements(self, tmp_path):
+        """测试签署需求。"""
+        from src.cli.main import init_command, signoff_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(signoff_command, ['requirements'])
+            assert result.exit_code == 0
+
+    def test_signoff_with_comment(self, tmp_path):
+        """测试带评论签署。"""
+        from src.cli.main import init_command, signoff_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(signoff_command, ['requirements', '--comment', '测试评论'])
+            assert result.exit_code == 0
+
+    def test_signoff_reject(self, tmp_path):
+        """测试拒签。"""
+        from src.cli.main import init_command, signoff_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(signoff_command, ['requirements', '--reject', '需要修改'])
+            assert result.exit_code == 0
+            assert '拒签' in result.output
+
+
+class TestHistoryCommand:
+    """历史命令测试。"""
+
+    def test_history(self, tmp_path):
+        """测试查看历史。"""
+        from src.cli.main import init_command, history_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(history_command)
+            assert result.exit_code == 0
+            assert '协作历史' in result.output
+
+    def test_history_with_limit(self, tmp_path):
+        """测试带限制查看历史。"""
+        from src.cli.main import init_command, history_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(history_command, ['--limit', '5'])
+            assert result.exit_code == 0
+
+
+class TestSyncCommand:
+    """同步命令测试。"""
+
+    def test_sync_no_changes(self, tmp_path):
+        """测试同步无变化。"""
+        from src.cli.main import init_command, sync_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(sync_command)
+            assert result.exit_code == 0
+
+
+class TestAutoCommand:
+    """自动执行命令测试。"""
+
+    def test_auto_execution(self, tmp_path):
+        """测试自动执行。"""
+        from src.cli.main import init_command, auto_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(auto_command, ['--max-iterations', '1', '--quiet'])
+            assert result.exit_code == 0
+
+    def test_auto_quiet_mode(self, tmp_path):
+        """测试静默模式。"""
+        from src.cli.main import init_command, auto_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(auto_command, ['--quiet'])
+            assert result.exit_code == 0
+
+
+class TestTodoCommand:
+    """待办命令测试。"""
+
+    def test_todo_display(self, tmp_path):
+        """测试显示待办事项。"""
+        from src.cli.main import init_command, todo_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(todo_command)
+            assert result.exit_code == 0
+            assert '待办事项' in result.output
+
+
+class TestWorkCommand:
+    """工作流引导命令测试。"""
+
+    def test_work_summary(self, tmp_path):
+        """测试工作流摘要。"""
+        from src.cli.main import init_command, work_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(work_command)
+            assert result.exit_code == 0
+            assert '状态摘要' in result.output
+
+    def test_work_suggestions(self, tmp_path):
+        """测试操作建议。"""
+        from src.cli.main import init_command, work_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(work_command)
+            assert result.exit_code == 0
+            assert '操作建议' in result.output
+
+
+class TestStateMachineIntegration:
+    """状态机集成测试。"""
+
+    def test_state_transition_project_init(self, tmp_path):
+        """测试项目初始化状态。"""
+        from src.core.state_machine import StateMachine, State
+        from src.core.state_manager import StateManager
+
+        with tempfile.TemporaryDirectory() as td:
+            Path(td, 'state').mkdir()
+            sm = StateMachine(State.PROJECT_INIT)
+            assert sm.current_state == State.PROJECT_INIT
+
+    def test_state_transition_to_requirements_draft(self, tmp_path):
+        """测试转换到需求草稿状态。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        result = sm.transition_to(State.REQUIREMENTS_DRAFT)
+        assert result['success']
+        assert sm.current_state == State.REQUIREMENTS_DRAFT
+
+    def test_state_transition_sequence(self, tmp_path):
+        """测试状态转换序列。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        sm.transition_to(State.REQUIREMENTS_DRAFT)
+        sm.transition_to(State.REQUIREMENTS_REVIEW)
+        sm.transition_to(State.REQUIREMENTS_APPROVED)
+        assert sm.current_state == State.REQUIREMENTS_APPROVED
+
+    def test_invalid_state_transition(self, tmp_path):
+        """测试无效状态转换。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        try:
+            sm.transition_to(State.DEVELOPMENT)
+            assert False, "应该抛出异常"
+        except Exception:
+            pass
+
+    def test_state_progress(self, tmp_path):
+        """测试状态进度。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        progress = sm.get_progress()
+        assert progress == 0.0
+        sm.transition_to(State.COMPLETED)
+        progress = sm.get_progress()
+        assert progress == 100.0
+
+
+class TestBrainEngineIntegration:
+    """脑引擎集成测试。"""
+
+    def test_brain_engine_initialization(self, tmp_path):
+        """测试脑引擎初始化。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        assert engine is not None
+
+    def test_get_action_agent1(self, tmp_path):
+        """测试Agent 1获取动作。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('产品经理', 'project_init')
+        assert action is not None
+
+    def test_get_action_agent2(self, tmp_path):
+        """测试Agent 2获取动作。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('开发', 'project_init')
+        assert action is not None
+
+
+class TestTaskExecutorIntegration:
+    """任务执行器集成测试。"""
+
+    def test_task_executor_initialization(self, tmp_path):
+        """测试任务执行器初始化。"""
+        from src.core.task_executor import TaskExecutor
+
+        executor = TaskExecutor()
+        assert executor is not None
+
+    def test_execute_action(self, tmp_path):
+        """测试执行动作。"""
+        from src.core.task_executor import TaskExecutor
+
+        executor = TaskExecutor()
+        context = {'agent_id': 'agent1', 'phase': 'project_init'}
+        result = executor.execute_action('create_requirements', context)
+        assert result is not None
+
+
+class TestDocGeneratorIntegration:
+    """文档生成器集成测试。"""
+
+    def test_doc_generator_initialization(self, tmp_path):
+        """测试文档生成器初始化。"""
+        from src.core.doc_generator import DocGenerator
+
+        generator = DocGenerator()
+        assert generator is not None
+
+    def test_generate_requirements_document(self, tmp_path):
+        """测试生成需求文档。"""
+        from src.core.doc_generator import DocGenerator
+
+        with tempfile.TemporaryDirectory() as td:
+            generator = DocGenerator()
+            context = {
+                'project_name': 'TestProject',
+                'project_type': 'PYTHON',
+                'timestamp': datetime.now().isoformat()
+            }
+            doc_path = generator.generate_requirements(td, context)
+            assert Path(doc_path).exists()
+
+
+class TestExceptionHandlerIntegration:
+    """异常处理器集成测试。"""
+
+    def test_exception_handler_initialization(self, tmp_path):
+        """测试异常处理器初始化。"""
+        from src.core.exception_handler import ExceptionHandler
+
+        handler = ExceptionHandler('test_agent', 'test_phase')
+        assert handler is not None
+
+    def test_classify_network_exception(self, tmp_path):
+        """测试分类网络异常。"""
+        from src.core.exception_handler import ExceptionHandler, ExceptionType
+
+        handler = ExceptionHandler('test_agent')
+        exc = Exception('network connection timeout')
+        ex_type, _ = handler.classify_exception(exc)
+        assert ex_type == ExceptionType.RETRYABLE
+
+    def test_classify_state_exception(self, tmp_path):
+        """测试分类状态异常。"""
+        from src.core.exception_handler import ExceptionHandler, ExceptionType
+
+        handler = ExceptionHandler('test_agent')
+        exc = Exception('state version conflict')
+        ex_type, _ = handler.classify_exception(exc)
+        assert ex_type == ExceptionType.RECOVERABLE
+
+    def test_classify_fatal_exception(self, tmp_path):
+        """测试分类致命异常。"""
+        from src.core.exception_handler import ExceptionHandler, ExceptionType
+
+        handler = ExceptionHandler('test_agent')
+        exc = Exception('permission denied')
+        ex_type, _ = handler.classify_exception(exc)
+        assert ex_type == ExceptionType.FATAL
+
+
+class TestGitMonitorIntegration:
+    """Git监控器集成测试。"""
+
+    def test_git_monitor_initialization(self, tmp_path):
+        """测试Git监控器初始化。"""
+        from src.core.git_monitor import GitMonitor, GitConfig
+
+        with tempfile.TemporaryDirectory() as td:
+            config = GitConfig()
+            monitor = GitMonitor(td, config)
+            assert monitor is not None
+
+
+class TestAgentIntegration:
+    """Agent集成测试。"""
+
+    def test_agent_initialization(self, tmp_path):
+        """测试Agent初始化。"""
+        from src.cli.agent import Agent, AgentConfig
+
+        config = AgentConfig(agent_id='agent1', agent_type='产品经理')
+        agent = Agent(config)
+        assert agent.config.agent_id == 'agent1'
+
+    def test_agent_start_stop(self, tmp_path):
+        """测试Agent启动停止。"""
+        from src.cli.agent import Agent, AgentConfig
+
+        config = AgentConfig(agent_id='agent1', agent_type='产品经理')
+        agent = Agent(config)
+        agent.initialize('.')
+        agent.start()
+        assert agent.status.value == 'running'
+        agent.stop()
+        assert agent.status.value == 'stopped'
+
+    def test_agent_mode_switch(self, tmp_path):
+        """测试Agent模式切换。"""
+        from src.cli.agent import Agent, AgentConfig, AgentMode
+
+        config = AgentConfig(agent_id='agent1', agent_type='产品经理')
+        agent = Agent(config)
+        agent.switch_mode(AgentMode.MANUAL)
+        assert agent.config.mode == AgentMode.MANUAL
+        agent.switch_mode(AgentMode.AUTO)
+        assert agent.config.mode == AgentMode.AUTO
+
+
+class TestFullWorkflowIntegration:
+    """完整工作流集成测试。"""
+
+    def test_full_workflow_project_init_to_completed(self, tmp_path):
+        """测试完整工作流。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        states = [
+            State.REQUIREMENTS_DRAFT,
+            State.REQUIREMENTS_REVIEW,
+            State.REQUIREMENTS_APPROVED,
+            State.DESIGN_DRAFT,
+            State.DESIGN_REVIEW,
+            State.DESIGN_APPROVED,
+            State.DEVELOPMENT,
+            State.TESTING,
+            State.DEPLOYMENT,
+            State.COMPLETED
+        ]
+
+        for state in states:
+            result = sm.transition_to(state)
+            assert result['success']
+
+        assert sm.is_completed()
+
+    def test_workflow_history_tracking(self, tmp_path):
+        """测试工作流历史跟踪。"""
+        from src.core.state_machine import StateMachine, State
+
+        sm = StateMachine()
+        sm.transition_to(State.REQUIREMENTS_DRAFT)
+        sm.transition_to(State.REQUIREMENTS_REVIEW)
+
+        history = sm.get_history()
+        assert len(history) == 2
+
+    def test_workflow_state_info(self, tmp_path):
+        """测试工作流状态信息。"""
+        from src.core.state_machine import StateMachine
+
+        sm = StateMachine()
+        info = sm.STATE_INFO[State.PROJECT_INIT]
+        assert info.state == State.PROJECT_INIT
+        assert info.name == '项目初始化'
+
+
+class TestEdgeCases:
+    """边界情况测试。"""
+
+    def test_empty_project_name(self, tmp_path):
+        """测试空项目名。"""
+        from src.cli.main import init_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            result = runner.invoke(init_command, ['', '--no-git'])
+            assert result.exit_code != 0
+
+    def test_invalid_agent_switch(self, tmp_path):
+        """测试无效Agent切换。"""
+        from src.cli.main import init_command, switch_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(switch_command, ['3'])
+            assert result.exit_code != 0
+
+    def test_invalid_review_stage(self, tmp_path):
+        """测试无效评审阶段。"""
+        from src.cli.main import init_command, review_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(review_command, ['invalid'])
+            assert result.exit_code != 0
+
+    def test_invalid_signoff_stage(self, tmp_path):
+        """测试无效签署阶段。"""
+        from src.cli.main import init_command, signoff_command
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+            runner.invoke(init_command, ['test_project', '--no-git'])
+            os.chdir('test_project')
+            result = runner.invoke(signoff_command, ['invalid'])
+            assert result.exit_code != 0
+
+
+class TestTemplateGeneration:
+    """模板生成测试。"""
+
+    def test_requirements_template_exists(self, tmp_path):
+        """测试需求模板存在。"""
+        templates_dir = Path(__file__).parent.parent / 'templates'
+        template_path = templates_dir / 'requirements_TEMPLATE.md'
+        assert template_path.exists()
+
+    def test_design_template_exists(self, tmp_path):
+        """测试设计模板存在。"""
+        templates_dir = Path(__file__).parent.parent / 'templates'
+        template_path = templates_dir / 'design_TEMPLATE.md'
+        assert template_path.exists()
+
+    def test_test_case_template_exists(self, tmp_path):
+        """测试测试用例模板存在。"""
+        templates_dir = Path(__file__).parent.parent / 'templates'
+        template_path = templates_dir / 'test_case_TEMPLATE.md'
+        assert template_path.exists()
+
+
+class TestConfigurationLoading:
+    """配置加载测试。"""
+
+    def test_pyproject_dependencies(self, tmp_path):
+        """测试pyproject依赖。"""
+        pyproject = Path(__file__).parent.parent / 'pyproject.toml'
+        assert pyproject.exists()
+
+        content = pyproject.read_text()
+        assert 'click' in content
+        assert 'pyyaml' in content
+        assert 'jinja2' in content
+
+    def test_script_entry_point(self, tmp_path):
+        """测试脚本入口点。"""
+        pyproject = Path(__file__).parent.parent / 'pyproject.toml'
+        content = pyproject.read_text()
+        assert 'oc-collab' in content
+
+
+class TestDocumentationExists:
+    """文档存在性测试。"""
+
+    def test_user_manual_exists(self, tmp_path):
+        """测试用户手册存在。"""
+        docs_dir = Path(__file__).parent.parent / 'docs'
+        manual_path = docs_dir / '使用手册.md'
+        assert manual_path.exists()
+
+    def test_development_plan_exists(self, tmp_path):
+        """测试开发计划存在。"""
+        docs_dir = Path(__file__).parent.parent / 'docs' / '05-development'
+        plan_path = docs_dir / 'development_plan_v1.md'
+        assert plan_path.exists()
+
+    def test_requirements_doc_exists(self, tmp_path):
+        """测试需求文档存在。"""
+        docs_dir = Path(__file__).parent.parent / 'docs' / '01-requirements'
+        req_path = docs_dir / 'requirements_v2.md'
+        assert req_path.exists()
+
+    def test_design_doc_exists(self, tmp_path):
+        """测试设计文档存在。"""
+        docs_dir = Path(__file__).parent.parent / 'docs' / '02-design'
+        design_path = docs_dir / 'detailed_design_v1.md'
+        assert design_path.exists()
+
+
+class TestStatePersistence:
+    """状态持久化测试。"""
+
+    def test_state_file_creation(self, tmp_path):
+        """测试状态文件创建。"""
+        from src.core.state_manager import StateManager
+
+        with tempfile.TemporaryDirectory() as td:
+            manager = StateManager(td)
+            manager.init_state('TestProject', 'PYTHON')
+            state_file = Path(td) / 'state' / 'project_state.yaml'
+            assert state_file.exists()
+
+    def test_state_file_loading(self, tmp_path):
+        """测试状态文件加载。"""
+        from src.core.state_manager import StateManager
+
+        with tempfile.TemporaryDirectory() as td:
+            manager = StateManager(td)
+            manager.init_state('TestProject', 'PYTHON')
+            state = manager.load_state()
+            assert state['project']['name'] == 'TestProject'
+
+    def test_state_file_update(self, tmp_path):
+        """测试状态文件更新。"""
+        from src.core.state_manager import StateManager
+
+        with tempfile.TemporaryDirectory() as td:
+            manager = StateManager(td)
+            manager.init_state('TestProject', 'PYTHON')
+            manager.update_phase('requirements_draft')
+            state = manager.load_state()
+            assert state['phase'] == 'requirements_draft'
+
+
+class TestAgentBehaviorRules:
+    """Agent行为规则测试。"""
+
+    def test_agent1_create_requirements(self, tmp_path):
+        """测试Agent 1创建需求。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('产品经理', 'project_init')
+        assert action.value in ['create_requirements', 'wait']
+
+    def test_agent1_signoff_requirements(self, tmp_path):
+        """测试Agent 1签署需求。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('产品经理', 'requirements_review')
+        assert action.value in ['signoff_requirements', 'wait']
+
+    def test_agent1_review_design(self, tmp_path):
+        """测试Agent 1评审设计。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('产品经理', 'design_review')
+        assert action.value in ['review_design', 'wait']
+
+    def test_agent2_review_requirements(self, tmp_path):
+        """测试Agent 2评审需求。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('开发', 'requirements_draft')
+        assert action.value in ['review_requirements', 'wait']
+
+    def test_agent2_create_design(self, tmp_path):
+        """测试Agent 2创建设计。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('开发', 'requirements_approved')
+        assert action.value in ['create_design', 'wait']
+
+    def test_agent2_implement_code(self, tmp_path):
+        """测试Agent 2实现代码。"""
+        from src.core.brain_engine import BrainEngine
+
+        engine = BrainEngine()
+        action, rule = engine.get_action('开发', 'development')
+        assert action.value in ['implement_code', 'wait']
+
+
+class TestNotificationSystem:
+    """通知系统测试。"""
+
+    def test_notification_config_creation(self, tmp_path):
+        """测试通知配置创建。"""
+        from src.core.exception_handler import NotificationConfig, NotificationChannel, ExceptionSeverity
+
+        config = NotificationConfig(
+            channel=NotificationChannel.LOG,
+            enabled=True,
+            min_severity=ExceptionSeverity.MEDIUM
+        )
+        assert config.channel == NotificationChannel.LOG
+
+    def test_notification_channel_enum(self, tmp_path):
+        """测试通知渠道枚举。"""
+        from src.core.exception_handler import NotificationChannel
+
+        assert NotificationChannel.LOG.value == 'log'
+        assert NotificationChannel.FILE.value == 'file'
+        assert NotificationChannel.WEBHOOK.value == 'webhook'
+
+
+class TestCrashRecovery:
+    """崩溃恢复测试。"""
+
+    def test_crash_log_saving(self, tmp_path):
+        """测试崩溃日志保存。"""
+        from src.core.exception_handler import ExceptionHandler, ExceptionInfo, ExceptionType, ExceptionSeverity
+        from datetime import datetime
+
+        with tempfile.TemporaryDirectory() as td:
+            handler = ExceptionHandler('test_agent', 'test_phase')
+            handler.crash_log_dir = Path(td)
+            handler.crash_log_dir.mkdir(exist_ok=True)
+
+            exc_info = ExceptionInfo(
+                exception_type=ExceptionType.RETRYABLE,
+                severity=ExceptionSeverity.MEDIUM,
+                message='test error',
+                timestamp=datetime.now().isoformat(),
+                agent_id='test_agent',
+                phase='test_phase',
+                context={}
+            )
+
+            crash_id = handler._save_crash_log(exc_info)
+            assert crash_id.startswith('test_agent_')
+
+    def test_recovery_info_saving(self, tmp_path):
+        """测试恢复信息保存。"""
+        from src.core.exception_handler import ExceptionHandler, ExceptionInfo, ExceptionType, ExceptionSeverity
+        from datetime import datetime
+
+        with tempfile.TemporaryDirectory() as td:
+            handler = ExceptionHandler('test_agent', 'test_phase')
+            handler.recovery_dir = Path(td)
+            handler.recovery_dir.mkdir(exist_ok=True)
+
+            exc_info = ExceptionInfo(
+                exception_type=ExceptionType.FATAL,
+                severity=ExceptionSeverity.CRITICAL,
+                message='fatal error',
+                timestamp=datetime.now().isoformat(),
+                agent_id='test_agent',
+                phase='test_phase',
+                context={'state': {'version': 1}}
+            )
+
+            handler._save_recovery_info(exc_info)
+            recovery_file = handler.recovery_dir / 'test_agent_recovery.json'
+            assert recovery_file.exists()
+
+
+class TestCLIHelp:
+    """CLI帮助测试。"""
+
+    def test_main_help(self, tmp_path):
+        """测试主命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['--help'])
+        assert result.exit_code == 0
+        assert 'init' in result.output
+        assert 'status' in result.output
+
+    def test_init_help(self, tmp_path):
+        """测试init命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['init', '--help'])
+        assert result.exit_code == 0
+        assert 'PROJECT_NAME' in result.output
+
+    def test_auto_help(self, tmp_path):
+        """测试auto命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['auto', '--help'])
+        assert result.exit_code == 0
+        assert '--max-iterations' in result.output
+
+    def test_todo_help(self, tmp_path):
+        """测试todo命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['todo', '--help'])
+        assert result.exit_code == 0
+
+    def test_work_help(self, tmp_path):
+        """测试work命令帮助。"""
+        from src.cli.main import main
+        from click.testing import CliRunner
+
+        runner = CliRunner()
+        result = runner.invoke(main, ['work', '--help'])
+        assert result.exit_code == 0
+        assert '--execute' in result.output
