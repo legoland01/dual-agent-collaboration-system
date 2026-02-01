@@ -11,13 +11,15 @@ iteration:
   status: design
 design:
   dev_signoff: true
-  pm_signoff: true
-  status: approved
+  pm_signoff: false
+  status: in_progress
   version: v1
+  design_doc: 'docs/02-design/detailed_design_v2.1.0.md'
 development:
-  dev_signoff: true
-  pm_signoff: true
-  status: completed
+  dev_signoff: false
+  pm_signoff: false
+  status: pending
+  version: v1
 history:
 - id: requirements_v210_r2_signoff_agent2_20260201141000
   timestamp: '2026-02-01T14:12:04.000000'

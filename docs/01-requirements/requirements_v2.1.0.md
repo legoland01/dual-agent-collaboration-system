@@ -1069,6 +1069,81 @@ $ oc-collab signoff requirements
   - [ ] 错误提示是否友好？
   - [ ] 流程是否支持多轮？
 
+### 7.1.5 迭代状态隔离机制（新增）
+
+**问题现象**: `design.status: approved` 是 v2.0.0 的遗留状态，v2.1.0 迭代开始时未被重置，导致状态不一致。
+
+**根因分析**:
+| 字段 | 值 | 来源 | 问题 |
+|------|------|------|------|
+| design.status | approved | v2.0.0 遗留 | v2.1.0 详细设计未关联 |
+| development.status | completed | v2.0.0 遗留 | v2.1.0 开发未开始 |
+| iteration.status | design | v2.1.0 新增 | ✅ 正确 |
+
+**解决方案**:
+
+**FR-STATE-001: 迭代状态隔离**
+
+```yaml
+# 方案：使用迭代维度的状态结构
+state:
+  deployment:  # 全局状态 (跨迭代共享)
+    status: released
+    version: 2.0.0
+  
+  iterations:
+    v2.0.0:
+      status: completed
+      requirements: approved
+      design: approved
+      development: completed
+      testing: passed
+      deployment: completed
+    
+    v2.1.0:
+      status: in_progress
+      requirements: approved  # 新迭代需要重新审批
+      design: in_progress
+      development: pending
+      testing: pending
+      deployment: pending
+```
+
+**FR-STATE-002: 状态自动验证**
+
+```python
+def validate_iteration_state(iteration_version):
+    """验证当前迭代状态与实际进度一致。"""
+    state = load_state()
+    iteration = state['iterations'].get(iteration_version)
+    
+    checks = [
+        (iteration['requirements'] == 'approved', "需求未审批"),
+        (iteration['design'] == 'in_progress' or iteration['design'] == 'approved', "设计阶段状态异常"),
+        (iteration['development'] == 'pending', "开发已开始但状态未更新"),
+    ]
+    
+    for passed, message in checks:
+        if not passed:
+            raise StateInconsistencyError(message)
+```
+
+**FR-STATE-003: 状态重置命令**
+
+```bash
+# 开始新迭代时重置状态
+oc-collab iteration start v2.1.0 --reset-state
+
+# 手动重置指定阶段状态
+oc-collab state reset --phase design
+```
+
+**验收标准**:
+- [ ] 新迭代开始时，所有阶段状态初始化为 `pending`
+- [ ] `oc-collab status` 显示当前迭代的正确状态
+- [ ] 状态与实际进度不一致时抛出警告
+- [ ] 支持手动重置状态命令
+
 ---
 
 ## 7.2 Agent 2 补充需求的正式纳入
