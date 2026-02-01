@@ -1,5 +1,14 @@
 deployment:
-  status: pending
+  status: released
+  released_at: '2026-02-01T11:57:00.000000'
+  pypi_released_at: '2026-02-01T12:05:00.000000'
+  version: 2.0.0
+  release_notes: true
+  pypi_url: https://pypi.org/project/opencode-collaboration/2.0.0/
+iteration:
+  current: v2.1.0
+  start_date: '2026-02-01T12:10:00.000000'
+  status: design
 design:
   dev_signoff: true
   pm_signoff: true
@@ -10,6 +19,46 @@ development:
   pm_signoff: true
   status: completed
 history:
+- id: requirements_v210_signoff_agent2_20260201140000
+  timestamp: '2026-02-01T13:55:45.000000'
+  action: signoff
+  agent_id: agent2
+  details: '签署 v2.1.0 需求评审: 需求完整，同意进入设计阶段。Git 工作流约束已明确，Agent 2 补充机制已添加，P0/P1/P2 优先级分类清晰。'
+- id: iteration_v210_start_20260201121000
+  timestamp: '2026-02-01T12:10:00.000000'
+  action: iteration_start
+  agent_id: agent1
+  details: '开始 v2.1.0 迭代: E2E 测试、异常处理、监控告警、配置热重载'
+- id: pypi_release_20260201120500
+  timestamp: '2026-02-01T12:05:00.000000'
+  action: pypi_release
+  agent_id: agent1
+  details: '发布 v2.0.0 到 PyPI: https://pypi.org/project/opencode-collaboration/2.0.0/'
+- id: release_20260201115700
+  timestamp: '2026-02-01T11:57:00.000000'
+  action: release
+  agent_id: agent1
+  details: 发布 v2.0.0 - Agent 守护进程功能
+- id: iteration_end_20260201115700
+  timestamp: '2026-02-01T11:57:00.000000'
+  action: iteration_end
+  agent_id: system
+  details: 迭代结束，版本发布
+- id: test_doc_cleanup_20260201115700
+  timestamp: '2026-02-01T11:57:00.000000'
+  action: cleanup
+  agent_id: agent1
+  details: 黑盒测试文档精简至 3 个文件
+- id: true_long_running_test_20260201115700
+  timestamp: '2026-02-01T11:57:00.000000'
+  action: test_complete
+  agent_id: agent2
+  details: 真实长时间测试 8/8 通过，验证内存、稳定性、并发
+- id: deployment_complete_20260201110200
+  timestamp: '2026-02-01T11:02:00.000000'
+  action: deployment_complete
+  agent_id: agent1
+  details: 部署报告生成，项目部署完成
 - id: test_signoff_dev_20260201020000
   timestamp: '2026-02-01T02:00:00.000000'
   action: signoff
@@ -24,7 +73,7 @@ history:
   timestamp: '2026-02-01T01:42:51.415558'
   action: phase_update
   agent_id: system
-  details: '阶段从 testing 更新为 deployment'
+  details: 阶段从 testing 更新为 deployment
 - action: test_complete
   agent_id: agent1
   details: 测试通过
