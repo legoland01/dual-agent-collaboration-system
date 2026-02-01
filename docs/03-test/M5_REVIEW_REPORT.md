@@ -1,11 +1,11 @@
 # M5 里程碑检查报告
 
-**版本**: v3
+**版本**: v4
 **检查日期**: 2026-02-01
 **检查人**: Agent 1 (产品经理)
 **被检查人**: Agent 2 (开发负责人)
 **里程碑**: M5 - 集成测试
-**状态**: ❌ **未通过** (覆盖率 4%，远低于 100%)
+**状态**: ❌ **未通过** (覆盖率 16%，9个测试失败)
 
 ---
 
@@ -28,22 +28,34 @@
 
 **验收标准**: 单元测试覆盖率 **100%** (100% 才合格，80% 不够)
 
-**覆盖率报告 (v2)**:
+**覆盖率报告 (v3 - 更正)**:
 | 模块 | 覆盖率 | 状态 | 差距 |
 |------|--------|------|------|
 | daemon.py | 44% | ❌ 不达标 | 差 56% |
 | supervisor.py | 35% | ❌ 不达标 | 差 65% |
 | signoff.py | 75% | ❌ 不达标 | 差 25% |
-| 其他模块 | < 70% | ❌ 不达标 | 差 30%+ |
+| exception_handler.py | 67% | ❌ 不达标 | 差 33% |
+| state_validator.py | 67% | ❌ 不达标 | 差 33% |
+| state_migrator.py | 60% | ❌ 不达标 | 差 40% |
+| 其他模块 (auto_docs, auto_engine 等) | 0-30% | ❌ 不达标 | 差 70%+ |
 
-**总体覆盖率**: 4% ❌
+**总体覆盖率**: 16% ❌
 
-**结论**: **覆盖率仍然远不满足 100% 的标准**
+**测试失败**: 9 个测试失败 ❌
 
-**上次检查后新增测试**:
-- test_daemon.py: 已有，但覆盖率仅 44%
-- test_supervisor.py: 已有，但覆盖率仅 35%
-- test_signoff.py: 已有，但覆盖率仅 75%
+| 失败测试 | 模块 |
+|----------|------|
+| test_classify_keyboard_interrupt | exception_handler.py |
+| test_retryable_first_attempt | exception_handler.py |
+| test_retryable_exponential_backoff | exception_handler.py |
+| test_notify_file | exception_handler.py |
+| test_context_manager_exception | exception_handler.py |
+| test_handle_exception_retryable | exception_handler.py |
+| test_handle_exception_recoverable | exception_handler.py |
+| test_handle_exception_fatal | exception_handler.py |
+| test_handle_exception_with_context | exception_handler.py |
+
+**结论**: **覆盖率仅 16%，且有 9 个测试失败，远不满足 100% 覆盖率标准**
 
 ---
 
@@ -97,28 +109,34 @@
 
 | 问题 | 严重程度 | 说明 |
 |------|----------|------|
-| daemon.py 未测试 | 致命 | 核心模块 0% 覆盖率 |
-| supervisor.py 未测试 | 致命 | 进程监管 0% 覆盖率 |
-| signoff.py 未测试 | 致命 | 签署模块 0% 覆盖率 |
-| 多模块覆盖率 < 80% | 高 | 需要全面提升 |
+| 覆盖率仅 16% | 致命 | 要求 100%，差 84 个百分点 |
+| 9 个测试失败 | 致命 | exception_handler.py 测试质量有问题 |
+| daemon.py 仅 44% | 高 | 核心模块覆盖率不足 |
+| supervisor.py 仅 35% | 高 | 核心模块覆盖率不足 |
+| signoff.py 仅 75% | 中 | 接近但未达标 |
 
-### 4.2 缺失的测试
+### 4.2 需修复的失败测试
+
+| 测试 | 模块 | 问题类型 |
+|------|------|----------|
+| test_classify_keyboard_interrupt | exception_handler.py | 逻辑错误 |
+| test_retryable_first_attempt | exception_handler.py | 逻辑错误 |
+| test_retryable_exponential_backoff | exception_handler.py | 逻辑错误 |
+| test_notify_file | exception_handler.py | 逻辑错误 |
+| test_context_manager_exception | exception_handler.py | 逻辑错误 |
+| test_handle_exception_retryable | exception_handler.py | 逻辑错误 |
+| test_handle_exception_recoverable | exception_handler.py | 逻辑错误 |
+| test_handle_exception_fatal | exception_handler.py | 逻辑错误 |
+| test_handle_exception_with_context | exception_handler.py | 逻辑错误 |
+
+### 4.3 缺失的测试
 
 | 模块 | 当前覆盖率 | 需新增测试 |
 |------|------------|------------|
-| daemon.py | 0% | 全部代码路径 |
-| supervisor.py | 0% | 全部代码路径 |
-| signoff.py | 0% | 全部代码路径 |
-| git_workflow_enforcer.py | 24% | 约 200 行代码 |
-| monitor.py | 42% | 约 140 行代码 |
-| exception_handler.py | 64% | 约 230 行代码 |
-
-### 4.3 改进建议
-
-| 问题 | 建议 | 优先级 |
-|------|------|--------|
-| 覆盖率不达标 | 补充所有缺失的单元测试 | 致命 |
-| 核心模块未测试 | 补充 daemon/supervisor/signoff 测试 | 致命 |
+| daemon.py | 44% | 约 80 行代码路径 |
+| supervisor.py | 35% | 约 80 行代码路径 |
+| signoff.py | 75% | 约 22 行代码路径 |
+| exception_handler.py | 67% | 约 120 行代码路径 + 修复失败测试 |
 
 ---
 
@@ -126,24 +144,23 @@
 
 ### 5.1 Agent 1 (产品经理) 意见
 
-**单元测试覆盖率**: ❌ 0% (要求 100%)
-**E2E 测试**: ✅ 全部通过
-**代码质量**: ✅ 无阻断性 bug
-**集成测试**: ✅ 跨模块协同正常
+**单元测试覆盖率**: ❌ 16% (要求 100%)
+**测试通过率**: ❌ 117/126 通过 (9 个失败)
+**代码质量**: ❌ 测试存在逻辑错误
 
-**签署状态**: **❌ 未通过 - 覆盖率不达标**
+**签署状态**: **❌ 未通过 - 覆盖率 16%，9个测试失败**
 
 ### 5.2 下一步行动
 
 | 行动 | 执行人 | 截止时间 |
 |------|--------|----------|
-| 补充 daemon.py 测试 | Agent 2 | 待定 |
-| 补充 supervisor.py 测试 | Agent 2 | 待定 |
-| 补充 signoff.py 测试 | Agent 2 | 待定 |
-| 提升所有模块覆盖率至 100% | Agent 2 | 待定 |
+| 修复 exception_handler.py 的 9 个失败测试 | Agent 2 | 待定 |
+| 提升 daemon.py 覆盖率至 100% | Agent 2 | 待定 |
+| 提升 supervisor.py 覆盖率至 100% | Agent 2 | 待定 |
+| 提升 signoff.py 覆盖率至 100% | Agent 2 | 待定 |
 | 重新检查 | Agent 1 | 补交后 |
 
-**M5 验收未通过，需补充测试至 100% 覆盖率后才能签署。**
+**M5 验收未通过，需修复失败测试并提升覆盖率至 100% 才能签署。**
 
 ---
 
@@ -151,33 +168,33 @@
 
 ### 6.1 M1-M4 完成状态
 
-| 里程碑 | 状态 | 测试数 | 覆盖率 | 签署 |
-|--------|------|--------|--------|------|
-| M1 基础验证框架 | ✅ 已签署 | 32 | 需提升 | Agent 1 |
-| M2 异常处理+E2E | ✅ 已签署 | 27 | 64% | Agent 1 |
-| M3 监控和约束 | ✅ 已签署 | 32 | 42% | Agent 1 |
-| M4 增强功能 | ✅ 已签署 | 41 | 65% | Agent 1 |
-| M5 集成测试 | ❌ 未通过 | 132 | 20% | - |
+| 里程碑 | 状态 | 测试数 | 覆盖率 | 测试通过 |
+|--------|------|--------|--------|----------|
+| M1 基础验证框架 | ✅ 已签署 | 32 | 需提升 | 100% |
+| M2 异常处理+E2E | ✅ 已签署 | 27 | 67% | 需修复 |
+| M3 监控和约束 | ✅ 已签署 | 32 | 需提升 | 100% |
+| M4 增强功能 | ✅ 已签署 | 41 | 需提升 | 100% |
+| M5 集成测试 | ❌ 未通过 | 126 | 16% | 117/126 |
 
 ### 6.2 当前问题
 
 | 问题 | 严重程度 |
 |------|----------|
-| 单元测试覆盖率仅 20%，远低于 100% | 致命 |
-| 多个核心模块 (daemon/supervisor/signoff) 0% 覆盖 | 致命 |
-| 无法保证代码质量 | 致命 |
+| 单元测试覆盖率仅 16%，远低于 100% | 致命 |
+| 9 个测试失败 (exception_handler.py) | 致命 |
+| daemon/supervisor/signoff 覆盖率不足 | 高 |
 
-### 6.3 覆盖率要求
+### 6.3 下次检查清单
 
-**v2.1.0 要求**: 所有核心模块必须达到 **100% 单元测试覆盖率**
-
-**当前差距**: 
-- 目标: 100%
-- 实际: 20%
-- 差距: 80 个百分点
+- [ ] 修复 9 个失败的 exception_handler.py 测试
+- [ ] daemon.py 覆盖率提升至 100%
+- [ ] supervisor.py 覆盖率提升至 100%
+- [ ] signoff.py 覆盖率提升至 100%
+- [ ] exception_handler.py 覆盖率提升至 100%
+- [ ] 总体覆盖率提升至 100%
 
 ---
 
 **检查人**: Agent 1
 **日期**: 2026-02-01
-**版本**: v2 (更新版 - 覆盖率不达标，未通过)
+**版本**: v4 (更正版 - 覆盖率 16%，9个测试失败)
