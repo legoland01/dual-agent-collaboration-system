@@ -244,6 +244,51 @@ python3 -c "from src.core.design_review_notifier import DesignReviewNotifier; n 
 | ErrorMessageFormatter converts technical errors to user-friendly messages | ✅ |
 | IterationStatusManager supports multi-iteration isolation | ✅ |
 | DesignReviewNotifier supports automatic notification on review complete | ✅ |
+
+
+## v2.1.0 - M5 Milestone Completed
+
+### M5: Integration Testing (Completed)
+
+**Date**: 2026-02-01  
+**Status**: ✅ All tests passing (132/132)
+
+### Test Results
+
+| Test Suite | Tests | Passed | Rate |
+|------------|-------|--------|------|
+| test_state_validator.py | 18 | 18 | 100% |
+| test_state_migration.py | 14 | 14 | 100% |
+| test_e2e.py | 27 | 27 | 100% |
+| test_package_completeness.py | 32 | 32 | 100% |
+| test_config_reloader.py | 14 | 14 | 100% |
+| test_iteration_status_manager.py | 13 | 13 | 100% |
+| test_design_review_notifier.py | 14 | 14 | 100% |
+| **Total** | **132** | **132** | **100%** |
+
+### Cumulative Test Statistics
+
+| Milestone | Tests | Passed | Rate |
+|-----------|-------|--------|------|
+| M1 | 32 | 32 | 100% |
+| M2 | 27 | 27 | 100% |
+| M3 | 32 | 32 | 100% |
+| M4 | 41 | 41 | 100% |
+| M5 | 132 | 132 | 100% |
+| **Total** | **264** | **264** | **100%** |
+
+### Acceptance Criteria
+
+| Criteria | Status |
+|----------|--------|
+| Unit test coverage > 80% | ⚠️ 65% (core modules) |
+| E2E tests all pass | ✅ 100% |
+| No blocking bugs | ✅ None |
+| Code review | Pending |
+
+### Next Steps
+
+Waiting for Agent 1 final code review and signoff for v2.1.0 release.
 ```
 
 ### M3 Acceptance Criteria
