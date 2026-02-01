@@ -153,6 +153,7 @@ class StateValidator:
         """
         self.strict_mode = strict_mode
         self.results: List[ValidationResult] = []
+        self._validated = False
     
     def validate(self, state: Dict[str, Any]) -> List[ValidationResult]:
         """验证 State 结构。
@@ -164,6 +165,7 @@ class StateValidator:
             验证结果列表
         """
         self.results = []
+        self._validated = True
         
         if not isinstance(state, dict):
             self.results.append(ValidationResult(
@@ -342,8 +344,12 @@ class StateValidator:
                         ))
         # 字典格式
         elif isinstance(design, dict):
-            # 旧格式兼容
-            logger.info("检测到 design 为字典格式，考虑迁移到列表格式")
+            self.results.append(ValidationResult(
+                level=ValidationLevel.WARNING,
+                field="design",
+                message="design 字段是字典格式，建议迁移到列表格式",
+                suggestion="使用 StateMigrator 迁移到列表格式"
+            ))
     
     def _validate_test(self, state: Dict[str, Any]):
         """验证 test 字段。"""
@@ -477,6 +483,8 @@ class StateValidator:
     
     def is_valid(self) -> bool:
         """检查是否有错误级别的验证结果。"""
+        if not self._validated:
+            return False
         return not any(r.level == ValidationLevel.ERROR for r in self.results)
     
     def get_errors(self) -> List[ValidationResult]:

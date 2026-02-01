@@ -1,43 +1,52 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## v2.1.0 - M1 Milestone Completed
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### M1: Foundation Validation Framework (Completed)
 
-## [0.1.0] - 2026-02-01
+**Date**: 2026-02-01  
+**Status**: ✅ All tests passing (32/32)
 
-### Added
-- Initial release of oc-collab (opencode-collaboration)
-- Dual-agent collaboration framework
-- Agent workflow management (requirements → design → development → testing → deployment)
-- Agent daemon functionality with background mode and process supervision
-- Git-based state management and communication between agents
-- CLI commands for project management and agent control
+### Changes
 
-### Features
-- `oc-collab agent` - Agent daemon command with daemonization support
-- `oc-collab project status` - Check current project phase and status
-- `oc-collab advance` - Advance project to next phase
-- `oc-collab signoff` - Sign off on phase completions
-- Process supervision with auto-restart (max 5 restarts/hour)
-- Configurable git timeout control
+- **src/core/state_validator.py** - State structure validation framework
+  - Added `_validated` flag to track validation status
+  - Fixed `is_valid()` method behavior for unvalidated states
+  - Added warning for dict format design fields
+  - 17 tests passing
 
-### Components
-- `AgentDaemon` - Core daemon class for agent lifecycle management
-- `ProcessSupervisor` - Process supervision with exponential backoff
-- `GitMonitor` - Git timeout and status monitoring
+- **src/core/state_migrator.py** - Version migration system
+  - Fixed dry_run mode to not create backup directory
+  - Added requirements field validation for test states
+  - 15 tests passing
 
-### Documentation
-- Requirements specifications for agent daemon
-- Detailed design documentation
-- Development task assignments
-- Blackbox test results
+- **tests/test_state_validator.py** - Unit tests for validator
+  - Fixed import issues
+  - Fixed assertions for project validation
+  - Fixed empty state validation logic
 
-### Tests
-- Unit tests for daemon functionality (24 tests passing)
-- Blackbox testing for all CLI commands
+- **tests/test_state_migration.py** - Unit tests for migrator
+  - Fixed backup creation tests
+  - Fixed dry run validation tests
+  - Added complete test states with all required fields
 
-## [Unreleased]
-- Additional agent features
-- Enhanced collaboration workflows
+### Test Results
+
+```
+========================= 32 passed in 0.07s =========================
+```
+
+### Commands Reference
+
+```bash
+# Run tests
+python3 -m pytest tests/test_state_validator.py tests/test_state_migration.py -v
+
+# Test validator directly
+python3 -c "from src.core.state_validator import StateValidator; v = StateValidator(); print(v.validate({'version': '2.0.0', 'project': {'name': 'Test', 'type': 'PYTHON', 'phase': 'development'}, 'requirements': [{}], 'design': [{}], 'test': {}, 'development': {}, 'deployment': {}}))"
+```
+
+### Next Steps (M2)
+
+- Exception handling: `src/core/exception_handler.py`
+- E2E tests: `tests/test_e2e.py`

@@ -46,8 +46,8 @@ class StateMigrator:
         self.backup_dir = Path(backup_dir) if backup_dir else self.state_path.parent / "backups"
         self.dry_run = dry_run
         
-        # 创建备份目录
-        self.backup_dir.mkdir(parents=True, exist_ok=True)
+        if not self.dry_run:
+            self.backup_dir.mkdir(parents=True, exist_ok=True)
     
     def get_current_version(self, state: Dict[str, Any]) -> str:
         """获取当前版本号。"""
