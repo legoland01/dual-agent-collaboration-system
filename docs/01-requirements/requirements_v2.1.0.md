@@ -90,6 +90,65 @@ def verify_agent_action(agent_id, action_type):
 - 每个阶段需要双方签署才能推进
 - 发布前需要 Agent 1 确认
 
+### A.5 Git 工作流强制约束
+
+**核心原则**：所有双 Agent 通信必须通过 Git 进行，禁止直接读取本地文件。
+
+```
+双 Agent 协作通信规则
+==========================
+
+✅ 正确做法:
+  Agent 1 提交文档 → Git push → Agent 2 Git pull → 读取最新文档
+  Agent 2 提交代码 → Git push → Agent 1 Git pull → 读取最新代码
+  Agent 1 提交测试报告 → Git push → Agent 2 Git pull → 拉取测试报告
+
+❌ 错误做法（禁止）:
+  Agent 2 直接读取本地项目目录的测试报告
+  Agent 1 直接读取本地项目目录的代码文件
+  Agent 之间通过非 Git 方式传递文件
+```
+
+**强制 Git 拉取的操作**：
+
+| 操作 | Agent | 必须执行 | 说明 |
+|------|-------|---------|------|
+| 读取需求文档 | Agent 2 | `git pull` | 必须获取 Agent 1 最新提交 |
+| 读取设计文档 | Agent 1 | `git pull` | 必须获取 Agent 2 最新提交 |
+| 读取测试报告 | Agent 2 | `git pull` | 必须获取 Agent 1 最新测试结果 |
+| 读取签署记录 | Agent 1/2 | `git pull` | 必须获取对方签署状态 |
+| 读取代码变更 | Agent 1 | `git pull` | 必须获取 Agent 2 实现代码 |
+
+**违规检测机制**：
+
+```python
+# 伪代码：检测本地文件修改 vs Git 最新版本
+def verify_git_workflow(agent_id, file_path):
+    local_content = read_local_file(file_path)
+    git_content = run_git_show(f"HEAD:{file_path}")
+    
+    if local_content != git_content:
+        raise WorkflowViolation(
+            f"Agent {agent_id} 未通过 Git 读取 {file_path}。 "
+            f"本地文件与 Git HEAD 不一致，可能直接修改了本地文件。 "
+            f"正确做法: git pull → 读取文件"
+        )
+```
+
+**典型反模式（需避免）**：
+```
+financial_case_generator_system 项目中的问题:
+❌ Agent 2 直接读取 docs/03-test/blackbox_test_results_*.md
+✅ 正确做法: git pull → 读取 docs/03-test/blackbox_test_results_*.md
+```
+
+**违反此约束的处理**：
+| 场景 | 处理方式 | 输出 |
+|------|----------|------|
+| 检测到本地文件与 Git 不一致 | 阻止读取，提示 Git pull | "请先执行 git pull 获取最新版本" |
+| 多次违规 | 记录到状态报告 | 状态报告中标记违规次数 |
+| 强制模式 | 抛出异常阻止执行 | "违反 Git 工作流约束"
+
 ---
 
 ## 附录 B: 部署发布流程
