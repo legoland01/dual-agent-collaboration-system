@@ -346,6 +346,277 @@ class TestValidationResult:
         assert data["message"] == "错误信息"
         assert data["suggestion"] == "修复建议"
 
+    def test_str_with_suggestion(self):
+        """测试 __str__ 方法（带建议）。"""
+        result = ValidationResult(
+            level=ValidationLevel.WARNING,
+            field="test.field",
+            message="警告信息",
+            suggestion="这是建议"
+        )
+        
+        result_str = str(result)
+        
+        assert "[WARNING]" in result_str
+        assert "警告信息" in result_str
+        assert "💡" in result_str
+        assert "这是建议" in result_str
+
+    def test_str_without_suggestion(self):
+        """测试 __str__ 方法（不带建议）。"""
+        result = ValidationResult(
+            level=ValidationLevel.INFO,
+            field="test.field",
+            message="信息"
+        )
+        
+        result_str = str(result)
+        
+        assert "[INFO]" in result_str
+        assert "信息" in result_str
+        assert "💡" not in result_str
+
+
+class TestStateValidatorMore:
+
+    def test_validate_version_wrong_type(self):
+        """测试 version 类型错误。"""
+        state = {
+            "version": 123,
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        version_errors = [r for r in results if r.field == "version"]
+        assert len(version_errors) == 1
+        assert "字符串" in version_errors[0].message
+
+    def test_validate_project_missing_name(self):
+        """测试 project.name 缺失。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        name_errors = [r for r in results if r.field == "project.name"]
+        assert len(name_errors) == 1
+
+    def test_validate_project_phase_in_root(self):
+        """测试 phase 在根级（警告）。"""
+        state = {
+            "version": "2.0.0",
+            "phase": "development",
+            "project": {"name": "Test", "type": "PYTHON"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        phase_warnings = [r for r in results if "phase" in r.field and r.level == ValidationLevel.WARNING]
+        assert len(phase_warnings) >= 1
+
+    def test_validate_project_missing_phase(self):
+        """测试 project.phase 缺失。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        phase_errors = [r for r in results if r.field == "project.phase" and r.level == ValidationLevel.ERROR]
+        assert len(phase_errors) == 1
+
+    def test_validate_test_wrong_type(self):
+        """测试 test 类型错误。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": "not a dict",
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        test_errors = [r for r in results if r.field == "test" and "字典格式" in r.message]
+        assert len(test_errors) == 1
+
+    def test_validate_test_invalid_status(self):
+        """测试 test.status 无效值。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {"status": "invalid_status"},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        status_errors = [r for r in results if r.field == "test.status"]
+        assert len(status_errors) == 1
+        assert "无效的 test.status" in status_errors[0].message
+
+    def test_validate_development_wrong_type(self):
+        """测试 development 类型错误。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": "not a dict",
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        dev_errors = [r for r in results if r.field == "development" and "字典格式" in r.message]
+        assert len(dev_errors) == 1
+
+    def test_validate_deployment_wrong_type(self):
+        """测试 deployment 类型错误。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": "not a dict"
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        deploy_errors = [r for r in results if r.field == "deployment" and "字典格式" in r.message]
+        assert len(deploy_errors) == 1
+
+    def test_validate_iteration(self):
+        """测试 iteration 验证。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {},
+            "iteration": {}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        iteration_results = [r for r in results if r.field == "iteration.current"]
+        assert len(iteration_results) >= 1
+
+    def test_validate_iteration_wrong_type(self):
+        """测试 iteration 类型错误。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {},
+            "iteration": "not a dict"
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        iteration_errors = [r for r in results if r.field == "iteration"]
+        assert len(iteration_errors) == 1
+
+    def test_validate_iteration_missing_current(self):
+        """测试 iteration 缺少 current。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {},
+            "iteration": {"total": 5}
+        }
+        
+        validator = StateValidator()
+        results = validator.validate(state)
+        
+        current_warnings = [r for r in results if r.field == "iteration.current" and r.level == ValidationLevel.WARNING]
+        assert len(current_warnings) == 1
+
+    def test_check_compatibility(self):
+        """测试兼容性检查。"""
+        state = {
+            "version": "2.0.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{}],
+            "design": [{}],
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        issues = validator.check_compatibility(state)
+        
+        assert isinstance(issues, list)
+
+    def test_check_compatibility_old_version(self):
+        """测试旧版本兼容性。"""
+        state = {
+            "version": "1.0.0",
+            "project": {"name": "Test", "type": "PYTHON"},
+            "requirements": {},
+            "design": {},
+            "test": {},
+            "development": {},
+            "deployment": {}
+        }
+        
+        validator = StateValidator()
+        issues = validator.check_compatibility(state)
+        
+        assert len(issues) >= 1
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -13,6 +13,7 @@ import tempfile
 import os
 from pathlib import Path
 import yaml
+from unittest.mock import patch
 
 from src.core.state_migrator import StateMigrator
 
@@ -329,6 +330,174 @@ class TestStateMigrationPaths:
         
         assert success
         assert result["version"] == "2.1.0"
+
+
+class TestStateMigratorExtended:
+    """StateMigrator 扩展测试。"""
+
+    def test_migrate_preserves_unknown_fields(self):
+        """测试迁移保留未知字段。"""
+        state = {
+            "version": "1.0",
+            "phase": "development",
+            "requirements": {"status": "approved"},
+            "design": {"status": "completed"},
+            "test": {"status": "pending"},
+            "development": {"status": "in_progress"},
+            "deployment": {"status": "pending"},
+            "custom_field": "custom_value"
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        success, result = migrator.migrate(state)
+        
+        assert success
+        assert "custom_field" in result
+        assert result["custom_field"] == "custom_value"
+
+    def test_migrate_v2_0_with_all_fields(self):
+        """测试 v2.0 完整迁移。"""
+        state = {
+            "version": "2.0",
+            "project": {"name": "Test", "type": "PYTHON", "phase": "development"},
+            "requirements": [{"id": "REQ-001", "status": "approved"}],
+            "design": [{"id": "DES-001", "status": "completed"}],
+            "test": {"status": "pending"},
+            "development": {"status": "in_progress"},
+            "deployment": {"status": "pending"}
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        success, result = migrator.migrate(state)
+        
+        assert success
+        assert result["version"] == "2.1.0"
+        assert "agent_constraints" in result
+        assert "iteration" in result
+        assert "project" in result
+
+    def test_needs_migration_v1_0(self):
+        """测试 v1.0 需要迁移。"""
+        state = {
+            "version": "1.0",
+            "phase": "development"
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        assert migrator.needs_migration(state) is True
+
+    def test_needs_migration_v1_1(self):
+        """测试 v1.1 需要迁移。"""
+        state = {
+            "version": "1.1",
+            "phase": "development"
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        assert migrator.needs_migration(state) is True
+
+    def test_needs_migration_v2_0(self):
+        """测试 v2.0 需要迁移。"""
+        state = {
+            "version": "2.0",
+            "project": {"name": "Test", "phase": "development"}
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        assert migrator.needs_migration(state) is True
+
+    def test_migrate_with_empty_project(self):
+        """测试迁移空项目。"""
+        state = {
+            "version": "1.0",
+            "phase": "requirements",
+            "requirements": {"status": "pending"},
+            "design": {"status": "pending"},
+            "test": {"status": "pending"},
+            "development": {"status": "pending"},
+            "deployment": {"status": "pending"}
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        success, result = migrator.migrate(state)
+        
+        assert success
+        assert result["project"]["phase"] == "requirements"
+
+    def test_migrate_preserves_project_name(self):
+        """测试迁移保留项目名称。"""
+        state = {
+            "version": "1.0",
+            "phase": "development",
+            "project_name": "My Project",
+            "requirements": {"status": "approved"},
+            "design": {"status": "completed"},
+            "test": {"status": "pending"},
+            "development": {"status": "in_progress"},
+            "deployment": {"status": "pending"}
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        success, result = migrator.migrate(state)
+        
+        assert success
+        assert "project" in result
+
+    def test_backup_failure_handling(self, tmp_path):
+        """测试备份失败处理。"""
+        state_path = tmp_path / "state.yaml"
+        backup_dir = tmp_path / "backups"
+        
+        state = {
+            "version": "1.0",
+            "phase": "development",
+            "requirements": {"status": "approved"},
+            "design": {"status": "completed"},
+            "test": {"status": "pending"},
+            "development": {"status": "in_progress"},
+            "deployment": {"status": "pending"}
+        }
+        with open(state_path, 'w') as f:
+            yaml.dump(state, f)
+        
+        original_mkdir = os.mkdir
+        
+        def mock_mkdir_error(path):
+            if str(path) == str(backup_dir):
+                raise OSError("Cannot create directory")
+            return original_mkdir(path)
+        
+        with patch('os.mkdir', side_effect=mock_mkdir_error):
+            migrator = StateMigrator(str(state_path), backup_dir=str(backup_dir), dry_run=False)
+            success, result = migrator.migrate(state)
+            
+            assert success
+
+    def test_migrate_complex_v2_state(self):
+        """测试复杂 v2.0 状态迁移。"""
+        state = {
+            "version": "2.0",
+            "project": {"name": "TestProject", "type": "PYTHON", "phase": "testing"},
+            "requirements": [
+                {"id": "REQ-001", "status": "approved"},
+                {"id": "REQ-002", "status": "pending"}
+            ],
+            "design": [
+                {"id": "DES-001", "status": "completed"}
+            ],
+            "test": {"status": "in_progress", "cases_passed": 10, "cases_failed": 2},
+            "development": {"status": "completed"},
+            "deployment": {"status": "pending"}
+        }
+        
+        migrator = StateMigrator("state/project_state.yaml", dry_run=True)
+        success, result = migrator.migrate(state)
+        
+        assert success
+        assert result["version"] == "2.1.0"
+        assert result["project"]["phase"] == "testing"
+        assert len(result["requirements"]) == 2
+        assert len(result["design"]) == 1
 
 
 if __name__ == "__main__":
