@@ -163,6 +163,87 @@ python3 -c "from src.core.monitor import ResourceMonitor; m = ResourceMonitor();
 
 # Test Git workflow enforcer
 python3 -c "from src.core.git_workflow_enforcer import GitWorkflowEnforcer; e = GitWorkflowEnforcer(); print(e.is_git_repository())"
+
+
+## v2.1.0 - M4 Milestone Completed
+
+### M4: Enhanced Features (Completed)
+
+**Date**: 2026-02-01  
+**Status**: ✅ All tests passing (28/28)
+
+### Changes
+
+- **src/core/config_reloader.py** - Configuration hot reload
+  - Added ConfigReloader class with monitoring support
+  - Added ConfigReloadError and ConfigValidationError exceptions
+  - Added start_monitoring() with 60-second interval
+  - Added load_all(), get(), add_config(), remove_config() methods
+  - Thread-safe monitoring loop
+
+- **src/core/error_templates.py** - Error message formatting
+  - Added ErrorMessageFormatter class with 10 error templates
+  - Added ErrorCategory enum for error classification
+  - Added ErrorTemplate class for custom templates
+  - Added UserFacingError exception
+  - Templates for Git, YAML, Permission, File, Network, State errors
+
+- **src/core/iteration_status_manager.py** - Iteration status management
+  - Added IterationStatusManager class for multi-iteration isolation
+  - Added IterationStatus and PhaseStatus enums
+  - Added IterationState dataclass
+  - Added start_iteration(), complete_iteration(), switch_iteration() methods
+  - Added update_phase_status(), reset_phase(), archive_iteration() methods
+  - Added get_progress() and validate_consistency() methods
+
+- **src/core/design_review_notifier.py** - Design review notifications
+  - Added DesignReviewNotifier class for automated notifications
+  - Added Notification and NotificationType classes
+  - Added NotificationPriority enum
+  - Added notify_design_review_complete(), notify_signoff_complete() methods
+  - Added notify_phase_advance(), notify_requirement_changed() methods
+  - Notification logging and history
+
+- **tests/test_m4_enhancements.py** - M4 enhancement tests
+  - TestConfigReloader: Configuration reloader tests
+  - TestErrorMessageFormatter: Error formatting tests
+  - TestIterationStatusManager: Iteration status tests
+  - TestDesignReviewNotifier: Notification tests
+  - TestM4Integration: Integration tests
+
+### Test Results
+
+```
+========================= 28 passed in 0.07s =========================
+```
+
+### Commands Reference
+
+```bash
+# Run M4 enhancement tests
+python3 -m pytest tests/test_m4_enhancements.py -v
+
+# Test config reloader
+python3 -c "from src.core.config_reloader import ConfigReloader; r = ConfigReloader({}); print(r.get_status())"
+
+# Test error formatter
+python3 -c "from src.core.error_templates import ErrorMessageFormatter; f = ErrorMessageFormatter(); print(f.format(Exception('git error')))"
+
+# Test iteration manager
+python3 -c "from src.core.iteration_status_manager import IterationStatusManager; m = IterationStatusManager('state.yaml'); print(m.get_progress())"
+
+# Test notifier
+python3 -c "from src.core.design_review_notifier import DesignReviewNotifier; n = DesignReviewNotifier('.'); print(n.get_notification_summary())"
+```
+
+### M4 Acceptance Criteria
+
+| Criteria | Status |
+|----------|--------|
+| ConfigHotReloader supports 60 second check interval | ✅ |
+| ErrorMessageFormatter converts technical errors to user-friendly messages | ✅ |
+| IterationStatusManager supports multi-iteration isolation | ✅ |
+| DesignReviewNotifier supports automatic notification on review complete | ✅ |
 ```
 
 ### M3 Acceptance Criteria
@@ -181,11 +262,11 @@ python3 -c "from src.core.git_workflow_enforcer import GitWorkflowEnforcer; e = 
 | M1 | 32 | 32 | 100% |
 | M2 | 27 | 27 | 100% |
 | M3 | 32 | 32 | 100% |
-| **Total** | **91** | **91** | **100%** |
+| M4 | 28 | 28 | 100% |
+| **Total** | **119** | **119** | **100%** |
 
-### Next Steps (M4)
+### Next Steps (M5)
 
-- ConfigHotReloader: `src/core/config_reloader.py`
-- ErrorMessageFormatter: `src/core/error_templates.py`
-- IterationStatusManager: `src/core/iteration_status_manager.py`
-- DesignReviewNotifier: `src/core/design_review_notifier.py`
+- Run full test suite
+- Fix any discovered issues
+- Final validation and signoff
