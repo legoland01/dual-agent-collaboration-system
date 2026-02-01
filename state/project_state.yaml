@@ -8,17 +8,17 @@ deployment:
 iteration:
   current: v2.1.0
   start_date: '2026-02-01T12:10:00.000000'
-  status: design
+  status: development
 design:
   dev_signoff: true
-  pm_signoff: false
-  status: in_progress
+  pm_signoff: true
+  status: approved
   version: v1
   design_doc: docs/02-design/detailed_design_v2.1.0.md
 development:
-  dev_signoff: false
-  pm_signoff: false
-  status: pending
+  dev_signoff: true
+  pm_signoff: true
+  status: in_progress
   version: v1
 history:
 - id: design_v210_signoff_agent2_20260201143500
