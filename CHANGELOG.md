@@ -50,3 +50,67 @@ python3 -c "from src.core.state_validator import StateValidator; v = StateValida
 
 - Exception handling: `src/core/exception_handler.py`
 - E2E tests: `tests/test_e2e.py`
+
+
+## v2.1.0 - M2 Milestone Completed
+
+### M2: Exception Handling and E2E Tests (Completed)
+
+**Date**: 2026-02-01  
+**Status**: ✅ All tests passing (27/27)
+
+### Changes
+
+- **src/core/exception_handler.py** - Enhanced exception handling
+  - Added NetworkError, DiskSpaceError, PermissionError exception classes
+  - Added DiskSpaceChecker class for disk space monitoring (< 100MB warning)
+  - Added PermissionChecker class for file/directory permission validation
+  - Added RetryConfig and with_retry decorator for automatic retry
+  - Enhanced ExceptionHandler with crash logging and notification
+
+- **tests/test_e2e.py** - End-to-end tests
+  - TestExceptionHandling: Exception classification and handler registration
+  - TestDiskSpaceChecker: Disk space monitoring tests
+  - TestPermissionChecker: Permission validation tests
+  - TestRetryDecorator: Retry mechanism tests
+  - TestFullWorkflow: Complete workflow validation tests
+  - TestConcurrentOperations: Parallel operation tests
+  - TestExceptionHandlerIntegration: Integration tests
+
+### Test Results
+
+```
+========================= 27 passed in 0.11s =========================
+```
+
+### Commands Reference
+
+```bash
+# Run E2E tests
+python3 -m pytest tests/test_e2e.py -v
+
+# Test disk space checker
+python3 -c "from src.core.exception_handler import DiskSpaceChecker; c = DiskSpaceChecker(); print(c.check())"
+
+# Test permission checker
+python3 -c "from src.core.exception_handler import PermissionChecker; c = PermissionChecker(); print(c.check_read('.'))"
+
+# Test retry decorator
+python3 -c "from src.core.exception_handler import with_retry, RetryConfig, NetworkError; @with_retry(RetryConfig(max_retries=2)); def test(): raise NetworkError('test'); test()"
+```
+
+### M2 Acceptance Criteria
+
+| Criteria | Status |
+|----------|--------|
+| NetworkExceptionHandler supports auto-retry | ✅ |
+| DiskSpaceChecker alerts when disk < 100MB | ✅ |
+| PermissionChecker validates file/directory permissions | ✅ |
+| test_full_workflow() passes | ✅ |
+| test_concurrent_operations() passes | ✅ |
+
+### Next Steps (M3)
+
+- ResourceMonitor: `src/core/monitor.py`
+- GitWorkFlowEnforcer: `src/core/git_workflow_enforcer.py`
+- Package completeness test: `tests/test_package_completeness.py`
