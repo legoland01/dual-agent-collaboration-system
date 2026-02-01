@@ -109,7 +109,8 @@ def status_command():
 
         table.add_row("项目名称", project_name)
         table.add_row("项目类型", project_type)
-        table.add_row("当前阶段", state.get("phase", "未知"))
+        current_phase = project_info.get("phase") or state.get("phase", "未知")
+        table.add_row("当前阶段", current_phase)
 
         active_agent = state_manager.get_active_agent()
         agents = state.get("agents", {})
@@ -999,7 +1000,8 @@ def project_command(action: str, type: str, value: str, cases: int,
             click.echo("提示: 运行 'oc-collab advance' 同步到 Git")
 
         elif action == "status":
-            phase_info = state.get('phase', 'unknown')
+            project_info = state.get("project", {})
+            phase_info = project_info.get("phase") or state.get('phase', 'unknown')
             test = state.get('test', {})
             dev = state.get('development', {})
             deploy = state.get('deployment', {})

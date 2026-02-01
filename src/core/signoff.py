@@ -53,14 +53,46 @@ class SignoffEngine:
         self.state_manager = state_manager
         self.workflow_engine = workflow_engine
     
+    def _get_stage_data(self, stage: str, state: dict) -> dict:
+        """获取阶段数据（处理 design 列表的情况）。"""
+        config = self.STAGE_CONFIG.get(stage, {})
+        status_field = config.get("status_field", stage)
+        stage_data = state.get(status_field, {})
+        
+        # design 阶段是列表，需要找到当前进行中的设计文档
+        if stage == "design" and isinstance(stage_data, list):
+            # 查找状态为 in_progress 或 completed 的设计文档
+            for doc in stage_data:
+                if isinstance(doc, dict) and doc.get("status") in ["in_progress", "completed", "approved"]:
+                    return doc
+            # 如果没有找到，返回第一个
+            if stage_data and isinstance(stage_data[0], dict):
+                return stage_data[0]
+            return {}
+        
+        return stage_data if isinstance(stage_data, dict) else {}
+    
+    def _save_stage_data(self, stage: str, state: dict, stage_data: dict):
+        """保存阶段数据（处理 design 列表的情况）。"""
+        config = self.STAGE_CONFIG.get(stage, {})
+        status_field = config.get("status_field", stage)
+        
+        # design 阶段是列表，需要找到并更新对应的设计文档
+        if stage == "design" and isinstance(state.get(status_field), list):
+            for i, doc in enumerate(state[status_field]):
+                if isinstance(doc, dict) and doc.get("status") in ["in_progress", "completed", "approved"]:
+                    state[status_field][i] = stage_data
+                    return
+        else:
+            state[status_field] = stage_data
+    
     def can_sign(self, stage: str, agent: str) -> Tuple[bool, str]:
         """检查是否可以进行签署。"""
         if stage not in self.STAGE_CONFIG:
             return False, f"未知的签署阶段: {stage}"
         
-        config = self.STAGE_CONFIG[stage]
         state = self.state_manager.load_state()
-        stage_data = state.get(config["status_field"], {})
+        stage_data = self._get_stage_data(stage, state)
         
         required_status = {
             "requirements": "review",
@@ -85,14 +117,12 @@ class SignoffEngine:
             raise SignoffError(message)
         
         state = self.state_manager.load_state()
-        config = self.STAGE_CONFIG[stage]
-        stage_data = state.get(config["status_field"], {})
+        stage_data = self._get_stage_data(stage, state)
         
         signoff_key = f"{agent}_signoff"
         stage_data[signoff_key] = True
         
-        state["updated_at"] = self.state_manager.load_state()
-        self.state_manager.save_state(state)
+        self._save_stage_data(stage, state, stage_data)
         
         self.state_manager.add_history(
             action="signoff",
@@ -113,16 +143,13 @@ class SignoffEngine:
             raise RejectionError("拒签原因必须不少于10个字符")
         
         state = self.state_manager.load_state()
-        config = self.STAGE_CONFIG[stage]
-        stage_data = state.get(config["status_field"], {})
+        stage_data = self._get_stage_data(stage, state)
         
         stage_data[f"{agent}_signoff"] = False
         stage_data[f"{agent}_rejected"] = True
         stage_data[f"{agent}_rejection_reason"] = reason
         
-        self.state_manager.save_state(state)
-        
-        self.workflow_engine.handle_rejection(stage, reason)
+        self._save_stage_data(stage, state, stage_data)
         
         self.state_manager.add_history(
             action="reject",
@@ -142,9 +169,8 @@ class SignoffEngine:
         if stage not in self.STAGE_CONFIG:
             return {"error": f"未知的签署阶段: {stage}"}
         
-        config = self.STAGE_CONFIG[stage]
         state = self.state_manager.load_state()
-        stage_data = state.get(config["status_field"], {})
+        stage_data = self._get_stage_data(stage, state)
         
         return {
             "stage": stage,
