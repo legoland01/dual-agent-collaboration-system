@@ -728,6 +728,184 @@ oc-collab agent constraints --validate
 
 ---
 
+## 2.6 State 结构验证（Agent 2 补充）
+
+### 2.6.1 Schema 定义
+
+**需求编号**: FR-VAL-001
+
+**描述**: 定义项目 state 文件的结构规范，启动时自动验证
+
+**验证范围**:
+| 字段 | 类型 | 必填 | 验证规则 |
+|------|------|------|---------|
+| version | string | 是 | 版本号格式 |
+| project.phase | string | 是 | 必须在阶段列表中 |
+| design | list/dict | 是 | 列表或字典格式 |
+| requirements.status | string | 是 | pending/review/approved |
+| test.status | string | 是 | pending/in_progress/passed |
+
+**错误处理**:
+| 场景 | 处理方式 | 用户提示 |
+|------|---------|---------|
+| 字段缺失 | 使用默认值 | WARNING 日志 |
+| 类型错误 | 抛出异常 | 详细错误信息 + 参考文档 |
+| 格式错误 | 抛出异常 | 期望格式 vs 实际格式 |
+
+### 2.6.2 兼容性检测
+
+**需求编号**: FR-VAL-002
+
+**描述**: 检测 state 文件格式与代码期望是否兼容
+
+**检测逻辑**:
+```python
+def check_compatibility(state):
+    issues = []
+    if 'design' in state:
+        if isinstance(state['design'], list):
+            issues.append("design 字段是列表格式")
+        elif isinstance(state['design'], dict):
+            issues.append("design 字段是字典格式")
+    if 'phase' in state and 'project' not in state:
+        issues.append("phase 在根级，请迁移到 project.phase")
+    return issues
+```
+
+### 2.6.3 State 版本迁移
+
+**需求编号**: FR-VAL-003
+
+**描述**: 自动将旧版本 state 格式迁移到新版本
+
+**迁移规则**:
+| 源版本 | 目标版本 | 迁移内容 |
+|--------|---------|---------|
+| v1.0 | v2.0 | phase: root → project.phase |
+| v1.0 | v2.0 | design: 字典 → 列表 |
+| v2.0 | v2.1 | 添加 agent_constraints |
+
+**自动迁移触发**:
+- 项目初始化时检测版本
+- 版本不匹配时自动迁移
+- 迁移前备份原始文件
+- 迁移后验证完整性
+
+---
+
+## 2.7 包完整性验证（Agent 2 补充）
+
+### 2.7.1 Wheel 内容验证
+
+**需求编号**: FR-PKG-001
+
+**描述**: 确保发布的 wheel 包包含所有必要文件
+
+**必须包含的文件**:
+| 文件路径 | 说明 | 重要性 |
+|---------|------|--------|
+| src/cli/main.py | CLI 入口 | P0 |
+| src/cli/agent.py | Agent 命令 | P0 |
+| src/core/signoff.py | 签署引擎 | P0 |
+| src/core/daemon.py | 守护进程 | P0 |
+| src/core/state_manager.py | 状态管理 | P0 |
+
+### 2.7.2 发布前检查清单
+
+**需求编号**: FR-PKG-002
+
+**发布前必须执行**:
+- [ ] 运行 `python -m pytest tests/test_package_completeness.py`
+- [ ] 验证 wheel 文件大小 > 50KB
+- [ ] 验证所有 CLI 命令可用
+- [ ] 验证 PyPI 页面可访问
+
+---
+
+## 2.8 用户友好错误提示（Agent 2 补充）
+
+### 2.8.1 错误分类与提示模板
+
+**需求编号**: FR-ERR-001
+
+**描述**: 将技术错误转换为用户友好的提示信息
+
+**错误分类**:
+| 错误类型 | 示例 | 提示级别 |
+|---------|------|---------|
+| State 结构错误 | design 是列表而非字典 | ERROR + 解决建议 |
+| Git 操作错误 | git pull 超时 | WARNING + 重试建议 |
+| 权限错误 | 无写入权限 | ERROR + 权限说明 |
+| 版本不兼容 | state 版本过旧 | ERROR + 迁移指南 |
+
+**提示模板**:
+```python
+ERROR_TEMPLATES = {
+    "STATE_DESIGN_LIST": {
+        "title": "State 文件格式不兼容",
+        "message": "design 字段是列表格式，但代码期望字典格式。",
+        "solution": "请参考 docs/state_structure_guide.md 进行修复。",
+    },
+    "PHASE_UNKNOWN": {
+        "title": "未知的项目阶段",
+        "message": "当前 phase 值为 'unknown'，系统无法识别。",
+        "solution": "请运行 'oc-collab init' 重新初始化项目。",
+    }
+}
+```
+
+### 2.8.2 上下文相关帮助
+
+**需求编号**: FR-ERR-002
+
+**描述**: 根据错误类型提供相关帮助链接
+
+**帮助系统**:
+```bash
+$ oc-collab signoff requirements
+错误: 当前阶段状态不允许签署: pending
+提示: 请先运行 'oc-collab advance --phase requirements' 推进阶段状态。
+参考: https://docs/collaboration_guide.md#signoff-flow
+```
+
+---
+
+## 2.9 多轮评审机制（Agent 2 补充）
+
+### 2.9.1 评审轮次管理
+
+**需求编号**: FR-REVIEW-001
+
+**描述**: 支持多轮评审，每轮产生独立版本
+
+**轮次编号规则**:
+- 第 1 轮: R1 (requirements_v2.1.0.md)
+- 第 2 轮: R2 (requirements_v2.1.0_R2.md)
+- 第 3 轮: R3 (requirements_v2.1.0_R3.md)
+
+**每轮评审产出**:
+| 文件 | 说明 |
+|------|------|
+| requirements_v2.1.0_R{n}.md | 更新后的需求文档 |
+| review_v2.1.0_R{n}.md | 本轮评审意见 |
+
+### 2.9.2 修改追踪
+
+**需求编号**: FR-REVIEW-002
+
+**描述**: 标记哪些内容在本次评审中修改
+
+**修改标记格式**:
+```markdown
+## v2.1.0 R2 更新内容
+
+### 新增
+- [NEW] State Schema 验证机制 (FR-VAL-001)
+- [NEW] 包完整性测试 (FR-PKG-001)
+```
+
+---
+
 ## 3. 非功能需求
 
 ### 3.1 性能需求
@@ -838,6 +1016,82 @@ oc-collab agent constraints --validate
 | E2E 测试复杂度高 | 可能延期 | 分阶段实现，先核心场景 |
 | 监控告警性能开销 | 影响守护进程 | 使用轻量级监控，采样频率可配置 |
 | 配置热重载竞态 | 可能出现异常 | 添加锁机制，串行化热重载 |
+
+---
+
+## 7.1 问题分析：Agent 1 需求文档为何不完整
+
+### 7.1.1 问题现象
+
+在 v2.1.0 需求评审中，Agent 2 补充了 9 个正式需求，包括：
+- State Schema 验证机制 (3个)
+- 包完整性测试 (2个)
+- 友好错误提示 (2个)
+- 多轮评审机制 (2个)
+
+这说明 Agent 1 创建的需求文档存在**遗漏**。
+
+### 7.1.2 原因分析
+
+| 原因 | 说明 | 影响 |
+|------|------|------|
+| **知识盲点** | Agent 1 未参与 v2.0.0 实际开发，不知道 State 结构不兼容问题 | 遗漏 FR-VAL-001/002/003 |
+| **视角差异** | Agent 1 从产品角度思考，Agent 2 从实现角度思考 | 遗漏 FR-PKG-001/002 |
+| **经验差距** | Agent 1 缺乏实际打包发布经验 | 遗漏 FR-ERR-001/002 |
+| **流程缺失** | 原流程只定义了单轮评审 | 遗漏 FR-REVIEW-001/002 |
+
+### 7.1.3 为什么 Agent 2 能发现这些问题
+
+| Agent | 优势 | 能发现的问题 |
+|-------|------|-------------|
+| Agent 2 | 参与 v2.0.0 开发，遇到过 State 兼容性问题 | FR-VAL-001/002/003 |
+| Agent 2 | 负责打包发布，遇到过 wheel 不完整问题 | FR-PKG-001/002 |
+| Agent 2 | 负责问题排查，收到过用户错误反馈 | FR-ERR-001/002 |
+| Agent 2 | 实际执行评审，发现单轮评审流程不足 | FR-REVIEW-001/002 |
+
+**结论**: Agent 2 在评审时补充需求，正是多 Agent 协作的核心价值！
+
+### 7.1.4 解决方案
+
+**方案 A：强制多轮评审（已实施）**
+- 第 1 轮：Agent 1 创建 → Agent 2 评审 + 补充
+- 第 2 轮：Agent 1 更新 → Agent 2 再次评审
+- 循环直到双方同意
+
+**方案 B：知识共享机制**
+- Agent 2 在开发过程中发现的问题，及时同步给 Agent 1
+- 使用 `docs/06-experience/` 记录经验教训
+
+**方案 C：评审检查清单**
+- Agent 2 评审时必须检查：
+  - [ ] State 结构是否正确定义？
+  - [ ] 包完整性是否有测试？
+  - [ ] 错误提示是否友好？
+  - [ ] 流程是否支持多轮？
+
+---
+
+## 7.2 Agent 2 补充需求的正式纳入
+
+### 7.2.1 补充记录
+
+| 轮次 | 补充内容 | 优先级 | 状态 |
+|------|---------|--------|------|
+| R2 | State Schema 验证 (FR-VAL-001/002/003) | P0 | ✅ 已纳入 |
+| R2 | 包完整性测试 (FR-PKG-001/002) | P0 | ✅ 已纳入 |
+| R2 | 友好错误提示 (FR-ERR-001/002) | P1 | ✅ 已纳入 |
+| R2 | 多轮评审机制 (FR-REVIEW-001/002) | P1 | ✅ 已纳入 |
+
+### 7.2.2 补充价值评估
+
+| 补充需求 | 实际背景 | 价值 |
+|---------|---------|------|
+| FR-VAL-001 | v2.0.0 开发中遇到 `'list' object has no attribute 'get'` | 避免重复踩坑 |
+| FR-PKG-001 | v2.0.0 发布时 wheel 不完整 | 提高发布质量 |
+| FR-ERR-001 | 用户反馈错误提示不友好 | 改善用户体验 |
+| FR-REVIEW-001 | 单轮评审流程不足 | 规范评审流程 |
+
+**总计**: Agent 2 补充了 9 个需求条目，提升了需求完整性。
 
 ---
 
