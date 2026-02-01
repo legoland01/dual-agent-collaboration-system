@@ -209,20 +209,30 @@ class ProcessSupervisor:
         kwargs: dict
     ) -> str:
         """创建进程包装脚本。"""
-        import pickle
+        arg_list = ['oc-collab', 'agent']
 
-        wrapper = f'''
+        for k, v in kwargs.items():
+            opt_name = f'--{k.replace("_", "-")}'
+            arg_list.append(opt_name)
+            if not isinstance(v, bool):
+                arg_list.append(str(v))
+
+        for a in args:
+            arg_list.append(str(a))
+
+        arg_lines = '\n'.join(f'args.append({repr(a)})' for a in arg_list)
+
+        wrapper = f'''#!/usr/bin/env python3
 import sys
-import pickle
-sys.path.insert(0, '{self.project_path}')
+import subprocess
 
-func, args, kwargs = pickle.loads({pickle.dumps((main_func, args, kwargs))})
-func(*args, **kwargs)
+args = []
+{arg_lines}
+
+sys.exit(subprocess.run(args).returncode)
 '''
-
         wrapper_file = self.project_path / ".supervisor_wrapper.py"
         wrapper_file.write_text(wrapper)
-
         return str(wrapper_file)
 
     def _log(self, message: str) -> None:

@@ -300,16 +300,53 @@ def agent_command(interval: int, daemon: bool, supervise: bool, status: bool, st
         if status:
             daemon_mgr = AgentDaemon(project_path)
             daemon_status = daemon_mgr.get_status()
+            
+            import os
+            import subprocess
+            
+            supervisor_running = False
+            supervisor_pid = None
+            
+            wrapper_file = Path(project_path) / ".supervisor_wrapper.py"
+            if wrapper_file.exists():
+                try:
+                    result = subprocess.run(
+                        ['ps', 'aux'],
+                        capture_output=True,
+                        text=True
+                    )
+                    for line in result.stdout.split('\n'):
+                        if 'supervisor_wrapper.py' in line and 'grep' not in line:
+                            parts = line.split()
+                            if len(parts) > 1:
+                                supervisor_running = True
+                                supervisor_pid = parts[1]
+                                break
+                except Exception:
+                    pass
+            
             console.print("\n[bold]守护进程状态[/bold]")
             from rich.table import Table
             table = Table(show_header=False)
             table.add_column("项目")
             table.add_column("值")
-            table.add_row("运行中", "✓" if daemon_status["running"] else "✗")
+            
+            running = daemon_status["running"] or supervisor_running
+            table.add_row("运行中", "✓" if running else "✗")
+            
             if daemon_status.get("pid"):
-                table.add_row("PID", str(daemon_status["pid"]))
+                table.add_row("Daemon PID", str(daemon_status["pid"]))
+            if supervisor_pid:
+                table.add_row("Supervisor PID", str(supervisor_pid))
             if daemon_status.get("log_lines"):
                 table.add_row("日志行数", str(daemon_status["log_lines"]))
+            if supervisor_running:
+                table.add_row("模式", "监管模式 (自动重启)")
+            elif daemon_status.get("running"):
+                table.add_row("模式", "后台模式")
+            else:
+                table.add_row("模式", "前台/未知")
+            
             console.print(table)
             return
 
@@ -324,12 +361,12 @@ def agent_command(interval: int, daemon: bool, supervise: bool, status: bool, st
         if supervise:
             supervisor = ProcessSupervisor(project_path)
 
-            def main_func():
+            def main_func_with_args():
                 run_scheduler(project_path, interval)
 
             click.echo(f"启动 Agent 监管模式 (间隔: {interval}秒)...")
             click.echo("按 Ctrl+C 停止")
-            result = supervisor.start(main_func)
+            result = supervisor.start(main_func_with_args, interval=interval)
             if result["success"]:
                 click.echo(f"监管进程正常退出")
             else:
