@@ -2,6 +2,7 @@
 import traceback
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable, Tuple
 from dataclasses import dataclass, field
@@ -43,6 +44,52 @@ class UnhandledExceptionError(ExceptionHandlerError):
 class RecoveryError(ExceptionHandlerError):
     """恢复异常。"""
     pass
+
+
+class NetworkError(Exception):
+    """网络异常。"""
+    
+    def __init__(self, message: str, operation: str = "unknown"):
+        super().__init__(message)
+        self.operation = operation
+        self.timestamp = time.time()
+
+
+class DiskSpaceError(Exception):
+    """磁盘空间异常。"""
+    
+    def __init__(self, free_mb: float, required_mb: float, path: str = "/"):
+        super().__init__(f"磁盘空间不足: {free_mb:.1f}MB < {required_mb}MB ({path})")
+        self.free_mb = free_mb
+        self.required_mb = required_mb
+        self.path = path
+
+
+class PermissionError(Exception):
+    """权限异常。"""
+    
+    def __init__(self, path: str, operation: str = "access"):
+        super().__init__(f"无权限访问: {path} ({operation})")
+        self.path = path
+        self.operation = operation
+
+
+class RetryConfig:
+    """重试配置。"""
+    
+    def __init__(
+        self,
+        max_retries: int = 3,
+        initial_delay: float = 1.0,
+        max_delay: float = 60.0,
+        exponential_base: float = 2.0,
+        timeout: int = 30
+    ):
+        self.max_retries = max_retries
+        self.initial_delay = initial_delay
+        self.max_delay = max_delay
+        self.exponential_base = exponential_base
+        self.timeout = timeout
 
 
 @dataclass
@@ -495,3 +542,171 @@ class ExceptionHandler:
         if exc_type:
             self.handle_exception(exc_val)
         return False
+
+
+class DiskSpaceChecker:
+    """磁盘空间检查器。"""
+    
+    def __init__(self, min_free_mb: int = 100, check_paths: list = None):
+        """初始化。
+        
+        Args:
+            min_free_mb: 最小可用空间 (MB)，默认 100MB
+            check_paths: 检查的路径列表
+        """
+        self.min_free_mb = min_free_mb
+        self.check_paths = check_paths or ["/"]
+    
+    def check(self, path: str = None) -> bool:
+        """检查磁盘空间。
+        
+        Args:
+            path: 要检查的路径，默认检查第一个配置路径
+            
+        Returns:
+            空间是否充足
+        """
+        check_path = path or self.check_paths[0]
+        
+        try:
+            stat = shutil.disk_usage(check_path)
+            free_mb = stat.free / (1024 * 1024)
+            
+            if free_mb < self.min_free_mb:
+                logger.warning(
+                    f"磁盘空间不足: {free_mb:.1f}MB "
+                    f"(阈值: {self.min_free_mb}MB, 路径: {check_path})"
+                )
+                return False
+            
+            logger.debug(f"磁盘空间充足: {free_mb:.1f}MB")
+            return True
+        
+        except OSError as e:
+            logger.error(f"检查磁盘空间失败: {e}")
+            return True
+    
+    def check_all(self) -> bool:
+        """检查所有配置的路径。"""
+        for path in self.check_paths:
+            if not self.check(path):
+                return False
+        return True
+    
+    def get_free_space(self, path: str = None) -> float:
+        """获取指定路径的可用空间 (MB)。"""
+        check_path = path or self.check_paths[0]
+        
+        try:
+            stat = shutil.disk_usage(check_path)
+            return stat.free / (1024 * 1024)
+        except OSError:
+            return -1
+
+
+class PermissionChecker:
+    """权限检查器。"""
+    
+    def __init__(self):
+        """初始化。"""
+        self.checked_paths = {}
+    
+    def check_read(self, path: str) -> bool:
+        """检查读权限。"""
+        try:
+            if os.path.isfile(path):
+                with open(path, 'r'):
+                    pass
+            else:
+                os.listdir(path)
+            self.checked_paths[path] = ("read", True)
+            return True
+        except PermissionError as e:
+            logger.error(f"无读权限: {path} - {e}")
+            self.checked_paths[path] = ("read", False)
+            return False
+    
+    def check_write(self, path: str) -> bool:
+        """检查写权限。"""
+        try:
+            test_file = os.path.join(path, ".write_test")
+            with open(test_file, 'w') as f:
+                f.write("")
+            os.remove(test_file)
+            self.checked_paths[path] = ("write", True)
+            return True
+        except (PermissionError, OSError) as e:
+            logger.error(f"无写权限: {path} - {e}")
+            self.checked_paths[path] = ("write", False)
+            return False
+    
+    def check_execute(self, path: str) -> bool:
+        """检查执行权限。"""
+        try:
+            os.access(path, os.X_OK)
+            self.checked_paths[path] = ("execute", True)
+            return True
+        except OSError as e:
+            logger.error(f"无执行权限: {path} - {e}")
+            self.checked_paths[path] = ("execute", False)
+            return False
+    
+    def check_all(self, path: str) -> bool:
+        """检查所有权限。"""
+        if os.path.isfile(path):
+            return self.check_read(path) and self.check_execute(path)
+        else:
+            return self.check_read(path) and self.check_write(path)
+    
+    def get_checked_paths(self) -> dict:
+        """获取已检查的路径结果。"""
+        return self.checked_paths.copy()
+
+
+def with_retry(config: RetryConfig = None):
+    """装饰器：添加重试逻辑。
+    
+    Args:
+        config: 重试配置，默认使用 RetryConfig()
+    
+    Example:
+        @with_retry(RetryConfig(max_retries=3, initial_delay=1.0))
+        def git_fetch():
+            # Git 操作
+            pass
+    """
+    from functools import wraps
+    
+    if config is None:
+        config = RetryConfig()
+    
+    def decorator(func: Callable):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            
+            for attempt in range(config.max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except NetworkError as e:
+                    last_exception = e
+                    
+                    if attempt < config.max_retries:
+                        delay = min(
+                            config.initial_delay * (config.exponential_base ** attempt),
+                            config.max_delay
+                        )
+                        
+                        logger.warning(
+                            f"网络操作失败，{delay:.1f}秒后重试 "
+                            f"(尝试 {attempt + 1}/{config.max_retries + 1}): {e}"
+                        )
+                        time.sleep(delay)
+                    else:
+                        logger.error(f"网络操作最终失败: {e}")
+                        raise
+            
+            raise last_exception
+        
+        return wrapper
+    return decorator
