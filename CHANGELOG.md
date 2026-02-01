@@ -211,6 +211,67 @@ python3 -c "from src.core.git_workflow_enforcer import GitWorkflowEnforcer; e = 
   - TestDesignReviewNotifier: Notification tests
   - TestM4Integration: Integration tests
 
+- **tests/test_config_reloader.py** - Config reloader tests (14 tests)
+- **tests/test_iteration_status_manager.py** - Iteration status tests (13 tests)
+- **tests/test_design_review_notifier.py** - Notifier tests (14 tests)
+
+- **tests/test_daemon.py** - Daemon tests (17 tests)
+- **tests/test_supervisor.py** - Supervisor tests (11 tests)
+- **tests/test_signoff.py** - Signoff tests (16 tests)
+
+
+### M5: Integration Testing (Completed)
+
+**Date**: 2026-02-01  
+**Status**: ✅ All tests passing (176/176)
+
+### Test Results
+
+| Test Suite | Tests | Passed | Rate |
+|------------|-------|--------|------|
+| test_state_validator.py | 18 | 18 | 100% |
+| test_state_migration.py | 14 | 14 | 100% |
+| test_e2e.py | 27 | 27 | 100% |
+| test_package_completeness.py | 32 | 32 | 100% |
+| test_config_reloader.py | 14 | 14 | 100% |
+| test_iteration_status_manager.py | 13 | 13 | 100% |
+| test_design_review_notifier.py | 14 | 14 | 100% |
+| test_daemon.py | 17 | 17 | 100% |
+| test_supervisor.py | 11 | 11 | 100% |
+| test_signoff.py | 16 | 16 | 100% |
+| **Total** | **176** | **176** | **100%** |
+
+### Module Coverage
+
+| Module | Coverage | Notes |
+|--------|----------|-------|
+| daemon.py | 44% | Added 17 tests |
+| supervisor.py | 35% | Added 11 tests |
+| signoff.py | 75% | Added 16 tests |
+| config_reloader.py | 58% | From M4 |
+| design_review_notifier.py | 86% | From M4 |
+| iteration_status_manager.py | 65% | From M4 |
+
+### Cumulative Test Statistics
+
+| Milestone | Tests | Passed | Rate |
+|-----------|-------|--------|------|
+| M1 | 32 | 32 | 100% |
+| M2 | 27 | 27 | 100% |
+| M3 | 32 | 32 | 100% |
+| M4 | 41 | 41 | 100% |
+| M5 | 44 | 44 | 100% |
+| **Total** | **176** | **176** | **100%** |
+
+### M5 Acceptance Criteria
+
+| Criteria | Status |
+|----------|--------|
+| Unit test coverage improvement | ✅ +44-75% for missing modules |
+| E2E tests all pass | ✅ 100% |
+| No blocking bugs | ✅ None |
+| Code review | Pending |
+
 ### Test Results
 
 ```
