@@ -1603,6 +1603,446 @@ feedback_auto_routing:
 
 ---
 
+## 2.10 智能记忆与提醒机制（解决Agent遗忘问题）
+
+**背景**: Agent 在 Compaction 后容易遗忘历史经验和 oc-collab 约束要求，导致同样的问题反复发生。需要建立智能记忆机制，确保：
+1. 记住历史教训（问题模式、解决方案）
+2. 在合适时机提醒（不是事后，而是事前）
+3. Compaction 不丢失关键记忆
+
+### 2.10.1 问题模式识别与记忆
+
+**需求编号**: FR-MEMORY-001
+
+**描述**: 记录问题类型、原因、解决方案，当相同模式再次出现时自动提醒
+
+**问题模式库**:
+```yaml
+problem_patterns:
+  - id: PATTERN-001
+    category: CONFIGURATION
+    pattern: "API Key.*missing|MISSING_API_KEY"
+    description: "API Key 配置缺失"
+    solutions:
+      - "使用环境变量: export OPENAI_API_KEY=xxx"
+      - "参考 config/template.yaml 配置"
+    occurrences: 5
+    last_occurrence: "2026-02-01"
+    
+  - id: PATTERN-002
+    category: MODE_CONFUSION
+    pattern: "mock|real.*混淆|mode.*ambiguous"
+    description: "Mock/Real 模式混淆"
+    solutions:
+      - "运行前必须声明 --mode real 或 --mode mock"
+      - "使用 mode_manager.py 验证模式"
+    occurrences: 3
+    last_occurrence: "2026-01-28"
+    
+  - id: PATTERN-003
+    category: TEST_ISOLATION
+    pattern: "中间结果.*复用|cache.*未清理|test.*隔离"
+    description: "中间结果复用导致测试失效"
+    solutions:
+      - "每次测试使用 --fresh 参数"
+      - "测试前运行 oc-collab test cleanup"
+    occurrences: 4
+    last_occurrence: "2026-01-30"
+```
+
+**触发机制**:
+| 触发时机 | 行为 |
+|----------|------|
+| Agent 启动时 | 加载问题模式库，检查是否有相关历史 |
+| 执行操作前 | 检测是否匹配已知问题模式 |
+| 发现新问题时 | 自动添加到问题模式库 |
+
+**命令**:
+```bash
+# 查看已知问题模式
+oc-collab memory patterns
+
+# 查看特定模式详情
+oc-collab memory pattern --id PATTERN-001
+
+# 添加新问题模式
+oc-collab memory pattern add --category CONFIGURATION --pattern "API Key.*error" --solution "xxx"
+
+# 检查当前操作是否匹配已知问题
+oc-collab memory check --operation "配置API Key"
+# 输出: ⚠️ 发现已知问题模式 PATTERN-001
+#       解决方案: 使用环境变量配置
+```
+
+### 2.10.2 决策追溯
+
+**需求编号**: FR-MEMORY-002
+
+**描述**: 记录关键决策及其理由，支持回溯查看"当时为什么这么做"
+
+**决策记录模板**:
+```yaml
+decisions:
+  - id: DEC-001
+    date: "2026-01-15"
+    topic: "Mock/Real 模式强制声明"
+    decision: "运行前必须声明 --mode 参数"
+    reason: |
+      1. Financial 项目多次发生 Mock/Real 混淆
+      2. 隐蔽性强，问题直到运行时才暴露
+      3. 模式声明成本低，收益高
+    alternatives:
+      - "默认值模式": 风险高，可能被忽略
+      - "配置文件声明": 增加配置复杂度
+    impact: "每次运行需额外1个参数，但防止重大混淆"
+    status: "ACTIVE"
+    
+  - id: DEC-002
+    date: "2026-01-20"
+    topic: "覆盖率验收标准"
+    decision: "核心模块必须100%覆盖，整体>=80%"
+    reason: |
+      1. v2.1.0 M5 发现核心模块覆盖率仅16%
+      2. M1-M4 都签署了"测试通过"，但实际未检查
+      3. 核心模块是系统骨架，必须全覆盖
+    status: "ACTIVE"
+```
+
+**命令**:
+```bash
+# 查看决策历史
+oc-collab memory decisions
+
+# 查看特定决策
+oc-collab memory decision --id DEC-001
+
+# 搜索相关决策
+oc-collab memory decisions --keyword "模式"
+
+# 回溯场景：遇到类似问题时查看历史决策
+oc-collab memory trace --problem "Mock模式混淆"
+# 输出: 相关决策 DEC-001
+```
+
+### 2.10.3 周期性回顾提醒
+
+**需求编号**: FR-MEMORY-003
+
+**描述**: 定期回顾之前的经验教训，防止长期遗忘
+
+**回顾机制**:
+| 周期 | 触发条件 | 提醒内容 |
+|------|----------|----------|
+| 每次会话开始 | Agent 启动 | "上次会话遗留问题: 3个" |
+| 每10次操作 | 操作计数 | "请回顾最近的经验教训" |
+| 遇到类似问题 | 问题匹配 | "此问题已发生 N 次，上次解决方案..." |
+| 里程碑签署前 | signoff 前 | "请确认已覆盖所有历史问题" |
+
+**提醒配置**:
+```yaml
+reminder_config:
+  session_start:
+    enabled: true
+    show_pending_issues: true
+    
+  operation_count:
+    interval: 10
+    show_lessons: true
+    
+  problem_pattern:
+    enabled: true
+    show_solutions: true
+    
+  before_signoff:
+    enabled: true
+    require_confirmation: true
+```
+
+**命令**:
+```bash
+# 查看待回顾事项
+oc-collab memory review pending
+
+# 执行回顾
+oc-collab memory review --lessons --issues --patterns
+
+# 配置提醒
+oc-collab memory reminder config --session-start true --before-signoff true
+
+# 忽略本次提醒
+oc-collab memory reminder dismiss --session
+```
+
+### 2.10.4 Compaction 知识保留
+
+**需求编号**: FR-MEMORY-004
+
+**描述**: 确保 Compaction 操作不丢失关键记忆，包括问题模式、决策历史、经验教训
+
+**Compaction 安全机制**:
+```yaml
+compaction_memory_protection:
+  export_before_compaction:
+    - "问题模式库 (state/memory/patterns.yaml)"
+    - "决策历史 (state/memory/decisions.yaml)"
+    - "经验教训 (state/memory/lessons.yaml)"
+    - "历史问题记录 (state/issues.json)"
+    
+  import_after_compaction:
+    - "检查是否存在记忆文件"
+    - "验证记忆完整性"
+    - "恢复到内存"
+    - "确认无丢失"
+    
+  safety_checks:
+    - "记忆文件签名验证"
+    - "版本兼容性检查"
+    - "完整性校验"
+```
+
+**Compaction 流程**:
+```
+用户执行 Compaction
+    │
+    ├── 1. 暂停所有 Agent
+    │
+    ├── 2. 导出关键记忆
+    │   ├── 导出问题模式库
+    │   ├── 导出决策历史
+    │   ├── 导出经验教训
+    │   └── 生成记忆摘要
+    │
+    ├── 3. 执行 Compaction
+    │
+    ├── 4. 导入记忆
+    │   ├── 验证记忆文件
+    │   ├── 恢复记忆到内存
+    │   └── 生成导入报告
+    │
+    ├── 5. Agent 恢复
+    │   ├── Agent 启动时加载记忆
+    │   └── 确认记忆完整
+    │
+    └── 6. 输出确认
+        └── "✓ 记忆已保留: 5 个问题模式, 10 个决策, 20 条经验"
+:
+```bash
+```
+
+**命令**# 查看 Compaction 保护状态
+oc-collab memory compaction status
+
+# 手动导出记忆（备份）
+oc-collab memory export --output memory_backup_20260201.tar.gz
+
+# 手动导入记忆（恢复）
+oc-collab memory import --file memory_backup_20260201.tar.gz
+
+# Compaction 前预览要保留的内容
+oc-collab memory compaction preview
+# 输出:
+# === Compaction 记忆预览 ===
+# 问题模式: 12 个
+# 决策历史: 15 个
+# 经验教训: 28 条
+# 历史问题: 45 个
+```
+
+### 2.10.5 上下文继承
+
+**需求编号**: FR-MEMORY-005
+
+**描述**: 新会话继承之前会话的关键信息，Agent 启动时自动加载历史记忆
+
+**继承内容**:
+| 继承项 | 说明 | 优先级 |
+|--------|------|--------|
+| 项目状态 | 当前阶段、里程碑进度 | P0 |
+| 问题模式库 | 已知问题及解决方案 | P0 |
+| 决策历史 | 关键决策及理由 | P1 |
+| 待办事项 | 未完成的任务 | P0 |
+| 活跃问题 | 正在处理的问题 | P0 |
+| 配置约束 | 当前生效的约束 | P1 |
+
+**Agent 启动流程**:
+```
+Agent 启动
+    │
+    ├── 1. 加载项目状态
+    │   └── state/project_state.yaml
+    │
+    ├── 2. 加载记忆
+    │   ├── 加载问题模式库
+    │   ├── 加载决策历史
+    │   └── 加载经验教训
+    │
+    ├── 3. 生成会话摘要
+    │   └── "欢迎回来！您有 3 个待处理问题..."
+    │
+    └── 4. 提供上下文
+        └── 可以通过 memory 命令查看历史
+```
+
+**命令**:
+```bash
+# 查看当前会话继承的上下文
+oc-collab memory context
+
+# 查看历史问题
+oc-collab memory history --type issues
+
+# 查看决策历史
+oc-collab memory history --type decisions
+
+# 清除当前会话记忆（保留持久化）
+oc-collab memory clear --session-only
+```
+
+### 2.10.6 智能提醒机制
+
+**需求编号**: FR-MEMORY-006
+
+**描述**: 在正确的时间提醒正确的 oc-collab 要求，不是"出错后提醒"，而是"开始前提醒"
+
+**提醒策略**:
+| 场景 | 提醒时机 | 提醒内容 |
+|------|----------|----------|
+| 写代码前 | 开始前 | "请确认已添加测试用例" |
+| 提交前 | commit 前 | "请确认覆盖率检查通过" |
+| 签署前 | signoff 前 | "请确认所有核心模块100%覆盖" |
+| 配置 API Key | 配置时 | "建议使用环境变量，参考 config/template.yaml" |
+| 运行测试 | 执行前 | "请使用 --fresh 参数确保结果可复现" |
+| 模式切换 | --mode 前 | "Mock 模式仅用于测试，真实生成请用 --mode real" |
+
+**提醒示例**:
+```bash
+# 用户尝试配置 API Key
+$ oc-collab config set api_key=xxx
+
+# 系统自动提醒
+# ⚠️ 提醒: Financial 项目曾多次发生 API Key 配置错误
+# 💡 建议: 使用环境变量配置
+#    export OPENAI_API_KEY=xxx
+# 📖 历史决策: DEC-001 (2026-01-15)
+```
+
+**提醒配置**:
+```yaml
+smart_reminders:
+  enabled: true
+  
+  levels:
+    - level: "blocking"
+      description: "阻止操作，必须处理"
+      examples: ["覆盖率不足", "缺少测试"]
+      
+    - level: "warning"
+      description: "警告，但可继续"
+      examples: ["历史问题复发", "配置建议"]
+      
+    - level: "info"
+      description: "信息提示"
+      examples: ["回顾提醒", "历史决策"]
+```
+
+**命令**:
+```bash
+# 查看当前生效的提醒
+oc-collab memory reminders active
+
+# 配置提醒策略
+oc-collab memory reminders config --level blocking --enabled true
+
+# 临时禁用提醒
+oc-collab memory reminders disable --session
+
+# 查看历史提醒
+oc-collab memory reminders history
+```
+
+### 2.10.7 经验教训沉淀
+
+**需求编号**: FR-MEMORY-007
+
+**描述**: 将问题解决经验沉淀为可复用的知识卡片
+
+**经验卡片模板**:
+```yaml
+lesson_cards:
+  - id: LESSON-001
+    title: "API Key 配置最佳实践"
+    category: CONFIGURATION
+    situation: |
+      Financial 项目反复发生 API Key 配置错误
+    solution: |
+      1. 使用环境变量而非硬编码
+      2. 配置文件模板 + .gitignore 保护
+      3. 启动时 config_validator.py 检查
+    outcome: |
+      后续项目未再发生同类问题
+    tags: [API_KEY, CONFIGURATION, BEST_PRACTICE]
+    
+  - id: LESSON-002
+    title: "Mock/Real 模式隔离"
+    category: TESTING
+    situation: |
+      测试时误用 Real 模式导致费用增加
+    solution: |
+      1. 强制 --mode 参数声明
+      2. Mock 模式添加水印
+      3. CI 流程强制 Mock 模式
+    outcome: |
+      误用率降为 0
+    tags: [MOCK, TESTING, COST_CONTROL]
+```
+
+**命令**:
+```bash
+# 查看所有经验卡片
+oc-collab memory lessons
+
+# 查看特定经验
+oc-collab memory lesson --id LESSON-001
+
+# 搜索经验
+oc-collab memory lessons --tag CONFIGURATION
+
+# 从问题生成经验卡片
+oc-collab memory lesson create --from-issue ISSUE-001
+```
+
+### 2.10.8 智能记忆验收标准
+
+| 标准 | 要求 | 验证方式 |
+|------|------|----------|
+| 问题模式记忆 | 记录并提醒已知问题 | `oc-collab memory patterns` 显示已知问题 |
+| 决策追溯 | 可回溯关键决策 | `oc-collab memory decision --id DEC-001` |
+| Compaction 安全 | 记忆不丢失 | Compaction 前/后记忆一致 |
+| 智能提醒 | 操作前提醒 | 配置 API Key 时显示建议 |
+| 上下文继承 | 新会话加载历史 | Agent 启动时显示会话摘要 |
+| 经验沉淀 | 问题→经验卡片 | `oc-collab memory lessons` 显示沉淀经验 |
+
+**测试用例**:
+```bash
+# 1. 测试问题模式识别
+oc-collab memory test pattern --input "API Key 错误"
+# 预期: 匹配 PATTERN-001，显示解决方案
+
+# 2. 测试 Compaction 记忆保护
+oc-collab memory test compaction
+# 预期: Compaction 后记忆完整
+
+# 3. 测试智能提醒
+oc-collab config set api_key=test
+# 预期: 显示提醒和建议
+
+# 4. 测试上下文继承
+oc-collab agent start
+# 预期: 显示会话摘要和待处理问题
+```
+
+---
+
 ## 3. 非功能需求
 
 ### 3.1 性能需求
