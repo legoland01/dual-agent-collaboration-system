@@ -793,6 +793,81 @@ def check_compatibility(state):
 
 ---
 
+## 2.10 协作通知机制（Agent 1 补充）
+
+### 2.10.1 设计评审自动通知
+
+**需求编号**: FR-NOTIFY-001
+
+**描述**: 设计评审完成后自动通知相关 Agent
+
+**问题背景**:
+当前流程中，Agent 1 提交设计评审意见后，Agent 2 只能通过以下方式知道：
+- 拉取 Git 时看到 REVIEW_NOTICE_*.md 文件
+- 依赖用户告知
+
+这可能导致信息不同步，影响协作效率。
+
+**解决方案**:
+| 组件 | 功能 |
+|------|------|
+| 状态更新 | project_state.yaml 中 design.status = "review_completed" |
+| 守护进程事件 | oc-collab agent 触发 "design_review_completed" 事件 |
+| Git 提交 | 评审通知文件自动创建和提交 |
+
+**实现方式**:
+```python
+class DesignReviewNotifier:
+    """设计评审通知器。"""
+    
+    def __init__(self, state_manager, git_helper):
+        self.state_manager = state_manager
+        self.git_helper = git_helper
+    
+    def notify_review_complete(self, review_notice_path: str):
+        """通知设计评审完成。"""
+        # 1. 更新状态
+        state = self.state_manager.load_state()
+        state['design']['status'] = 'review_completed'
+        state['design']['review_notice'] = review_notice_path
+        self.state_manager.save_state(state)
+        
+        # 2. 触发守护进程事件
+        # 守护进程检测到状态变化，通知 Agent 2
+        self._trigger_event('design_review_completed', {
+            'notice_path': review_notice_path,
+            'reviewer': 'Agent 1'
+        })
+```
+
+**触发条件**:
+- Agent 1 提交设计评审意见 (REVIEW_NOTICE_*.md)
+
+**期望行为**:
+- Agent 2 的守护进程检测到状态变化
+- Agent 2 自动拉取最新代码
+- Agent 2 收到评审意见通知
+
+### 2.10.2 需求变更通知
+
+**需求编号**: FR-NOTIFY-002
+
+**描述**: 需求文档更新后通知相关 Agent
+
+**触发条件**:
+- 需求文档版本更新 (requirements_v*.md)
+- 新增需求补充
+
+**通知内容**:
+| 信息 | 说明 |
+|------|------|
+| 变更类型 | 新增/修改/删除 |
+| 涉及需求 | FR-XXX 列表 |
+| 变更原因 | 简要说明 |
+| 影响评估 | 对设计的影响 |
+
+---
+
 ## 2.7 包完整性验证（Agent 2 补充）
 
 ### 2.7.1 Wheel 内容验证
