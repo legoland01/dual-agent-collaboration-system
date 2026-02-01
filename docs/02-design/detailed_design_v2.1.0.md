@@ -1256,7 +1256,474 @@ def test_git_workflow_enforcement():
 
 ---
 
-## 5. 实施计划
+### 3.7 迭代状态隔离机制（FR-STATE-001/002/003）
+
+**文件**: `src/core/iteration_status_manager.py`
+
+```python
+from typing import Dict, Optional, List
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import yaml
+
+
+class IterationStatus(Enum):
+    """迭代状态。"""
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+
+
+class PhaseStatus(Enum):
+    """阶段状态。"""
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    APPROVED = "approved"
+
+
+@dataclass
+class IterationState:
+    """迭代状态。"""
+    version: str
+    status: str = IterationStatus.PENDING.value
+    start_date: str = ""
+    end_date: str = ""
+    requirements: str = PhaseStatus.PENDING.value
+    design: str = PhaseStatus.PENDING.value
+    development: str = PhaseStatus.PENDING.value
+    testing: str = PhaseStatus.PENDING.value
+    deployment: str = PhaseStatus.PENDING.value
+    history: List[Dict] = field(default_factory=list)
+
+
+class IterationStatusManager:
+    """迭代状态管理器。
+    
+    职责：
+    1. 管理多迭代状态隔离
+    2. 验证迭代状态与实际进度一致
+    3. 重置指定阶段状态
+    """
+    
+    PHASES = ["requirements", "design", "development", "testing", "deployment"]
+    
+    def __init__(self, state_path: str):
+        """初始化。
+        
+        Args:
+            state_path: state.yaml 文件路径
+        """
+        self.state_path = state_path
+        self.state = self._load_state()
+        self.current_iteration = self._get_current_iteration()
+    
+    def _load_state(self) -> dict:
+        """加载状态文件。"""
+        with open(self.state_path, 'r') as f:
+            return yaml.safe_load(f)
+    
+    def _save_state(self):
+        """保存状态文件。"""
+        with open(self.state_path, 'w') as f:
+            yaml.dump(self.state, f, allow_unicode=True, sort_keys=False)
+    
+    def _get_current_iteration(self) -> Optional[str]:
+        """获取当前迭代版本。"""
+        return self.state.get("iteration", {}).get("current")
+    
+    def start_iteration(self, version: str) -> IterationState:
+        """开始新迭代，初始化状态。
+        
+        Args:
+            version: 迭代版本号，如 "v2.1.0"
+            
+        Returns:
+            迭代状态对象
+        """
+        # 初始化 iterations 字典
+        if "iterations" not in self.state:
+            self.state["iterations"] = {}
+        
+        # 检查迭代是否已存在
+        if version in self.state["iterations"]:
+            existing = self.state["iterations"][version]
+            if existing.get("status") == IterationStatus.COMPLETED.value:
+                raise ValueError(f"迭代 {version} 已完成，无法重新开始")
+            return IterationState(**existing)
+        
+        # 创建新迭代状态
+        now = datetime.now().isoformat()
+        iteration_state = IterationState(
+            version=version,
+            status=IterationStatus.IN_PROGRESS.value,
+            start_date=now
+        )
+        
+        # 保存到状态文件
+        self.state["iterations"][version] = {
+            "version": version,
+            "status": IterationStatus.IN_PROGRESS.value,
+            "start_date": now,
+            "end_date": "",
+            "requirements": PhaseStatus.PENDING.value,
+            "design": PhaseStatus.PENDING.value,
+            "development": PhaseStatus.PENDING.value,
+            "testing": PhaseStatus.PENDING.value,
+            "deployment": PhaseStatus.PENDING.value,
+            "history": []
+        }
+        
+        # 更新当前迭代
+        self.state["iteration"] = {
+            "current": version,
+            "start_date": now,
+            "status": "design"
+        }
+        
+        self._save_state()
+        self.current_iteration = version
+        
+        return iteration_state
+    
+    def update_phase_status(self, phase: str, status: str):
+        """更新阶段状态。
+        
+        Args:
+            phase: 阶段名
+            status: 新状态
+        """
+        if phase not in self.PHASES:
+            raise ValueError(f"无效阶段: {phase}")
+        
+        if status not in [s.value for s in PhaseStatus]:
+            raise ValueError(f"无效状态: {status}")
+        
+        # 更新状态
+        self.state["iterations"][self.current_iteration][phase] = status
+        
+        # 记录历史
+        self._add_history(phase, status)
+        
+        # 检查是否所有阶段完成
+        self._check_iteration_completion()
+        
+        self._save_state()
+    
+    def validate_iteration_state(self) -> Dict[str, List[str]]:
+        """验证当前迭代状态与实际进度一致。
+        
+        Returns:
+            验证结果 {phase: [issues]}
+        """
+        issues = {}
+        
+        # 检查是否有未完成的阶段
+        for phase in self.PHASES:
+            phase_status = self.state["iterations"][self.current_iteration].get(phase)
+            
+            if phase_status == PhaseStatus.COMPLETED.value:
+                # 检查对应的签署状态
+                signoff_key = f"{phase}_signoff"
+                pm_signed = self.state.get(phase, {}).get("pm_signoff", False)
+                dev_signed = self.state.get(phase, {}).get("dev_signoff", False)
+                
+                if not (pm_signed and dev_signed):
+                    issues[phase] = ["阶段标记完成但未签署"]
+        
+        return issues
+    
+    def reset_phase_status(self, phase: str, reason: str = ""):
+        """重置指定阶段状态。
+        
+        Args:
+            phase: 阶段名
+            reason: 重置原因
+        """
+        if phase not in self.PHASES:
+            raise ValueError(f"无效阶段: {phase}")
+        
+        # 记录重置历史
+        self._add_history(f"reset_{phase}", reason)
+        
+        # 重置状态
+        self.state["iterations"][self.current_iteration][phase] = PhaseStatus.PENDING.value
+        
+        # 如果重置的是当前阶段，同时更新 iteration.status
+        current_phase = self.state.get("iteration", {}).get("status")
+        if current_phase == phase:
+            self.state["iteration"]["status"] = "pending"
+        
+        self._save_state()
+    
+    def complete_iteration(self):
+        """完成当前迭代。"""
+        now = datetime.now().isoformat()
+        
+        # 更新迭代状态
+        self.state["iterations"][self.current_iteration]["status"] = IterationStatus.COMPLETED.value
+        self.state["iterations"][self.current_iteration]["end_date"] = now
+        
+        # 清空当前迭代标记
+        self.state["iteration"]["current"] = ""
+        self.state["iteration"]["status"] = "completed"
+        
+        self._add_history("iteration_complete", f"Iteration {self.current_iteration} completed")
+        
+        self._save_state()
+    
+    def _add_history(self, action: str, details: str):
+        """添加历史记录。"""
+        entry = {
+            "id": f"{action}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            "timestamp": datetime.now().isoformat(),
+            "action": action,
+            "details": details
+        }
+        
+        self.state["iterations"][self.current_iteration]["history"].append(entry)
+    
+    def _check_iteration_completion(self):
+        """检查是否所有阶段完成。"""
+        all_complete = all(
+            self.state["iterations"][self.current_iteration].get(phase) == PhaseStatus.APPROVED.value
+            for phase in self.PHASES
+        )
+        
+        if all_complete:
+            self.state["iterations"][self.current_iteration]["status"] = IterationStatus.COMPLETED.value
+```
+
+---
+
+### 3.8 协作通知机制（FR-NOTIFY-001/002）
+
+**文件**: `src/core/design_review_notifier.py`
+
+```python
+import subprocess
+import logging
+from typing import Dict, List, Optional, Callable
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+
+
+logger = logging.getLogger(__name__)
+
+
+class NotificationType(Enum):
+    """通知类型。"""
+    DESIGN_REVIEW_READY = "design_review_ready"
+    DESIGN_REVIEW_COMPLETE = "design_review_complete"
+    REQUIREMENT_CHANGED = "requirement_changed"
+    SIGNOFF_COMPLETE = "signoff_complete"
+    PHASE_ADVANCE = "phase_advance"
+
+
+@dataclass
+class Notification:
+    """通知信息。"""
+    type: NotificationType
+    title: str
+    message: str
+    timestamp: str = ""
+    sender: str = ""
+    recipients: List[str] = None
+    action_required: bool = False
+    action_url: str = ""
+
+
+class DesignReviewNotifier:
+    """设计评审通知器。
+    
+    功能：
+    1. 评审完成后自动通知相关 Agent
+    2. 需求变更时通知相关 Agent
+    3. 签署完成时通知
+    """
+    
+    def __init__(self, project_path: str):
+        """初始化。
+        
+        Args:
+            project_path: 项目路径
+        """
+        self.project_path = project_path
+        self.notification_log: List[Dict] = []
+    
+    def notify_design_review_complete(self, reviewer: str, version: str):
+        """通知设计评审完成。
+        
+        Args:
+            reviewer: 评审人 ID
+            version: 设计版本
+        """
+        notification = Notification(
+            type=NotificationType.DESIGN_REVIEW_COMPLETE,
+            title="设计评审完成",
+            message=f"Agent {reviewer} 已完成 v{version} 详细设计的评审。",
+            sender=reviewer,
+            recipients=[self._get_other_agent(reviewer)],
+            action_required=True,
+            action_url="docs/02-design/detailed_design_v2.1.0.md"
+        )
+        
+        self._send_notification(notification)
+    
+    def notify_requirement_changed(self, changer: str, section: str):
+        """通知需求变更。
+        
+        Args:
+            changer: 变更人 ID
+            section: 变更的章节
+        """
+        notification = Notification(
+            type=NotificationType.REQUIREMENT_CHANGED,
+            title="需求文档更新",
+            message=f"Agent {changer} 更新了需求文档的 {section} 章节。",
+            sender=changer,
+            recipients=[self._get_other_agent(changer)],
+            action_required=True,
+            action_url="docs/01-requirements/requirements_v2.1.0.md"
+        )
+        
+        self._send_notification(notification)
+    
+    def notify_signoff_complete(self, signer: str, stage: str):
+        """通知签署完成。
+        
+        Args:
+            signer: 签署人 ID
+            stage: 签署的阶段
+        """
+        notification = Notification(
+            type=NotificationType.SIGNOFF_COMPLETE,
+            title=f"{stage} 阶段签署",
+            message=f"Agent {signer} 已签署 {stage} 阶段。",
+            sender=signer,
+            recipients=[self._get_other_agent(signer)],
+            action_required=False
+        )
+        
+        self._send_notification(notification)
+    
+    def notify_phase_advance(self, actor: str, from_phase: str, to_phase: str):
+        """通知阶段推进。
+        
+        Args:
+            actor: 执行人 ID
+            from_phase: 原阶段
+            to_phase: 目标阶段
+        """
+        notification = Notification(
+            type=NotificationType.PHASE_ADVANCE,
+            title="阶段推进",
+            message=f"项目已从 {from_phase} 推进到 {to_phase}。",
+            sender=actor,
+            recipients=["agent1", "agent2"],
+            action_required=False
+        )
+        
+        self._send_notification(notification)
+    
+    def _send_notification(self, notification: Notification):
+        """发送通知。
+        
+        Args:
+            notification: 通知对象
+        """
+        notification.timestamp = datetime.now().isoformat()
+        
+        # 记录到日志
+        logger.info(f"发送通知: [{notification.type.value}] {notification.title}")
+        
+        # 记录到通知日志
+        self.notification_log.append({
+            "type": notification.type.value,
+            "title": notification.title,
+            "message": notification.message,
+            "sender": notification.sender,
+            "timestamp": notification.timestamp
+        })
+        
+        # 打印通知到控制台
+        self._print_notification(notification)
+        
+        # 可以扩展：发送邮件、Slack 消息等
+    
+    def _print_notification(self, notification: Notification):
+        """打印通知到控制台。"""
+        print("\n" + "=" * 50)
+        print(f"📢 通知: {notification.title}")
+        print(f"   {notification.message}")
+        if notification.action_required:
+            print(f"   📎 操作: {notification.action_url}")
+        print("=" * 50 + "\n")
+    
+    def _get_other_agent(self, agent_id: str) -> str:
+        """获取另一个 Agent ID。"""
+        return "agent2" if agent_id == "agent1" else "agent1"
+    
+    def get_notification_history(self) -> List[Dict]:
+        """获取通知历史。"""
+        return self.notification_log
+    
+    def clear_history(self):
+        """清空通知历史。"""
+        self.notification_log = []
+
+
+class RequirementChangeDetector:
+    """需求变更检测器。
+    
+    功能：
+    1. 检测需求文档的变更
+    2. 自动通知相关 Agent
+    """
+    
+    def __init__(self, notifier: DesignReviewNotifier):
+        """初始化。
+        
+        Args:
+            notifier: 通知器
+        """
+        self.notifier = notifier
+        self.last_content: Dict[str, str] = {}
+    
+    def detect_changes(self, requirements_path: str, changer: str):
+        """检测需求变更。
+        
+        Args:
+            requirements_path: 需求文档路径
+            changer: 变更人 ID
+        """
+        # 读取当前内容
+        with open(requirements_path, 'r') as f:
+            current_content = f.read()
+        
+        # 检测变更（简化版：比较文件大小和修改时间）
+        file_path = Path(requirements_path)
+        current_mtime = file_path.stat().st_mtime
+        last_mtime = self.last_content.get(requirements_path, {}).get("mtime", 0)
+        
+        if current_mtime > last_mtime:
+            # 检测到变更，通知其他 Agent
+            self.notifier.notify_requirement_changed(changer, "需求文档")
+        
+        # 更新记录
+        self.last_content[requirements_path] = {
+            "content": current_content,
+            "mtime": current_mtime
+        }
+```
+
+---
+
+## 实施计划
 
 ### 5.1 里程碑
 
@@ -1267,9 +1734,11 @@ def test_git_workflow_enforcement():
 | M3 | 监控告警 | monitor.py |
 | M4 | 配置热重载 | config_reloader.py |
 | M5 | Git 工作流约束 | git_workflow_enforcer.py |
-| M6 | 包完整性测试 | test_package_completeness.py |
-| M7 | E2E 测试集成 | test_e2e.py |
-| M8 | 集成测试 | 完整测试套件 |
+| M6 | 迭代状态隔离 | iteration_status_manager.py |
+| M7 | 协作通知机制 | design_review_notifier.py |
+| M8 | 包完整性测试 | test_package_completeness.py |
+| M9 | E2E 测试集成 | test_e2e.py |
+| M10 | 集成测试 | 完整测试套件 |
 
 ### 5.2 依赖
 
