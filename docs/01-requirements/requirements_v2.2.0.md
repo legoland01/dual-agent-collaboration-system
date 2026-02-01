@@ -233,11 +233,11 @@ oc-collab milestone check --milestone M1
 **v2.2.0 开发阶段里程碑**:
 | 里程碑 | 内容 | 交付物 | 签署 |
 |--------|------|--------|------|
-| M1 | 多 Agent 基础 | agent_manager.py | Agent 1 |
-| M2 | 项目管理 | project_manager.py, resource_lock.py | Agent 1 |
-| M3 | 会议管理 | meeting_manager.py | Agent 1 |
-| M4 | 用户故事 | story_e2e_tests.py | Agent 1 |
-| M5 | 完整测试套件 | 集成测试 | Agent 1+Agent 2 |
+| M1 | 多 Agent 基础 | agent_manager.py, blackbox_tests_M1.md | Agent 1 |
+| M2 | 项目管理 | project_manager.py, resource_lock.py, blackbox_tests_M2.md | Agent 1 |
+| M3 | 会议管理 | meeting_manager.py, blackbox_tests_M3.md | Agent 1 |
+| M4 | 用户故事 | story_e2e_tests.py, blackbox_tests_M4.md | Agent 1 |
+| M5 | 完整测试套件 | 集成测试, blackbox_tests_full.md | Agent 1+Agent 2 |
 
 **v2.2.0 验收标准模板**:
 ```yaml
@@ -253,13 +253,17 @@ acceptance_criteria:
     - 核心功能完整实现: true
     - 无阻断性 bug: true
 
-  testing:
-    - 单元测试覆盖率 >= 80%: true
-    - 核心模块覆盖率 100%: true  # v2.2.0 新增: daemon.py, supervisor.py, signoff.py
-    - 所有测试用例通过: true
-    - 测试文件完整: true
-    - 覆盖率报告已生成: true      # v2.2.0 新增: 必须运行coverage命令
-    - 覆盖率报告已分析: true      # v2.2.0 新增: 必须确认核心模块覆盖达标
+   testing:
+     - 单元测试覆盖率 >= 80%: true
+     - 核心模块覆盖率 100%: true  # v2.2.0 新增: daemon.py, supervisor.py, signoff.py
+     - 所有测试用例通过: true
+     - 测试文件完整: true
+     - 覆盖率报告已生成: true      # v2.2.0 新增: 必须运行coverage命令
+     - 覆盖率报告已分析: true      # v2.2.0 新增: 必须确认核心模块覆盖达标
+     - 黑盒测试 P0 用例 100% 通过: true   # v2.2.0 新增: 防止 M5 教训重演
+     - 黑盒测试 P1 用例 100% 通过: true   # v2.2.0 新增: CLI 功能验证
+     - 黑盒测试结果已记录: true           # v2.2.0 新增: docs/03-test/blackbox_test_results.md
+     - E2E 测试完整: true
 
   signoff:
     dev_signoff: true
@@ -344,6 +348,7 @@ v2.2.0 旨在实现：
 | 多技术栈协同 | P0 | 新增 |
 | 项目管理增强 | P0 | 新增 |
 | 执行约束管理 | P0 | 新增 |
+| **黑盒测试管理** | **P0** | **新增** |
 
 ---
 
@@ -1460,7 +1465,201 @@ tests/
 
 ---
 
-### 2.8 会议管理
+### 2.8 黑盒测试管理
+
+**背景**: v2.1.0 M5 签署时发现黑盒测试未完整执行，仅部分用例通过代码审查。v2.2.0 将黑盒测试纳入正式验收标准，确保签署前所有 P0/P1 测试用例实际执行通过。
+
+**v2.1.0 教训**:
+- 黑盒测试用例已编写，但未实际执行
+- M5 仅依赖单元测试覆盖率，未验证 CLI 功能
+- 导致部分 CLI 命令（如 `oc-collab advance -p`）未经验证
+
+#### 2.8.1 黑盒测试用例管理
+
+**需求编号**: FR-BLACKBOX-001
+
+**描述**: 管理黑盒测试用例的全生命周期，包括创建、执行、结果记录
+
+**测试用例模板**:
+```markdown
+## TC-XXX: [用例名称]
+
+| 属性 | 值 |
+|-----|------|
+| 用例编号 | TC-XXX |
+| 用例名称 | [名称] |
+| 优先级 | P0/P1/P2 |
+| 前置条件 | [条件] |
+| 测试步骤 | 1. [步骤1]<br>2. [步骤2] |
+| 预期结果 | 1. [结果1]<br>2. [结果2] |
+| 执行状态 | 待执行/通过/失败 |
+```
+
+**用例文件位置**:
+```
+docs/03-test/
+├── blackbox_test_cases.md      # 测试用例定义
+├── blackbox_test_results.md    # 测试结果记录
+└── test_cases_v{version}.md    # 版本专用测试用例
+```
+
+#### 2.8.2 黑盒测试执行机制
+
+**需求编号**: FR-BLACKBOX-002
+
+**描述**: 里程碑签署前必须执行黑盒测试并通过
+
+**测试执行要求**:
+| 里程碑 | P0 用例 | P1 用例 | P2 用例 | 通过标准 |
+|--------|---------|---------|---------|----------|
+| M1 | 100% | 100% | - | 所有 P0/P1 通过 |
+| M2 | 100% | 100% | - | 所有 P0/P1 通过 |
+| M3 | 100% | 100% | - | 所有 P0/P1 通过 |
+| M4 | 100% | 100% | 90% | P0/P1 100%，P2 ≥90% |
+| M5 | 100% | 100% | 100% | 所有用例通过 |
+
+**黑盒测试命令**:
+```bash
+# 执行所有黑盒测试
+oc-collab test blackbox
+
+# 执行特定用例
+oc-collab test blackbox --tc TC-001
+
+# 生成测试报告
+oc-collab test blackbox --report
+
+# 查看测试结果
+oc-collab test blackbox --results
+```
+
+#### 2.8.3 黑盒测试结果记录
+
+**需求编号**: FR-BLACKBOX-003
+
+**描述**: 自动记录黑盒测试执行结果
+
+**结果记录模板**:
+```markdown
+### TC-XXX: [用例名称]
+- **用例编号**: TC-XXX
+- **优先级**: P0
+- **测试步骤**: [步骤]
+- **测试结果**: 通过/失败
+- **测试说明**: [说明]
+- **执行日期**: YYYY-MM-DD
+- **执行人**: Agent X
+- **状态**: ✓ 通过 / ✗ 失败
+```
+
+**结果文件**:
+- `docs/03-test/blackbox_test_results.md` - 记录所有测试结果
+- 每次执行更新文件，保留历史记录
+
+#### 2.8.4 签署前黑盒测试验证
+
+**需求编号**: FR-BLACKBOX-004
+
+**描述**: 里程碑签署前自动检查黑盒测试通过状态
+
+**签署条件**:
+```yaml
+signoff_prerequisites:
+  blackbox_tests:
+    required: true
+    passes:
+      - "所有 P0 用例通过"
+      - "所有 P1 用例通过"
+      - "P2 用例通过率 >= 90%"
+    evidence: "blackbox_test_results.md 已更新"
+```
+
+**自动检查**:
+```bash
+# 签署前检查
+oc-collab signoff --check-blackbox
+
+# 输出示例
+# === 黑盒测试检查 ===
+# P0 用例: 5/5 通过 ✅
+# P1 用例: 6/6 通过 ✅
+# P2 用例: 4/4 通过 ✅
+# 检查结果: ✅ 通过
+# 可以签署 M5
+```
+
+#### 2.8.5 黑盒测试模板库
+
+**需求编号**: FR-BLACKBOX-005
+
+**描述**: 提供可复用的黑盒测试模板
+
+**标准测试模板**:
+| 模板名称 | 适用场景 | 优先级 |
+|----------|----------|--------|
+| 项目初始化 | `oc-collab init` | P0 |
+| 状态查看 | `oc-collab status` | P0 |
+| Agent 切换 | `oc-collab switch` | P0 |
+| 阶段推进 | `oc-collab advance` | P0 |
+| 签署确认 | `oc-collab signoff` | P0 |
+| Git 同步 | `oc-collab sync` | P1 |
+| 状态验证 | YAML 格式验证 | P1 |
+| 帮助信息 | `--help` | P2 |
+
+**模板使用**:
+```bash
+# 从模板创建测试用例
+oc-collab test template --from init --output test_my_feature.md
+
+# 执行模板测试
+oc-collab test template --name "项目初始化"
+```
+
+#### 2.8.6 黑盒测试验收标准
+
+**v2.2.0 黑盒测试验收标准**:
+| 标准 | 要求 | 验证方式 |
+|------|------|----------|
+| P0 用例 | 100% 通过 | `oc-collab test blackbox --priority P0` |
+| P1 用例 | 100% 通过 | `oc-collab test blackbox --priority P1` |
+| P2 用例 | ≥90% 通过 | `oc-collab test blackbox --priority P2` |
+| 测试报告 | 已生成 | `oc-collab test blackbox --report` |
+| 结果记录 | 已更新 | `docs/03-test/blackbox_test_results.md` |
+
+**验收检查命令**:
+```bash
+# 执行完整黑盒测试
+oc-collab test blackbox --full --report
+
+# 检查签署准备状态
+oc-collab signoff --check-all
+
+# 输出示例
+# === 签署准备检查 ===
+# ✓ 单元测试: 245/245 通过
+# ✓ E2E 测试: 27/27 通过
+# ✓ 黑盒测试: 15/15 通过
+# ✓ 覆盖率: 88% >= 80%
+# 检查结果: ✅ 所有检查通过，可以签署 M5
+```
+
+#### 2.8.7 黑盒测试与 E2E 测试关系
+
+黑盒测试和 E2E 测试是**正交关系**（独立维度）：
+
+| 维度 | 视角 | 测试对象 | 示例 |
+|------|------|----------|------|
+| **黑盒测试** | CLI 命令视角 | 外部接口 | `oc-collab init`, `oc-collab status` |
+| **E2E 测试** | 端到端视角 | 完整流程 | 完整用户故事流程 |
+
+**测试覆盖**:
+- 黑盒测试: 覆盖所有 CLI 命令
+- E2E 测试: 覆盖用户故事完整流程
+- 两者互补，确保功能完整
+
+---
+
+### 2.9 会议管理
 
 #### 2.8.1 会议类型
 
