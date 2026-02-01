@@ -266,7 +266,7 @@ class GitWorkflowEnforcer:
                 logger.debug(f"Git show 失败: {result.stderr}")
                 return None
         
-        except subprocess.TimeoutExpired:
+        except (subprocess.TimeoutExpired, FileNotFoundError):
             logger.warning(f"Git show 超时: {file_path}")
             return None
 
