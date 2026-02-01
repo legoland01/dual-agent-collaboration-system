@@ -21,6 +21,11 @@ development:
   status: in_progress
   version: v1
 history:
+- id: dev_plan_v210_signoff_agent2_20260201144000
+  timestamp: '2026-02-01T14:39:35.000000'
+  action: signoff
+  agent_id: agent2
+  details: '签署 v2.1.0 开发计划: 同意 5 阶段开发计划，从 M1 开始执行。'
 - id: design_v210_signoff_agent2_20260201143500
   timestamp: '2026-02-01T14:33:48.000000'
   action: signoff
