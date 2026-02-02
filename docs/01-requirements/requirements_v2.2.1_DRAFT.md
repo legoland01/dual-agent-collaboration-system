@@ -456,6 +456,157 @@ reminders:
 | FR-DUAL-AUTO-003 | Skill 内容完整，包含动态仓库配置 | 代码审查 |
 | FR-DUAL-AUTO-004 | 关键节点有职责提醒 | 功能测试 |
 
+### 3.7 补充机制细节（从 Compaction 恢复）
+
+#### 3.7.1 困惑信号触发阈值
+
+**描述**: 设定困惑信号检测的置信度阈值，避免误触发。
+
+**阈值配置**:
+```yaml
+confusion_detection:
+  confidence_threshold: 0.8  # 置信度 >= 0.8 才触发自动加载
+  min_keyword_matches: 2     # 至少匹配 2 个关键词才触发
+```
+
+**触发条件**:
+| 条件 | 说明 |
+|------|------|
+| 置信度 >= 0.8 | 关键词匹配度高，确信 Agent 困惑 |
+| 至少匹配 2 个关键词 | 避免单一关键词误触发 |
+
+**优先级规则**:
+| 优先级 | 信号类型 | 示例 |
+|--------|----------|------|
+| 1 (最高) | 角色混淆 | "我是谁"、"你做什么" |
+| 2 | 职责越界 | "我直接做"、"不需要对方" |
+| 3 | 流程困惑 | "下一步做什么"、"接下来" |
+
+#### 3.7.2 Skill 加载失败处理
+
+**描述**: 当 Skill 自动加载失败时，提供降级方案。
+
+**失败场景**:
+| 场景 | 处理方式 |
+|------|----------|
+| Skill 文件不存在 | 降级为直接输出协作指南文本 |
+| Skill 格式错误 | 降级为直接输出协作指南文本 |
+| Skill 加载超时 | 降级为直接输出协作指南文本 |
+
+**降级方案**:
+```python
+def load_collaboration_guide_skill() -> str:
+    """加载协作指南 Skill，失败时降级为直接提示"""
+    try:
+        skill = load_skill("oc_collab_collaboration_guide")
+        return skill.execute()
+    except SkillLoadError:
+        # 降级：直接输出关键信息
+        return get_fallback_guidance()
+```
+
+**降级输出内容**:
+```markdown
+## 当前协作状态提醒
+
+**你的角色**: {Agent 1 / Agent 2}
+**当前阶段**: {project_phase}
+**下一步建议**: {recommended_action}
+
+**快速命令**:
+- 查看状态: `oc-collab status`
+- 查看待办: `oc-collab todo`
+- 签署确认: `oc-collab signoff`
+```
+
+#### 3.7.3 提醒频率控制
+
+**描述**: 控制职责边界提醒的频率，避免过度提醒造成干扰。
+
+**频率配置**:
+```yaml
+reminder_control:
+  max_reminders_per_session: 5      # 每会话最多 5 次提醒
+  min_interval_between_reminders: 10  # 提醒间隔至少 10 分钟
+  ignored_triggers: []              # 可忽略的触发场景列表
+```
+
+**提醒抑制规则**:
+| 场景 | 处理方式 |
+|------|----------|
+| 同一触发条件 10 分钟内重复 | 抑制提醒 |
+| 单会话提醒超过 5 次 | 抑制后续提醒 |
+| 用户明确忽略某类提醒 | 永久抑制该类提醒 |
+
+**智能提醒判断**:
+```python
+def should_show_reminder(trigger: str, context: Dict) -> bool:
+    """判断是否应该显示提醒"""
+    if is_suppressed(trigger):
+        return False
+    if get_reminder_count() >= MAX_REMINDERS:
+        return False
+    if get_time_since_last_reminder(trigger) < MIN_INTERVAL:
+        return False
+    return True
+```
+
+#### 3.7.4 动态内容缓存策略
+
+**描述**: 缓存动态获取的内容（如仓库配置），减少 git 调用频率。
+
+**缓存配置**:
+```yaml
+cache_config:
+  enabled: true
+  ttl: 300  # 缓存 5 分钟
+  max_size: 100  # 最多缓存 100 个条目
+```
+
+**缓存内容**:
+| 内容 | TTL | 说明 |
+|------|-----|------|
+| 远端 URL | 5 分钟 | 从 .git/config 读取 |
+| 当前分支 | 5 分钟 | `git branch` |
+| 最后同步时间 | 5 分钟 | 记录每次 sync 时间 |
+| 项目阶段 | 5 分钟 | 从 state/project_state.yaml 读取 |
+| 签署状态 | 5 分钟 | 从 state/ 目录读取 |
+
+**缓存失效场景**:
+| 触发条件 | 失效内容 |
+|----------|----------|
+| 执行 `git push` | 远端 URL、分支、同步时间 |
+| 执行 `git pull` | 远端 URL、分支、同步时间 |
+| 修改 state 文件 | 项目阶段、签署状态 |
+| 阶段推进 | 项目阶段 |
+
+**实现示例**:
+```python
+from functools import lru_cache
+import time
+
+class DynamicContentCache:
+    def __init__(self, ttl: int = 300):
+        self.ttl = ttl
+        self._cache = {}
+
+    def get(self, key: str):
+        if key in self._cache:
+            cached, timestamp = self._cache[key]
+            if time.time() - timestamp < self.ttl:
+                return cached
+        return None
+
+    def set(self, key: str, value):
+        self._cache[key] = (value, time.time())
+
+    def invalidate(self, key: str = None):
+        if key:
+            self._cache.pop(key, None)
+        else:
+            self._cache.clear()
+```
+
 ---
 
 ## 7. 相关文档

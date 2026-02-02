@@ -220,6 +220,168 @@ class TestPerformanceBlackbox:
         assert elapsed < 2.0
 
 
+class TestGitMonitorBlackbox:
+    """Git 监控黑盒测试 (TC-BB-002)"""
+
+    @pytest.mark.skip(reason="需要集成测试环境")
+    def test_git_monitor_init_from_current_repo(self):
+        """测试 Git 监控初始化 - 使用当前项目仓库。"""
+        from src.core.git_monitor import GitMonitor
+        import os
+        current_dir = os.getcwd()
+        
+        monitor = GitMonitor(current_dir)
+        
+        assert str(monitor.project_path) == current_dir
+
+    @pytest.mark.skip(reason="需要集成测试环境")
+    def test_git_commit_detection_from_current_repo(self):
+        """测试 Git 提交检测 - 使用当前项目仓库。"""
+        from src.core.git_monitor import GitMonitor
+        import os
+        current_dir = os.getcwd()
+        
+        monitor = GitMonitor(current_dir)
+        
+        assert monitor is not None
+        commits = monitor.get_new_commits()
+        assert monitor.get_current_branch() is not None
+
+
+class TestGitWorkflowBlackbox:
+    """Git 工作流强制执行黑盒测试 (TC-BB-004)"""
+
+    @pytest.fixture
+    def initialized_temp_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from src.core.state_manager import StateManager
+            manager = StateManager(str(tmpdir))
+            manager.initialize_project("TestProject", "PYTHON")
+            yield Path(tmpdir)
+
+    def test_state_with_initialized_project(self, initialized_temp_dir):
+        """测试已初始化项目的状态管理。"""
+        from src.core.state_manager import StateManager
+        manager = StateManager(str(initialized_temp_dir))
+        
+        state = manager.read_state()
+        assert state is not None
+        assert state["project"]["name"] == "TestProject"
+
+    def test_git_status_in_initialized_project(self, initialized_temp_dir):
+        """测试已初始化项目的 Git 状态。"""
+        import subprocess
+        subprocess.run(["git", "init"], cwd=str(initialized_temp_dir), capture_output=True)
+        
+        from src.core.state_manager import StateManager
+        manager = StateManager(str(initialized_temp_dir))
+        state = manager.read_state()
+        
+        assert state is not None
+        assert state["project"]["name"] == "TestProject"
+
+
+class TestMultiRoundIterationBlackbox:
+    """多轮迭代协作黑盒测试 (TC-E2E-002)"""
+
+    @pytest.fixture
+    def temp_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
+    def test_requirement_modification_and_resignoff(self, temp_dir):
+        """测试需求修改后的重新评审。"""
+        from src.core.state_manager import StateManager
+        from datetime import datetime
+        
+        manager = StateManager(str(temp_dir))
+        manager.initialize_project("TestProject", "PYTHON")
+        
+        state = manager.read_state()
+        
+        original_signoffs = len(state.get("signoffs", []))
+        
+        state["signoffs"] = state.get("signoffs", [])
+        state["signoffs"].append({
+            "agent": "Agent 1",
+            "phase": "requirements",
+            "timestamp": datetime.now().isoformat(),
+            "version": "1"
+        })
+        manager.write_state(state)
+        
+        state = manager.read_state()
+        assert len(state["signoffs"]) == original_signoffs + 1
+        
+        state["signoffs"].append({
+            "agent": "Agent 2",
+            "phase": "requirements",
+            "timestamp": datetime.now().isoformat(),
+            "version": "1"
+        })
+        manager.write_state(state)
+        
+        state = manager.read_state()
+        assert len(state["signoffs"]) == original_signoffs + 2
+
+
+class TestRemoteCollaborationBlackbox:
+    """远程协作黑盒测试 (TC-E2E-003)"""
+
+    @pytest.fixture
+    def temp_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
+    def test_signoff_history_preserved(self, temp_dir):
+        """测试签署历史保留。"""
+        from src.core.state_manager import StateManager
+        from datetime import datetime
+        
+        manager = StateManager(str(temp_dir))
+        manager.initialize_project("TestProject", "PYTHON")
+        
+        signoffs = [
+            {
+                "agent": "Agent 1",
+                "phase": "requirements",
+                "timestamp": "2026-02-01T10:00:00",
+                "version": "1"
+            },
+            {
+                "agent": "Agent 2",
+                "phase": "requirements",
+                "timestamp": "2026-02-01T10:05:00",
+                "version": "1"
+            }
+        ]
+        
+        state = manager.read_state()
+        state["signoffs"] = signoffs
+        manager.write_state(state)
+        
+        state = manager.read_state()
+        assert len(state["signoffs"]) == 2
+        assert state["signoffs"][0]["agent"] == "Agent 1"
+        assert state["signoffs"][1]["agent"] == "Agent 2"
+
+    def test_state_version_tracking(self, temp_dir):
+        """测试状态版本跟踪。"""
+        from src.core.state_manager import StateManager
+        
+        manager = StateManager(str(temp_dir))
+        manager.initialize_project("TestProject", "PYTHON")
+        
+        state = manager.read_state()
+        assert "version" in state
+        
+        state["version"] = "2.0"
+        manager.write_state(state)
+        
+        state = manager.read_state()
+        assert state["version"] == "2.0"
+
+
 class TestE2EBlackbox:
     """端到端黑盒测试"""
 

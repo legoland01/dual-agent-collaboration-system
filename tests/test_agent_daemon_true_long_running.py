@@ -23,7 +23,7 @@ class TestTrueLongRunning:
         shutil.rmtree(temp, ignore_errors=True)
 
     def test_memory_leak_over_time(self, temp_dir):
-        """测试内存泄漏 - 持续运行30秒。"""
+        """测试内存泄漏 - 持续运行180秒（3分钟）。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
         from src.core.supervisor import ProcessSupervisor, SupervisorConfig
 
@@ -38,7 +38,7 @@ class TestTrueLongRunning:
         process = psutil.Process()
         initial_memory = process.memory_info().rss
 
-        for i in range(30):
+        for i in range(180):
             daemon._log(f"Memory leak test iteration {i}")
             time.sleep(1)
 
@@ -54,7 +54,7 @@ class TestTrueLongRunning:
         print("✅ No significant memory leak detected")
 
     def test_log_file_growth(self, temp_dir):
-        """测试日志文件增长 - 持续写入60秒。"""
+        """测试日志文件增长 - 持续写入180秒。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
 
         config = DaemonConfig(log_file="logs/test.log")
@@ -64,7 +64,7 @@ class TestTrueLongRunning:
 
         initial_size = daemon.log_file.stat().st_size if daemon.log_file.exists() else 0
 
-        for i in range(60):
+        for i in range(180):
             daemon._log(f"Log growth test - iteration {i}")
             time.sleep(1)
 
@@ -80,7 +80,7 @@ class TestTrueLongRunning:
         print("✅ Log file growth verified")
 
     def test_process_stability(self, temp_dir):
-        """测试进程稳定性 - 保持进程存活120秒。"""
+        """测试进程稳定性 - 保持进程存活300秒（5分钟）。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
 
         config = DaemonConfig(log_file="logs/test.log")
@@ -92,17 +92,17 @@ class TestTrueLongRunning:
         pid = daemon.pid_file.read_text().strip()
         process = psutil.Process(int(pid))
 
-        for i in range(120):
+        for i in range(300):
             status = daemon.get_status()
             assert status["running"] is True
             assert process.is_running()
-            if i % 30 == 0:
+            if i % 60 == 0:
                 print(f"Process still running at {i} seconds")
             time.sleep(1)
 
         assert process.is_running()
         daemon.cleanup()
-        print("✅ Process stable for 120 seconds")
+        print("✅ Process stable for 300 seconds")
 
     def test_signal_handling(self, temp_dir):
         """测试信号处理能力 - 使用外部进程。"""
@@ -121,7 +121,7 @@ d = AgentDaemon("''' + temp_dir + '''", config)
 d._ensure_directories()
 d._write_pid()
 print("DAEMON_STARTED", flush=True)
-time.sleep(30)
+time.sleep(60)
 '''
 
         wrapper_path = Path(temp_dir) / "test_daemon.py"
@@ -148,7 +148,7 @@ time.sleep(30)
         print("✅ Signal handling works correctly")
 
     def test_file_descriptor_leak(self, temp_dir):
-        """测试文件描述符泄漏 - 频繁开关文件。"""
+        """测试文件描述符泄漏 - 频繁开关文件120秒。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
 
         config = DaemonConfig(log_file="logs/test.log")
@@ -159,9 +159,9 @@ time.sleep(30)
         process = psutil.Process()
         initial_fds = process.num_fds()
 
-        for i in range(100):
+        for i in range(240):
             daemon._log(f"FD test {i}")
-            time.sleep(0.1)
+            time.sleep(0.5)
 
         final_fds = process.num_fds()
         fd_growth = final_fds - initial_fds
@@ -175,7 +175,7 @@ time.sleep(30)
         print("✅ No file descriptor leak detected")
 
     def test_concurrent_stress(self, temp_dir):
-        """并发压力测试 - 多线程同时操作30秒。"""
+        """并发压力测试 - 多线程同时操作120秒。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
         import concurrent.futures
         import random
@@ -188,23 +188,23 @@ time.sleep(30)
         stop_event = threading.Event()
 
         def writer():
-            for i in range(100):
+            for i in range(200):
                 if stop_event.is_set():
                     break
                 daemon._log(f"Concurrent write {i}")
-                time.sleep(0.1)
+                time.sleep(0.5)
 
         def reader():
-            for i in range(100):
+            for i in range(200):
                 if stop_event.is_set():
                     break
                 daemon.get_status()
-                time.sleep(0.1)
+                time.sleep(0.5)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [executor.submit(writer) for _ in range(5)] + \
                       [executor.submit(reader) for _ in range(5)]
-            time.sleep(30)
+            time.sleep(120)
             stop_event.set()
             for f in futures:
                 f.result()
@@ -213,10 +213,10 @@ time.sleep(30)
         print("✅ Concurrent stress test passed")
 
     def test_restart_backoff(self, temp_dir):
-        """测试重启退避策略 - 模拟频繁重启。"""
+        """测试重启退避策略 - 模拟频繁重启（60秒测试）。"""
         from src.core.supervisor import ProcessSupervisor, SupervisorConfig
 
-        config = SupervisorConfig(max_restarts=3, initial_delay=1, max_backoff=4)
+        config = SupervisorConfig(max_restarts=5, initial_delay=1, max_backoff=8)
         supervisor = ProcessSupervisor(temp_dir, config)
 
         def failing_func():
@@ -224,9 +224,9 @@ time.sleep(30)
 
         supervisor.start(failing_func, backoff_on_failure=True)
 
-        time.sleep(2)
+        time.sleep(20)
         status1 = supervisor.get_status()
-        time.sleep(2)
+        time.sleep(20)
         status2 = supervisor.get_status()
 
         print(f"Restart count: {status1['restart_count']}")
@@ -236,7 +236,7 @@ time.sleep(30)
         print("✅ Restart backoff strategy works")
 
     def test_graceful_shutdown(self, temp_dir):
-        """测试优雅关闭 - 验证停止逻辑。"""
+        """测试优雅关闭 - 验证停止逻辑（保持进程存活60秒后关闭）。"""
         from src.core.daemon import AgentDaemon, DaemonConfig
 
         config = DaemonConfig(log_file="logs/test.log")
@@ -248,6 +248,9 @@ time.sleep(30)
         pid = int(daemon.pid_file.read_text().strip())
         assert Path(daemon.pid_file).exists()
 
+        # 保持进程存活60秒
+        time.sleep(60)
+        
         daemon.cleanup()
 
         assert not Path(daemon.pid_file).exists(), "PID file should be cleaned"

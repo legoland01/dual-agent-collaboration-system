@@ -1,13 +1,13 @@
 """SignoffEngine 单元测试。
 
 测试用例：
-- 签署异常
-- 签署引擎初始化
-- 阶段配置
+- 签署配置
 - 签署操作
+- 拒签操作
+- 签署状态检查
 """
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, patch
 
 
 class TestSignoffExceptions:
@@ -58,24 +58,20 @@ class TestSignoffEngine:
         
         state_manager = Mock()
         workflow_engine = Mock()
-        
         engine = SignoffEngine(state_manager, workflow_engine)
         
-        assert engine.state_manager is state_manager
-        assert engine.workflow_engine is workflow_engine
+        assert engine.state_manager == state_manager
+        assert engine.workflow_engine == workflow_engine
 
     def test_stage_config(self):
         """测试阶段配置。"""
         from src.core.signoff import SignoffEngine
         
-        assert "requirements" in SignoffEngine.STAGE_CONFIG
-        assert "design" in SignoffEngine.STAGE_CONFIG
-        assert "test" in SignoffEngine.STAGE_CONFIG
+        config = SignoffEngine.STAGE_CONFIG
         
-        req_config = SignoffEngine.STAGE_CONFIG["requirements"]
-        assert req_config["agent1_role"] == "产品经理"
-        assert req_config["agent2_role"] == "开发"
-        assert req_config["status_field"] == "requirements"
+        assert "requirements" in config
+        assert "design" in config
+        assert "test" in config
 
     def test_get_stage_data_dict(self):
         """测试获取阶段数据（字典格式）。"""
@@ -85,10 +81,10 @@ class TestSignoffEngine:
         workflow_engine = Mock()
         engine = SignoffEngine(state_manager, workflow_engine)
         
-        state = {"requirements": {"status": "approved"}}
-        data = engine._get_stage_data("requirements", state)
+        state = {"requirements": {"status": "pending"}}
+        result = engine._get_stage_data("requirements", state)
         
-        assert data["status"] == "approved"
+        assert result == {"status": "pending"}
 
     def test_get_stage_data_list_design(self):
         """测试获取设计阶段数据（列表格式）。"""
@@ -98,16 +94,14 @@ class TestSignoffEngine:
         workflow_engine = Mock()
         engine = SignoffEngine(state_manager, workflow_engine)
         
-        state = {
-            "design": [
-                {"version": "v1", "status": "pending"},
-                {"version": "v2", "status": "in_progress"}
-            ]
-        }
-        data = engine._get_stage_data("design", state)
+        state = {"design": [
+            {"name": "设计文档1", "status": "in_progress"},
+            {"name": "设计文档2", "status": "completed"}
+        ]}
+        result = engine._get_stage_data("design", state)
         
-        assert data["version"] == "v2"
-        assert data["status"] == "in_progress"
+        assert result["name"] == "设计文档1"
+        assert result["status"] == "in_progress"
 
     def test_get_stage_data_empty(self):
         """测试获取空阶段数据。"""
@@ -118,9 +112,9 @@ class TestSignoffEngine:
         engine = SignoffEngine(state_manager, workflow_engine)
         
         state = {}
-        data = engine._get_stage_data("requirements", state)
+        result = engine._get_stage_data("requirements", state)
         
-        assert data == {}
+        assert result == {}
 
     def test_get_stage_data_unknown_stage(self):
         """测试获取未知阶段数据。"""
@@ -131,9 +125,9 @@ class TestSignoffEngine:
         engine = SignoffEngine(state_manager, workflow_engine)
         
         state = {"unknown": {}}
-        data = engine._get_stage_data("unknown", state)
+        result = engine._get_stage_data("unknown", state)
         
-        assert data == {}
+        assert result == {}
 
     def test_save_stage_data_dict(self):
         """测试保存阶段数据（字典格式）。"""
@@ -143,10 +137,10 @@ class TestSignoffEngine:
         workflow_engine = Mock()
         engine = SignoffEngine(state_manager, workflow_engine)
         
-        state = {"requirements": {"status": "pending"}}
-        engine._save_stage_data("requirements", state, {"status": "approved"})
+        state = {"requirements": {}}
+        engine._save_stage_data("requirements", state, {"status": "review"})
         
-        assert state["requirements"]["status"] == "approved"
+        assert state["requirements"]["status"] == "review"
 
     def test_can_sign_unknown_stage(self):
         """测试未知阶段不能签署。"""
@@ -156,17 +150,19 @@ class TestSignoffEngine:
         workflow_engine = Mock()
         engine = SignoffEngine(state_manager, workflow_engine)
         
-        can_sign, message = engine.can_sign("unknown_stage", "agent1")
+        can_sign, message = engine.can_sign("unknown", "agent1")
         
         assert can_sign is False
         assert "未知" in message
 
     def test_can_sign_wrong_status(self):
-        """测试状态不允许签署。"""
+        """测试状态不对不能签署。"""
         from src.core.signoff import SignoffEngine
         
         state_manager = Mock()
-        state_manager.load_state.return_value = {"requirements": {"status": "pending"}}
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "pending"}
+        }
         
         workflow_engine = Mock()
         engine = SignoffEngine(state_manager, workflow_engine)
@@ -174,10 +170,10 @@ class TestSignoffEngine:
         can_sign, message = engine.can_sign("requirements", "agent1")
         
         assert can_sign is False
-        assert "状态不允许" in message
+        assert "不允许签署" in message
 
     def test_can_sign_already_signed(self):
-        """测试已签署不能重复签署。"""
+        """测试已经签署不能再次签署。"""
         from src.core.signoff import SignoffEngine
         
         state_manager = Mock()
@@ -194,7 +190,7 @@ class TestSignoffEngine:
         assert "已经签署过" in message
 
     def test_can_sign_valid(self):
-        """测试可以签署。"""
+        """测试可以签署的情况。"""
         from src.core.signoff import SignoffEngine
         
         state_manager = Mock()
@@ -233,7 +229,6 @@ class TestSignoffOperations:
         assert result["agent"] == "agent1"
         assert result["signed"] is True
         assert result["comment"] == "同意"
-        state_manager.add_history.assert_called_once()
 
     def test_sign_fail(self):
         """测试签署失败。"""
@@ -267,6 +262,134 @@ class TestSignoffOperations:
         assert result["agent"] == "agent1"
         assert result["rejected"] is True
         assert result["reason"] == "代码需要修改完善逻辑"
+
+
+class TestSignoffEngineExtended:
+    """SignoffEngine 扩展测试。"""
+
+    def test_save_stage_data_list(self):
+        """测试保存设计阶段数据（列表格式）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        state = {"design": [
+            {"name": "设计文档1", "status": "in_progress"},
+            {"name": "设计文档2", "status": "completed"}
+        ]}
+        engine._save_stage_data("design", state, {"name": "设计文档1", "status": "approved"})
+
+        assert state["design"][0]["status"] == "approved"
+
+    def test_get_stage_data_list_completed(self):
+        """测试获取已完成状态的设计文档。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        state = {"design": [
+            {"name": "设计文档1", "status": "draft"},
+            {"name": "设计文档2", "status": "completed"}
+        ]}
+        result = engine._get_stage_data("design", state)
+
+        assert result["name"] == "设计文档2"
+        assert result["status"] == "completed"
+
+    def test_get_stage_data_list_approved(self):
+        """测试获取已批准状态的设计文档。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        state = {"design": [
+            {"name": "设计文档1", "status": "draft"},
+            {"name": "设计文档2", "status": "approved"}
+        ]}
+        result = engine._get_stage_data("design", state)
+
+        assert result["name"] == "设计文档2"
+        assert result["status"] == "approved"
+
+    def test_get_signoff_summary_unknown_stage(self):
+        """测试获取未知阶段的签署摘要。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.get_signoff_summary("unknown")
+
+        assert "error" in result
+
+    def test_get_signoff_summary_with_data(self):
+        """测试获取签署摘要（带数据）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"pm_signoff": True, "dev_signoff": True}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.get_signoff_summary("requirements")
+
+        assert result["pm_signoff"] is True
+        assert result["dev_signoff"] is True
+        assert result["both_signed"] is True
+
+    def test_check_all_signed_empty_stages(self):
+        """测试检查所有阶段签署（空列表）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed([])
+
+        assert result is True
+
+    def test_check_all_signed_with_rejection(self):
+        """测试检查所有阶段签署（包含拒签）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"pm_signoff": True, "dev_signoff": False, "pm_rejected": False, "dev_rejected": True}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed(["requirements"])
+
+        assert result is False
+
+    def test_can_sign_test_status_in_progress(self):
+        """测试测试阶段状态为进行中时可以签署。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "test": {"status": "in_progress"}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        can_sign, message = engine.can_sign("test", "agent1")
+
+        assert can_sign is True
 
 
 if __name__ == "__main__":

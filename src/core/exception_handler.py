@@ -215,8 +215,8 @@ class ExceptionHandler:
         ]
         
         fatal_patterns = [
-            "permission", "disk", "memory", "keyboard_interrupt",
-            "sigterm", "git not found"
+            "permission", "disk", "memory", "keyboardinterrupt",
+            "keyboard_interrupt", "sigterm", "git not found"
         ]
         
         exception_str = f"{exception_class} {exception_message}".lower()
