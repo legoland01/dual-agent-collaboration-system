@@ -16,9 +16,9 @@
 | M2: 项目管理 | ✅ 完成 | project_manager.py (232行)<br>resource_lock.py (195行) | 41 测试 | 82% | 已签署 |
 | M3: 会议管理 | ✅ 完成 | meeting_manager.py (185行) | 21 测试 | 86% | 已签署 |
 | M4: 用户故事 | ✅ 完成 | story_manager.py (266行)<br>test_story_manager.py (34测试) | 34 测试 | 90% | 已签署 |
-| M5: 完整测试套件 | ⏳ 待开发 | - | - | - | - |
+| M5: 完整测试套件 | ✅ 完成 | tests/test_stories/ (14 E2E)<br>blackbox_test_results.md | 48 测试 | 88% | 已签署 |
 
-**总体进度**: 4/5 里程碑完成 (80%)
+**总体进度**: 5/5 里程碑完成 (100%) - v2.2.0 开发完成
 
 ### v2.2.1 进度
 
