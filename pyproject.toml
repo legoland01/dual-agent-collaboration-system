@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "OpenCode", email = "dev@opencode.ai"}
+    {name = "liuzhen", email = "dev@opencode.ai"}
 ]
 keywords = ["collaboration", "agent", "project-management", "cli"]
 classifiers = [
