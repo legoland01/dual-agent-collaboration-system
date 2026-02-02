@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opencode-collaboration"
-version = "2.1.0"
+version = "2.2.0"
 description = "双Agent协作框架 - 产品经理与开发的分离式协作工具"
 readme = "README.md"
 requires-python = ">=3.8"
