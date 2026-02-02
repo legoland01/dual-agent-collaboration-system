@@ -660,4 +660,4 @@ oc-collab status
 
 **Full Changelog**: [View Git History](https://github.com/opencode/dual-agent-collaboration/commits/main)
 
-**Next Version**: v2.2.0 (planned)
+**Next Version**: v2.2.1 (planned)
