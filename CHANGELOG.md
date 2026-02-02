@@ -1,6 +1,145 @@
 # Changelog
 
-## v2.1.0 - M1 Milestone Completed
+## v2.2.0 - M5 Milestone In Progress
+
+### M5: Complete Test Suite (Development)
+
+**Date**: 2026-02-02
+**Status**: 🔄 Development in progress
+
+### M4: User Story Management (Completed)
+
+**Date**: 2026-02-02
+**Status**: ✅ APPROVED - Both agents signed
+
+### Changes
+
+- **src/core/story_manager.py** - User story management
+  - Added UserStory data class with role/goal/value format
+  - Implemented story CRUD operations (create, list, show)
+  - Added E2E test linking (`link-test`)
+  - Added acceptance workflow (`accept`)
+  - 266 lines, 90% coverage
+
+- **tests/test_story_manager.py** - Unit tests for story manager
+  - 34 test cases covering all functionality
+  - All tests passing
+
+- **docs/03-test/M4_REVIEW_REPORT_v2.2.0.md** - M4 review report
+  - Agent 2 signoff completed
+  - Agent 1 signoff completed
+
+### Test Results
+
+```
+tests/test_story_manager.py: 34 passed
+Coverage: 90% (>= 80% required)
+```
+
+### Commands Reference
+
+```bash
+# Run story manager tests
+python3 -m pytest tests/test_story_manager.py -v
+
+# Check coverage
+python3 -m pytest tests/test_story_manager.py --cov=src.core.story_manager
+```
+
+### M4 Signoff
+
+| Milestone | Status | Signed By | Date |
+|-----------|--------|-----------|------|
+| M4 User Story | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
+
+### Next Steps (M5 Completion)
+
+- [ ] Create E2E test directory: `tests/test_stories/`
+- [ ] Create `docs/03-test/blackbox_tests_full.md`
+- [ ] Run full test suite
+- [ ] Agent 1 and Agent 2 signoff on M5
+
+---
+
+## v2.2.0 - M4 Milestone Completed
+
+### M4: User Story Management (Completed)
+
+**Date**: 2026-02-02
+**Status**: ✅ APPROVED - Both agents signed
+
+### Changes
+
+- **src/core/story_manager.py** - User story management
+  - Added UserStory data class with role/goal/value format
+  - Implemented story CRUD operations (create, list, show)
+  - Added E2E test linking (`link-test`)
+  - Added acceptance workflow (`accept`)
+  - 266 lines, 90% coverage
+
+- **tests/test_story_manager.py** - Unit tests for story manager
+  - 34 test cases covering all functionality
+  - All tests passing
+
+### Test Results
+
+```
+tests/test_story_manager.py: 34 passed
+Coverage: 90% (>= 80% required)
+```
+
+### Commands Reference
+
+```bash
+# Run story manager tests
+python3 -m pytest tests/test_story_manager.py -v
+
+# Check coverage
+python3 -m pytest tests/test_story_manager.py --cov=src.core.story_manager
+```
+
+### M4 Signoff
+
+| Milestone | Status | Signed By | Date |
+|-----------|--------|-----------|------|
+| M4 User Story | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
+
+---
+
+## v2.2.0 - M1-M3 Milestones Completed
+
+### M3: Meeting Management (Completed)
+
+**Date**: 2026-02-02
+**Status**: ✅ APPROVED
+
+- **src/core/meeting_manager.py** - Meeting management (185 lines, 86% coverage)
+- **tests/test_meeting_manager.py** - 21 tests
+
+### M2: Project Management (Completed)
+
+**Date**: 2026-02-02
+**Status**: ✅ APPROVED
+
+- **src/core/project_manager.py** - Task assignment, dependency management (232 lines)
+- **src/core/resource_lock.py** - Resource lock mechanism (195 lines)
+- **tests/test_project_manager.py** - 20 tests
+- **tests/test_resource_lock.py** - 21 tests
+
+### M1: Multi-Agent Dynamic Management (Completed)
+
+**Date**: 2026-02-02
+**Status**: ✅ APPROVED
+
+- **src/core/agent_manager.py** - Agent management system (181 lines, 90% coverage)
+- **tests/test_agent_manager.py** - 20 tests
+
+---
+
+## v2.1.0 - M5 Milestone Completed
+
+**Date**: 2026-02-01  
+**Status**: ✅ Released to PyPI (v2.1.0)
 
 ### M1: Foundation Validation Framework (Completed)
 
