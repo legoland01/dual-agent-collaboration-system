@@ -99,7 +99,7 @@ myproject/
 ## 详细文档
 
 完整使用指南请参见项目 GitHub 仓库：
-https://github.com/opencode/dual-agent-collaboration-system
+https://github.com/legoland01/dual-agent-collaboration-system
 
 ---
 
