@@ -10,6 +10,55 @@
 
 ---
 
+## 摘要（浓缩版）
+
+本文记录了一次针对 AI Agent 软件工程实践的系统性探索，通过 oc-collab 项目中"session_start"功能缺失的真实案例，展示人机协作如何发现并修正传统软件工程中的根本性假设。
+
+**核心发现**：AI Agent 需要与传统人类开发者完全不同的流程控制，这不是因为 AI Agent 能力不足，而是因为它们基于"精确执行明确指令"的范式运作，传统的"期望人主动发现问题"假设在 AI 场景下完全不成立。
+
+**关键转折**：最初的 5-Why 分析得出"人会主动发现问题，AI 不会"的结论，但被人类专家质疑——"人就一定会主动发现问题吗？"这个质疑引导我们找到真正的根因：不是 AI 不如人会主动，而是机制必须从"期望主动"转变为"强制执行"。
+
+**人类核心价值**：在 AI 时代，人类不可替代的价值不在于执行技术任务，而在于**质疑隐含假设、直击问题核心、引导 AI 走向正确方向**。
+
+**解决方案**：提出四项核心原则（强制约束、系统自动验证、追溯关联、持久化记忆）和动态 checklist 机制，确保 AI Agent 工作流程的完整性和可追溯性。
+
+---
+
+## 背景简介
+
+### oc-collab 是什么
+
+oc-collab 是一个**双 Agent 协作开发框架**，用于协调两个 AI Agent（产品经理 Agent 1 + 开发 Agent 2）共同完成软件项目。它借鉴传统软件工程的阶段划分（需求→设计→开发→测试→部署），通过里程碑签署、质量门禁、状态管理等机制，确保开发过程规范化。
+
+### v2.2.0 核心功能
+
+| 功能 | 说明 |
+|------|------|
+| 双 Agent 角色管理 | Agent 1（产品）+ Agent 2（开发），职责分离 |
+| 里程碑签署 | 每个阶段完成后需双方签字确认 |
+| 状态管理 | 记录项目当前 phase、签署状态、待办事项 |
+| 记忆机制 | 记录决策、问题模式、经验教训 |
+
+### 极其简单的使用流程
+
+```bash
+# 1. 初始化项目
+oc-collab init myproject
+
+# 2. 创建需求文档
+编辑 docs/01-requirements/requirements_v*.md
+
+# 3. 评审并签署
+oc-collab signoff requirements
+
+# 4. 推进到下一阶段
+oc-collab advance -p design
+```
+
+详细背景资料请见本文档末尾的"附录：oc-collab 项目背景"。
+
+---
+
 ## 第一章：问题的起点
 
 ### 1.1 一个沉默的失败
@@ -367,6 +416,133 @@ def generate_review_checklist(document_path: str, document_type: str) -> Checkli
     
     return checklist
 ```
+
+---
+
+## 附录：oc-collab 项目背景
+
+### B.1 oc-collab 是什么
+
+oc-collab（OpenCode Collaboration）是一个**双 Agent 协作开发框架**，基于 OpenCode 平台实现。它的核心目标是解决 AI Agent 独立开发时的混乱问题，通过引入产品经理（Agent 1）和开发（Agent 2）的分离式协作，确保开发过程规范化、可追溯、可复用。
+
+**项目定位**：为 AI Agent 提供类似传统软件工程的流程约束，但不依赖人类监督。
+
+**核心价值**：
+- 双代理协作：产品 + 开发，互相监督
+- 里程碑签署：质量门禁，不跳过
+- 状态管理：单一事实来源
+- 问题追踪：不重复踩坑
+- 记忆机制：记得教训
+
+### B.2 v2.2.0 功能清单
+
+oc-collab v2.2.0 于 2026-02-02 发布，包含以下核心功能：
+
+| 模块 | 功能 | 说明 |
+|------|------|------|
+| Agent 管理 | agent_manager.py | Agent 角色系统（6 种类型） |
+| 项目管理 | project_manager.py | 任务分配、依赖管理 |
+| 资源锁 | resource_lock.py | 资源锁机制 |
+| 会议管理 | meeting_manager.py | 会议管理 |
+| 用户故事 | story_manager.py | 用户故事管理 |
+| 签署引擎 | signoff.py | 签署流程 |
+| 状态管理 | state_manager.py | 项目状态追踪 |
+| 记忆机制 | memory_manager.py | 问题模式、决策历史、经验教训 |
+
+**测试覆盖**：164 测试，88% 覆盖率。
+
+### B.3 协作流程详解
+
+oc-collab 的协作流程基于传统软件工程的阶段划分：
+
+```
+需求评审 → 设计评审 → 开发完成 → 测试通过 → 部署上线
+    ↓          ↓           ↓          ↓         ↓
+   签署       签署         签署       签署      完成
+
+每个阶段必须双方签署后才能进入下一阶段
+```
+
+**各阶段文档要求**：
+
+| 阶段 | 文档位置 | 文档类型 |
+|------|----------|----------|
+| 需求 | docs/01-requirements/ | requirements_v*.md, requirements_review_*.md |
+| 设计 | docs/02-design/ | detailed_design_*.md, design_review_*.md |
+| 测试 | docs/03-test/ | blackbox_test_cases_*.md, *REVIEW_REPORT*.md |
+| 部署 | docs/04-changelog/ | change_log.md, RELEASE_NOTES_*.md |
+
+### B.4 核心命令参考
+
+| 命令 | 说明 |
+|------|------|
+| `oc-collab init <project_name>` | 初始化协作项目 |
+| `oc-collab status` | 查看当前协作状态 |
+| `oc-collab switch <1|2>` | 切换 Agent 角色 |
+| `oc-collab advance -p <phase>` | 推进到指定阶段 |
+| `oc-collab signoff <stage>` | 签署确认 |
+| `oc-collab review <type>` | 评审功能 |
+| `oc-collab history` | 查看协作历史 |
+
+### B.5 项目结构
+
+```
+myproject/
+├── docs/
+│   ├── 01-requirements/   # 需求文档
+│   ├── 02-design/         # 设计文档
+│   ├── 03-test/           # 测试报告
+│   ├── 04-changelog/      # 变更记录
+│   └── 00-memos/          # 备忘录
+├── state/
+│   └── project_state.yaml # 项目状态
+├── src/                   # 源代码
+└── tests/                 # 测试代码
+```
+
+### B.6 签署机制详解
+
+oc-collab 的签署机制是质量门禁的核心：
+
+**签署条件**：
+1. 双方必须都完成签署
+2. 签署前必须通过自动检查
+3. 签署后状态更新为 "APPROVED"
+
+**签署流程**：
+```
+1. Agent 1 (产品) 完成评审，更新 pm_signoff: true
+2. Agent 2 (开发) 完成评审，更新 dev_signoff: true
+3. 系统检查所有前置条件
+4. 双方签署完成，phase 推进到下一阶段
+```
+
+### B.7 记忆机制详解
+
+oc-collab 的记忆机制用于解决 Agent 会话隔离问题：
+
+| 记忆类型 | 文件位置 | 内容 |
+|----------|----------|------|
+| 问题模式 | state/memory/patterns.yaml | 已知问题及其解决方案 |
+| 决策历史 | state/memory/decisions.yaml | 重要决策及其理由 |
+| 经验教训 | state/memory/lessons.yaml | 项目经验总结 |
+| 待处理事项 | state/memory/pending.yaml | 当前待办 |
+
+**Compaction 保护**：Compaction 操作前会导出所有记忆文件，确保不丢失关键信息。
+
+### B.8 相关文档链接
+
+本文档中引用的 oc-collab 项目文档：
+
+| 文档 | 路径 |
+|------|------|
+| 需求文档 | docs/01-requirements/requirements_v2.2.0.md |
+| 概要设计 | docs/02-design/OUTLINE_DESIGN_v2.2.0.md |
+| 详细设计 | docs/02-design/detailed_design_v2.1.0.md |
+| 测试用例 | docs/03-test/blackbox_test_cases_v2.2.0.md |
+| 测试报告 | docs/03-test/blackbox_test_results.md |
+| MEMO-2026-02-003 | docs/00-memos/MEMO-2026-02-003_oc-collab_Core_Design_Philosophy.md |
+| MEMO-2026-02-004 | docs/00-memos/MEMO-2026-02-004_AI_Agent_Engineering_Process.md |
 
 ---
 
