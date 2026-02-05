@@ -46,7 +46,7 @@
 
 ## M4: 动态 Checklist 扩展 ⏳
 
-- [ ] 扩展 `ChecklistGenerator`
+- [x] `ExtendedChecklistGenerator` 类
 - [ ] 需求追溯检查
 - [ ] 质量门禁检查
 - [ ] 与 Ad-hoc Items 集成
