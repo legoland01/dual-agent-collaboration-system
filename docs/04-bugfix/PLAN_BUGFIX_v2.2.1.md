@@ -34,7 +34,7 @@
 
 **问题**: Agent 反复需要人类提醒才能回到 oc-collab 规范流程
 
-**相关文档**: `docs/bugs/BUG-20260205-001_Process_Compliance.md`
+**相关文档**: `docs/bugs/BUG-20260205-001.md`
 
 **修复内容**:
 在 `session_manager.py` 中添加流程合规检查钩子：
@@ -57,7 +57,7 @@
 
 **问题**: Agent 2 在没有收到正式任务指派的情况下，主动开始实现功能
 
-**相关文档**: `docs/bugs/BUG-20260205-002_Agent2_Overstepping.md`
+**相关文档**: `docs/bugs/BUG-20260205-002.md`
 
 **修复内容**:
 在 `SessionManager` 中添加任务触发机制：

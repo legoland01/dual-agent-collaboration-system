@@ -116,7 +116,7 @@ oc-collab phase-advance --force
 
 | 文档 | 说明 |
 |------|------|
-| `docs/bugs/BUG-20260205-001_Process_Compliance.md` | Bug 报告 |
+| `docs/bugs/BUG-20260205-001.md` | Bug 报告 |
 | `requirements_v2.2.1_APPROVED.md` | v2.2.1 原始需求 |
 
 ---
