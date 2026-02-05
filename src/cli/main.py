@@ -1256,5 +1256,47 @@ def workflow_command(check: bool, suggest: bool):
         sys.exit(1)
 
 
+@main.command("compliance")
+@click.option("--prd", "-p", help="检查 PRD 文件")
+@click.option("--rfc", "-r", help="检查 RFC 文件")
+@click.option("--detect", "-d", is_flag=True, help="检测冲突")
+def compliance_command(prd: str, rfc: str, detect: bool):
+    """检查变更合规性。"""
+    try:
+        from ..core.change_compliance import ChangeComplianceChecker
+
+        project_path = get_project_path()
+        checker = ChangeComplianceChecker(project_path)
+
+        if prd:
+            result = checker.check_prd_compliance(prd)
+            if result.valid:
+                click.echo("✅ PRD 合规")
+            else:
+                for v in result.violations:
+                    click.echo(f"❌ {v}")
+
+        if rfc:
+            result = checker.check_rfc_compliency(rfc, prd)
+            if result.valid:
+                click.echo("✅ RFC 合规")
+            else:
+                for v in result.violations:
+                    click.echo(f"❌ {v}")
+
+        if detect and prd and rfc:
+            conflicts = checker.detect_conflicts(prd, rfc)
+            if conflicts:
+                click.echo(f"⚠️ 发现 {len(conflicts)} 个冲突:")
+                for c in conflicts:
+                    click.echo(f"  - {c.type}: {c.description}")
+            else:
+                click.echo("✅ 未检测到冲突")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     main()
