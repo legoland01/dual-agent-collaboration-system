@@ -101,10 +101,24 @@ git push
 
 ## 任务清单速查
 
-| 任务 | 优先级 | 说明 |
-|------|--------|------|
-| 提升覆盖率 | P0 | session_manager.py 从 73% 提升至 80% |
-| 动态 checklist | P0 | review 命令添加 --checklist 选项 |
+| 任务 | 优先级 | 状态 | 说明 |
+|------|--------|------|------|
+| 提升覆盖率 | P0 | ✅ 已完成 | session_manager.py 从 73% 提升至 91% |
+| 动态 checklist | P0 | ✅ 已完成 | review 命令添加 --checklist 选项 |
+
+---
+
+## 完成摘要
+
+### 覆盖率提升 (91%)
+- 新增 15 个测试用例
+- 20/20 tests passed
+
+### 动态 Checklist 实现
+- `src/core/checklist_generator.py` - 动态 checklist 生成器
+- `src/core/checklist_generator_types.py` - 类型定义
+- `src/cli/main.py` - review 命令集成 --checklist 选项
+- `tests/test_checklist_generator.py` - 8 个测试用例 (8/8 passed)
 
 ---
 
