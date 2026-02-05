@@ -1,5 +1,6 @@
 """签署引擎模块。"""
-from typing import Tuple
+from typing import Tuple, Optional
+from dataclasses import dataclass
 
 
 class SignoffError(Exception):
@@ -25,6 +26,22 @@ class DuplicateSignoffError(SignoffError):
 class RejectionError(SignoffError):
     """拒签异常。"""
     pass
+
+
+@dataclass
+class SignoffResult:
+    """签署结果"""
+    success: bool
+    message: str
+    synced: bool = False
+    sync_error: Optional[str] = None
+
+
+@dataclass
+class SyncResult:
+    """同步结果"""
+    success: bool
+    message: str
 
 
 class SignoffEngine:
@@ -194,3 +211,36 @@ class SignoffEngine:
                 return False
         
         return True
+    
+    def signoff_with_sync(self, stage: str, agent: str, comment: str = "", git_helper=None) -> SignoffResult:
+        """执行签署并同步到远程"""
+        try:
+            sign_result = self.sign(stage, agent, comment)
+            
+            synced = False
+            sync_error = None
+            
+            if git_helper:
+                try:
+                    git_helper.push()
+                    synced = True
+                except Exception as e:
+                    sync_error = str(e)
+            
+            message = f"签署成功: {stage} 阶段"
+            if synced:
+                message += "\n✓ 已同步到远程仓库"
+            elif sync_error:
+                message += f"\n⚠ 同步失败: {sync_error}"
+            
+            return SignoffResult(
+                success=True,
+                message=message,
+                synced=synced,
+                sync_error=sync_error
+            )
+        except SignoffError as e:
+            return SignoffResult(
+                success=False,
+                message=f"签署失败: {e}"
+            )

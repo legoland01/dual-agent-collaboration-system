@@ -252,26 +252,74 @@ def review_command(stage: str, file: str, checklist: bool, new: bool, list: bool
 @click.argument("stage", type=click.Choice(["requirements", "design", "test"]))
 @click.option("--comment", "-m", default="")
 @click.option("--reject", "-r", default=None)
-def signoff_command(stage: str, comment: str, reject: str):
+@click.option("--sync", "-s", is_flag=True, default=False, help="签署后自动同步到远程")
+def signoff_command(stage: str, comment: str, reject: str, sync: bool):
     """签署确认。"""
     try:
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         workflow_engine = WorkflowEngine(state_manager)
         signoff_engine = SignoffEngine(state_manager, workflow_engine)
-        
+
         agent_id = state_manager.get_active_agent()
-        
+
         if reject:
             result = signoff_engine.reject(stage, agent_id, reject)
             click.echo(f"已拒签 {stage} 阶段")
         else:
-            result = signoff_engine.sign(stage, agent_id, comment)
-            click.echo(f"已签署 {stage} 阶段")
-            
+            if sync:
+                from ..core.git import GitHelper
+                git_helper = GitHelper(project_path)
+                result = signoff_engine.signoff_with_sync(stage, agent_id, comment, git_helper)
+                click.echo(result.message)
+            else:
+                result = signoff_engine.sign(stage, agent_id, comment)
+                click.echo(f"已签署 {stage} 阶段")
+
             if state_manager.can_proceed_to_next_phase():
                 click.echo("双方已签署，可以推进到下一阶段")
-        
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("signoffs")
+@click.option("--list", "-l", is_flag=True, default=False, help="列出所有签署记录")
+@click.option("--id", "-i", help="查看特定签署记录ID")
+def signoffs_command(list: bool, id: str):
+    """查看签署记录。"""
+    try:
+        from ..core.signoff_record_manager import SignoffRecordManager
+
+        project_path = get_project_path()
+        manager = SignoffRecordManager(project_path)
+
+        if id:
+            record = manager.get_signoff(id)
+            if record:
+                console.print(f"\n[bold]签署记录: {id}[/bold]")
+                console.print(f"里程碑: {record.get('milestone')}")
+                console.print(f"阶段: {record.get('phase')}")
+                console.print(f"状态: {record.get('status')}")
+                console.print("\n签署者:")
+                for signer in record.get("signers", []):
+                    status_icon = "✓" if signer.get("status") == "approved" else "○"
+                    console.print(f"  {status_icon} {signer.get('role')} ({signer.get('agent')}) - {signer.get('timestamp')}")
+            else:
+                click.echo(f"未找到签署记录: {id}")
+        elif list:
+            signoffs = manager.list_signoffs()
+            if signoffs:
+                console.print("\n[bold]签署记录列表[/bold]")
+                for record in signoffs:
+                    status_icon = "✓" if record.get("status") == "APPROVED" else "○"
+                    console.print(f"{status_icon} {record.get('signoff_id')} - {record.get('milestone')} - {record.get('phase')}")
+            else:
+                click.echo("暂无签署记录")
+        else:
+            click.echo("请使用 --list 列出所有记录，或 --id 查看特定记录")
+
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
