@@ -17,6 +17,7 @@ from ..core.auto_engine import AutoCollaborationEngine, TodoCommandExecutor, Wor
 from ..core.auto_retry import AutoRetry, AutoRetryConfig
 from ..core.auto_docs import AutoDocs, AutoDocsConfig
 from ..core.phase_advance import PhaseAdvanceEngine
+from ..core.session_manager import SessionManager
 from ..utils.lock import LockExistsError
 
 
@@ -123,6 +124,9 @@ def status_command():
         req_status = state_manager.get_signoff_status("requirements")
         console.print(f"需求签署 - 产品经理: {'✓' if req_status['pm_signoff'] else '✗'}, 开发: {'✓' if req_status['dev_signoff'] else '✗'}")
 
+        session_manager = SessionManager(project_path)
+        session_manager.show_welcome(active_agent)
+
     except StateFileNotFoundError:
         click.echo("错误: 未找到项目状态文件，请先初始化项目")
         sys.exit(1)
@@ -136,22 +140,33 @@ def status_command():
 
 @main.command("switch")
 @click.argument("agent_id", type=click.IntRange(1, 2))
-def switch_command(agent_id: int):
+@click.option("--welcome/--no-welcome", "-w", default=True, help="显示欢迎信息")
+def switch_command(agent_id: int, welcome: bool):
     """切换Agent角色。"""
     try:
         project_path = get_project_path()
         state_manager = StateManager(project_path)
-        
+
         current_agent = state_manager.get_active_agent()
         if current_agent == f"agent{agent_id}":
             click.echo(f"已经是 Agent {agent_id}")
             return
-        
+
         state_manager.set_active_agent(f"agent{agent_id}")
-        
-        agent_info = state_manager.load_state()["agents"][f"agent{agent_id}"]
-        click.echo(f"已切换到 Agent {agent_id} ({agent_info['role']})")
-        
+
+        if welcome:
+            session_manager = SessionManager(project_path)
+            session_manager.show_welcome(f"agent{agent_id}")
+        else:
+            try:
+                state = state_manager.load_state()
+                agents = state.get("agents", {})
+                agent_info = agents.get(f"agent{agent_id}", {})
+                role = agent_info.get("role", "未知")
+            except Exception:
+                role = "未知"
+            click.echo(f"已切换到 Agent {agent_id} ({role})")
+
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)

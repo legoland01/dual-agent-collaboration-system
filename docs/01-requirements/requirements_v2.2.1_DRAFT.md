@@ -26,16 +26,20 @@ v2.2.0 发布后，发现以下问题需要修复：
 |----------|----------|----------|----------|
 | Agent 2 | 签署后不自动同步 | LOW | 功能增强 |
 | Agent 1 | 签署流程不规范 | P1 | 流程改进 |
+| **协作实践** | **Agent 新会话不知道 oc-collab 存在** | **P0** | **v2.2.0 BUG 修复 - 会话起始引导** |
 | 协作实践 | Agent 搞不清角色和职责 | P1 | Skill 自动加载 |
 | 协作实践 | 不知道另一个 Agent 在做什么 | P1 | 困惑信号检测 |
 | 协作实践 | 独自决策，跳过协作流程 | P1 | 职责边界提醒 |
 | 协作实践 | 不知道项目的仓库配置 | P2 | 动态仓库配置 |
+| **协作实践** | **变更载体不明确** | **P2** | **明确 PRD/RFC 角色分工** |
 
 ### 1.3 主要变更
 
 1. **签署自动同步**: `oc-collab signoff` 添加 `--sync` 选项
 2. **签署流程改进**: 规范化签署模板和检查清单
-3. **双代理认知免疫系统**:
+3. **会话起始引导**: Agent 新会话自动显示角色职责和使用指南
+4. **变更载体明确化**: 明确 PRD 与 RFC 的角色分工（可只用 PRD 承载变更，无需 RFC）
+5. **双代理认知免疫系统**:
    - 困惑信号检测
    - 协作指南 Skill 自动加载
    - 职责边界提醒
@@ -167,6 +171,147 @@ status: APPROVED
 created_at: 2026-02-02T12:00:00
 ```
 
+---
+
+### 2.2 签署记录持久化
+
+**需求编号**: FR-SIGNOFF-IMPROVE-003
+
+**描述**: 签署记录应保存到 `state/signoffs/` 目录。
+
+**文件格式** (`state/signoffs/sig_M1_20260202.yaml`):
+```yaml
+signoff_id: SIG-M1-20260202
+milestone: M1
+phase: integration_testing
+signers:
+  - role: 产品负责人
+    agent: Agent 1
+    timestamp: 2026-02-02T12:00:00
+    status: approved
+  - role: 开发负责人
+    agent: Agent 2
+    timestamp: 2026-02-02T12:05:00
+    status: approved
+status: APPROVED
+created_at: 2026-02-02T12:00:00
+```
+
+### 2.3 变更载体明确化
+
+**需求编号**: FR-CHANGE-CLARITY-001
+
+**问题背景**:
+在 financial_case_generator_system 项目中，出现变更载体不明确的问题：
+- PRD 变更已评审签署，但 RFC 文档存在但无需单独评审
+- Agent 不知道应该用 PRD 还是 RFC 承载变更
+- 没有明确规则处理 PRD 和 RFC 的关系
+
+**核心原则**：**需求变更仍需要流程**，但 RFC 不一定是独立流程。
+
+**解决方案**:
+
+#### 2.3.1 PRD 与 RFC 角色分工
+
+**变更载体规则**:
+| 场景 | 变更载体 | 是否需要签署流程 | 说明 |
+|------|----------|------------------|------|
+| 需求新增/重大变更 | PRD | ✅ 需要 | PRD 是变更的**主要载体**，必须评审签署 |
+| 需求澄清/技术方案 | RFC | ✅ 需要 | RFC 是变更的**辅助载体**，独立议题需要评审 |
+| PRD 已包含 RFC 内容 | PRD | ✅ PRD 评审即有效 | RFC 可作为**变更记录**，无需单独评审 |
+
+**流程规则**:
+```
+需求变更 → PRD 更新 → PRD 评审签署 → 完成 ✅
+            ↓
+        (可选) RFC 创建 → 作为变更记录，无评审要求
+```
+
+**示例**:
+| 场景 | PRD | RFC | 处理方式 |
+|------|-----|-----|----------|
+| 新增功能需求 | ✅ 第2.4节 | 可选 | PRD 评审签署即可 |
+| 技术方案讨论 | ❌ | ✅ RFC-001 | RFC 评审签署 |
+| PRD 已包含 RFC 内容 | ✅ | ✅ | PRD 评审有效，RFC 可作为记录 |
+
+#### 2.3.2 流程合规检测
+
+**描述**: 检测变更流程是否符合规范（**需求变更必须走流程**）。
+
+**检测规则**:
+```python
+CHANGE_COMPLIANCE_RULES = {
+    "prd_change_requires_signoff": True,   # PRD 变更必须签署
+    "rfc_optional_when_prd_complete": True, # PRD 完整时 RFC 可选（作为记录）
+    "conflict_detection": True,             # 检测 PRD/RFC 冲突
+}
+```
+
+**检测场景**:
+| 场景 | 检测逻辑 | 处理方式 |
+|------|----------|----------|
+| PRD 新增/修改 | 检查是否完成签署 | 未签署则**阻止开发** ⭐ |
+| RFC 独立议题 | 检查是否完成签署 | 未签署则提醒 |
+| PRD 与 RFC 冲突 | 检测内容一致性 | 提示冲突，人工解决 |
+
+#### 2.3.3 冲突检测与解决
+
+**冲突类型**:
+| 冲突类型 | 示例 | 检测方式 |
+|----------|------|----------|
+| 内容冲突 | PRD 和 RFC 描述不一致 | 关键词对比 |
+| 状态冲突 | PRD 已签署，RFC 待评审 | 状态对比 |
+| 版本冲突 | 不同版本的内容混用 | 版本号检查 |
+
+**冲突解决流程**:
+```
+冲突检测 → 冲突报告 → 人工确认 → 更新文档 → 重新签署（如需要）
+```
+
+**冲突报告示例**:
+```
+⚠️  检测到冲突
+
+冲突类型: 内容不一致
+文件: PRD v3.0 第2.4节 vs RFC-2026-02-001
+差异: 
+  - PRD: "主入口待设计"
+  - RFC: "主入口已完成设计"
+
+建议: 
+  1. 检查哪个版本是最新的
+  2. 更新落后的一方
+  3. 如有重大变更，重新签署
+```
+
+#### 2.3.4 流程违规处理
+
+**违规场景**:
+| 违规场景 | 检测方式 | 处理方式 |
+|----------|----------|----------|
+| PRD 变更未签署 | 检查签署状态 | **阻止开发** ⭐ |
+| 基于未签署 PRD 开发 | 检查开发时间 vs 签署时间 | 拒绝执行 |
+| 跳过评审直接开发 | 检查 RFC/PRD 状态 | 拒绝执行 |
+
+**违规处理原则**:
+- **PRD 未签署 = 不能开发**（硬性约束）
+- **RFC 未签署 = 提醒，但允许继续**（软性约束）
+
+**违规处理代码**:
+```python
+def handle_violation(violation_type: str, context: dict) -> ViolationAction:
+    """处理流程违规"""
+    if violation_type == "UNSIGNED_PRD":
+        return ViolationAction.BLOCK  # 阻止开发，必须先签署 PRD
+    elif violation_type == "DEV_BEFORE_SIGNOFF":
+        return ViolationAction.BLOCK  # 拒绝开发命令
+        return ViolationAction.BLOCK  # 阻止开发
+    elif violation_type == "SKIP_REVIEW":
+        return ViolationAction.REQUIRE_REVIEW  # 要求评审
+```
+
+---
+
 ## 3. 非功能需求
 
 ### 3.1 兼容性
@@ -220,392 +365,10 @@ created_at: 2026-02-02T12:00:00
 | 里程碑 | 内容 | 交付物 |
 |--------|------|--------|
 | M1 | 签署自动同步功能 | signoff.py + CLI --sync 选项 |
-| M2 | 签署流程改进 | 模板 + 检查清单 + 记录持久化 |
-| M3 | 双代理认知免疫系统 | Skill + 检测机制 + 提醒 |
-| M4 | 测试和签署 | 测试用例 + 签署 |
-
----
-
-## 6. 风险
-
-| 风险 | 影响 | 缓解措施 |
-|------|------|----------|
-| 同步冲突 | 中 | 提供清晰的冲突解决提示 |
-| 用户习惯 | 低 | 默认不启用，给予适应时间 |
-
----
-
-## 3. 双代理认知免疫系统
-
-### 3.1 变更动机
-
-在双代理协作过程中，发现以下问题需要解决：
-
-| 问题来源 | 问题描述 | 严重程度 | 解决方案 |
-|----------|----------|----------|----------|
-| 协作困惑 | Agent 搞不清角色和职责 | P1 | Skill 自动加载 |
-| 认知断层 | 不知道另一个 Agent 在做什么 | P1 | 困惑信号检测 |
-| 职责混淆 | 独自决策，跳过协作流程 | P1 | 职责边界提醒 |
-| 仓库不明 | 不知道项目的仓库配置 | P2 | 动态仓库配置 |
-
-### 3.2 Skill 自动加载机制
-
-**需求编号**: FR-DUAL-AUTO-001
-
-**问题背景**:
-在双代理协作过程中，Agent 有时会"忘记"另一个 Agent 的存在，导致：
-- 独自决策，跳过评审流程
-- 不知道文件应该放在哪里
-- 不清楚下一步应该做什么
-
-**解决方案**:
-
-#### 3.2.1 自动加载触发
-
-**描述**: 当检测到 Agent 困惑信号时，自动加载 oc-collab 协作指南 Skill。
-
-**触发信号**:
-| 信号 | 示例 | 置信度 |
-|------|------|--------|
-| 角色混淆 | "我是谁"、"你做什么"、"我的角色" | 高 |
-| 不知道下一步 | "下一步"、"接下来"、"做什么" | 高 |
-| 不知道文件位置 | "文件在哪"、"放哪里"、"在哪里" | 高 |
-| 独自决策 | "我直接做"、"不需要对方"、"我自己决定" | 高 |
-
-**触发流程**:
-```
-Agent 困惑表达
-    ↓
-困惑信号检测（FR-DUAL-AUTO-002）
-    ↓
-自动加载 Skill: oc_collab_collaboration_guide
-    ↓
-提供上下文
-    ↓
-Agent 恢复正常协作
-```
-
-#### 3.2.2 Skill 引用机制
-
-**描述**: 在 System Prompt 中引用协作指南 Skill。
-
-**配置格式**:
-```yaml
-system_prompt:
-  skill_references:
-    - "oc_collab_collaboration_guide"  # 当检测到协作困惑时自动加载
-```
-
-### 3.3 困惑信号检测
-
-**需求编号**: FR-DUAL-AUTO-002
-
-**描述**: 实现困惑信号检测机制，识别 Agent 的协作困惑。
-
-**检测方式**:
-| 检测方式 | 说明 |
-|----------|------|
-| 关键词检测 | "我是谁"、"怎么做"、"文件在哪" |
-| 行为分析 | 跳过签署、独自决策 |
-| 上下文推断 | 从对话内容推断困惑 |
-
-**检测实现**:
-```python
-COLLABORATION_CONFUSION_SIGNALS = {
-    "role_confusion": ["我是谁", "你做什么", "我的角色"],
-    "next_step_confusion": ["下一步", "接下来", "做什么"],
-    "location_confusion": ["文件在哪", "放哪里", "在哪里"],
-    "solo_decision": ["我直接做", "不需要对方", "我自己决定"]
-}
-
-def detect_confusion(text: str) -> Dict[str, float]:
-    """检测协作困惑信号，返回置信度"""
-```
-
-### 3.4 协作指南 Skill 内容
-
-**需求编号**: FR-DUAL-AUTO-003
-
-**描述**: 创建 oc_collab_collaboration_guide Skill，包含完整的协作指南内容。
-
-**Skill 结构**:
-```
-skills/
-└── oc_collab_collaboration_guide/
-    ├── skill.yaml          # Skill 元数据
-    ├── skill.py            # Skill 主逻辑
-    └── content.md          # 协作指南内容
-```
-
-**协作指南内容大纲**:
-```markdown
-# oc-collab 协作指南
-
-## 1. 当前协作状态
-- Agent 角色识别（Agent 1 / Agent 2）
-- 当前项目阶段
-- 待完成任务
-
-## 2. 双代理职责边界
-- Agent 1（产品经理）职责
-  - 创建需求文档
-  - 创建 RFC
-  - 评审并签署
-- Agent 2（开发）职责
-  - 评审需求和技术方案
-  - 实现功能
-  - 编写测试
-  - 评审并签署
-
-## 3. 协作规则
-- 创建者 ≠ 评审者（必须由另一方评审）
-- 双方签署后才能进入下一阶段
-- 通过文件系统（docs/, state/）协作
-
-## 4. 协作流程
-### RFC 协作流程
-1. Agent 1 创建 RFC → 写入 docs/
-2. git push 到远端
-3. Agent 2 git pull → 读取 docs/ → 发现 RFC
-4. Agent 2 评审并签署 → git push 到远端
-5. Agent 1 git pull → 读取签署状态 → 评审并签署 → git push
-
-## 5. 下一步推荐行动
-- 根据当前阶段推荐具体行动
-- 避免越界行为
-
-## 6. 关键文件位置
-- RFC 文档：docs/*RFC*.md
-- 需求文档：docs/01-requirements/
-- 测试用例：tests/
-- 状态文件：state/project_state.yaml
-
-## 7. 仓库配置（动态获取）
-
-### 当前项目仓库
-- 远端 URL: {动态从 .git/config 读取}
-- 分支: {当前分支}
-- 最后同步: {时间}
-
-### 同步操作
-- 读取 RFC: `git pull` → `ls docs/`
-- 提交评审: `git push`
-
-### 不同项目可能使用
-- GitHub / Gitee / GitLab
-- 不同仓库 URL
-- 不同同步频率
-
-## 8. 签署流程
-- 当前签署状态
-- 如何推进签署
-
-## 9. 常见问题
-- Q: 我不知道 RFC 在哪里？
-  A: RFC 保存在 docs/ 目录，使用 `ls docs/*RFC*.md` 查找
-- Q: 我需要和谁协作？
-  A: 你是一个双代理系统，另一个 Agent 负责评审/实现
-- Q: 签署是什么意思？
-  A: 双方确认后才能进入下一阶段
-```
-
-**动态内容获取**:
-```python
-def get_dynamic_content() -> Dict[str, str]:
-    """获取动态内容"""
-    return {
-        "remote_url": get_remote_url(),           # 从 .git/config 读取
-        "current_branch": get_current_branch(),   # 获取当前分支
-        "last_sync": get_last_sync_time(),        # 获取最后同步时间
-        "project_phase": get_project_phase(),     # 从 state/project_state.yaml 读取
-        "signoff_status": get_signoff_status(),   # 获取签署状态
-    }
-```
-
-### 3.5 职责边界提醒
-
-**需求编号**: FR-DUAL-AUTO-004
-
-**描述**: 在关键节点自动提醒 Agent 的职责边界。
-
-**提醒场景**:
-| 场景 | 提醒内容 |
-|------|----------|
-| 创建 RFC 后 | "RFC 已创建，等待 Agent 2 评审" |
-| 评审时 | "你是 Agent 2，负责评审，不是创建者" |
-| 签署前 | "请确认双方都已评审后再签署" |
-| 独自决策时 | "这是一个需要双方确认的决策" |
-
-**提醒配置**:
-```yaml
-reminders:
-  - trigger: "after_rfc_creation"
-    message: "RFC 已创建，等待 Agent 2 评审。请勿自行评审自己的 RFC。"
-  - trigger: "before_signoff"
-    message: "请确认双方都已评审后再签署。"
-  - trigger: "solo_decision_detected"
-    message: "这是一个需要双方确认的决策，请通知另一方。"
-```
-
-### 3.6 验收标准
-
-| FR 编号 | 验收标准 | 验证方式 |
-|---------|----------|----------|
-| FR-DUAL-AUTO-001 | 困惑时自动加载 Skill | 集成测试 |
-| FR-DUAL-AUTO-002 | 困惑信号检测准确率 >= 80% | 测试集验证 |
-| FR-DUAL-AUTO-003 | Skill 内容完整，包含动态仓库配置 | 代码审查 |
-| FR-DUAL-AUTO-004 | 关键节点有职责提醒 | 功能测试 |
-
-### 3.7 补充机制细节（从 Compaction 恢复）
-
-#### 3.7.1 困惑信号触发阈值
-
-**描述**: 设定困惑信号检测的置信度阈值，避免误触发。
-
-**阈值配置**:
-```yaml
-confusion_detection:
-  confidence_threshold: 0.8  # 置信度 >= 0.8 才触发自动加载
-  min_keyword_matches: 2     # 至少匹配 2 个关键词才触发
-```
-
-**触发条件**:
-| 条件 | 说明 |
-|------|------|
-| 置信度 >= 0.8 | 关键词匹配度高，确信 Agent 困惑 |
-| 至少匹配 2 个关键词 | 避免单一关键词误触发 |
-
-**优先级规则**:
-| 优先级 | 信号类型 | 示例 |
-|--------|----------|------|
-| 1 (最高) | 角色混淆 | "我是谁"、"你做什么" |
-| 2 | 职责越界 | "我直接做"、"不需要对方" |
-| 3 | 流程困惑 | "下一步做什么"、"接下来" |
-
-#### 3.7.2 Skill 加载失败处理
-
-**描述**: 当 Skill 自动加载失败时，提供降级方案。
-
-**失败场景**:
-| 场景 | 处理方式 |
-|------|----------|
-| Skill 文件不存在 | 降级为直接输出协作指南文本 |
-| Skill 格式错误 | 降级为直接输出协作指南文本 |
-| Skill 加载超时 | 降级为直接输出协作指南文本 |
-
-**降级方案**:
-```python
-def load_collaboration_guide_skill() -> str:
-    """加载协作指南 Skill，失败时降级为直接提示"""
-    try:
-        skill = load_skill("oc_collab_collaboration_guide")
-        return skill.execute()
-    except SkillLoadError:
-        # 降级：直接输出关键信息
-        return get_fallback_guidance()
-```
-
-**降级输出内容**:
-```markdown
-## 当前协作状态提醒
-
-**你的角色**: {Agent 1 / Agent 2}
-**当前阶段**: {project_phase}
-**下一步建议**: {recommended_action}
-
-**快速命令**:
-- 查看状态: `oc-collab status`
-- 查看待办: `oc-collab todo`
-- 签署确认: `oc-collab signoff`
-```
-
-#### 3.7.3 提醒频率控制
-
-**描述**: 控制职责边界提醒的频率，避免过度提醒造成干扰。
-
-**频率配置**:
-```yaml
-reminder_control:
-  max_reminders_per_session: 5      # 每会话最多 5 次提醒
-  min_interval_between_reminders: 10  # 提醒间隔至少 10 分钟
-  ignored_triggers: []              # 可忽略的触发场景列表
-```
-
-**提醒抑制规则**:
-| 场景 | 处理方式 |
-|------|----------|
-| 同一触发条件 10 分钟内重复 | 抑制提醒 |
-| 单会话提醒超过 5 次 | 抑制后续提醒 |
-| 用户明确忽略某类提醒 | 永久抑制该类提醒 |
-
-**智能提醒判断**:
-```python
-def should_show_reminder(trigger: str, context: Dict) -> bool:
-    """判断是否应该显示提醒"""
-    if is_suppressed(trigger):
-        return False
-    if get_reminder_count() >= MAX_REMINDERS:
-        return False
-    if get_time_since_last_reminder(trigger) < MIN_INTERVAL:
-        return False
-    return True
-```
-
-#### 3.7.4 动态内容缓存策略
-
-**描述**: 缓存动态获取的内容（如仓库配置），减少 git 调用频率。
-
-**缓存配置**:
-```yaml
-cache_config:
-  enabled: true
-  ttl: 300  # 缓存 5 分钟
-  max_size: 100  # 最多缓存 100 个条目
-```
-
-**缓存内容**:
-| 内容 | TTL | 说明 |
-|------|-----|------|
-| 远端 URL | 5 分钟 | 从 .git/config 读取 |
-| 当前分支 | 5 分钟 | `git branch` |
-| 最后同步时间 | 5 分钟 | 记录每次 sync 时间 |
-| 项目阶段 | 5 分钟 | 从 state/project_state.yaml 读取 |
-| 签署状态 | 5 分钟 | 从 state/ 目录读取 |
-
-**缓存失效场景**:
-| 触发条件 | 失效内容 |
-|----------|----------|
-| 执行 `git push` | 远端 URL、分支、同步时间 |
-| 执行 `git pull` | 远端 URL、分支、同步时间 |
-| 修改 state 文件 | 项目阶段、签署状态 |
-| 阶段推进 | 项目阶段 |
-
-**实现示例**:
-```python
-from functools import lru_cache
-import time
-
-class DynamicContentCache:
-    def __init__(self, ttl: int = 300):
-        self.ttl = ttl
-        self._cache = {}
-
-    def get(self, key: str):
-        if key in self._cache:
-            cached, timestamp = self._cache[key]
-            if time.time() - timestamp < self.ttl:
-                return cached
-        return None
-
-    def set(self, key: str, value):
-        self._cache[key] = (value, time.time())
-
-    def invalidate(self, key: str = None):
-        if key:
-            self._cache.pop(key, None)
-        else:
-            self._cache.clear()
-```
+| M2 | 变更载体明确化 | PRD/RFC 角色分工指南 + 合规检测 |
+| M3 | 签署流程改进 | 模板 + 检查清单 + 记录持久化 |
+| M4 | 双代理认知免疫系统 | Skill + 检测机制 + 提醒 |
+| M5 | 测试和签署 | 测试用例 + 签署 |
 
 ---
 
