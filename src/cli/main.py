@@ -1216,5 +1216,45 @@ def advance_command(phase: str, force: bool, check: bool):
         sys.exit(1)
 
 
+@main.command("workflow")
+@click.option("--check", "-c", is_flag=True, help="显示合规检查结果")
+@click.option("--suggest", "-s", is_flag=True, help="显示下一步建议")
+def workflow_command(check: bool, suggest: bool):
+    """查看当前工作流状态和推理。"""
+    try:
+        from ..core.workflow_inference import WorkflowInferenceEngine
+
+        project_path = get_project_path()
+        state_manager = StateManager(project_path)
+        engine = WorkflowInferenceEngine(project_path, state_manager)
+
+        result = engine.infer_next_action()
+
+        if result.unknown:
+            click.echo("⚠️ 无法确定当前流程状态")
+            click.echo("请先初始化项目: oc-collab project init")
+        else:
+            console.print(Panel(
+                f"当前阶段: {result.current_phase}\n\n{result.suggestion}",
+                title="工作流状态",
+                style="blue"
+            ))
+
+            if check or suggest:
+                compliance = result.compliance_check
+                if compliance.valid:
+                    click.echo("\n✅ 流程合规")
+                else:
+                    click.echo("\n⚠️ 流程不合规:")
+                    for violation in compliance.violations:
+                        click.echo(f"  - {violation}")
+                    for suggestion in compliance.suggestions:
+                        click.echo(f"  💡 {suggestion}")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     main()

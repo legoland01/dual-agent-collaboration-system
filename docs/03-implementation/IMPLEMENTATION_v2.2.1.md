@@ -72,10 +72,10 @@
 
 ## PATCH-001: 流程合规检查
 
-- [ ] 实现 `WorkflowInferenceEngine`
+- [x] 实现 `WorkflowInferenceEngine`
+- [x] 实现 `oc-collab workflow` 命令
 - [ ] 扩展 `StateValidator`
 - [ ] 扩展 `SessionManager`
-- [ ] 实现 `oc-collab workflow` 命令
 - [ ] 编写测试用例
 
 ---
