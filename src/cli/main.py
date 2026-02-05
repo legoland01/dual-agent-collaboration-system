@@ -175,62 +175,14 @@ def switch_command(agent_id: int, welcome: bool):
 @main.command("review")
 @click.argument("stage", type=click.Choice(["requirements", "design", "test"]))
 @click.option("--file", "-f", help="指定评审文件路径")
-@click.option("--checklist", "-c", is_flag=True, default=False, help="显示动态检查清单")
 @click.option("--new", is_flag=True, default=False)
 @click.option("--list", "-l", is_flag=True, default=False)
-def review_command(stage: str, file: str, checklist: bool, new: bool, list: bool):
+def review_command(stage: str, file: str, new: bool, list: bool):
     """管理评审流程。"""
     try:
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         workflow_engine = WorkflowEngine(state_manager)
-
-        if checklist:
-            from ..core.checklist_generator import ChecklistGenerator, CheckStatus
-
-            generator = ChecklistGenerator(project_path)
-
-            if stage == "requirements":
-                if file:
-                    doc_path = file
-                else:
-                    req_dir = Path(project_path) / "docs" / "01-requirements"
-                    doc_path = str(sorted(req_dir.glob("*.md"))[-1] if req_dir.exists() else "")
-
-                if doc_path and Path(doc_path).exists():
-                    checklist_items = generator.generate_requirements_checklist(doc_path)
-                    rendered = generator.render_checklist(checklist_items, f"{stage.upper()} 评审 Checklist")
-                    console.print(Panel(rendered, title="动态检查清单", style="green"))
-                else:
-                    click.echo("错误: 未找到需求文档")
-
-            elif stage == "design":
-                if file:
-                    doc_path = file
-                else:
-                    design_dir = Path(project_path) / "docs" / "02-design"
-                    doc_path = str(sorted(design_dir.glob("*.md"))[-1] if design_dir.exists() else "")
-
-                if doc_path and Path(doc_path).exists():
-                    checklist_items = generator.generate_design_checklist(doc_path)
-                    rendered = generator.render_checklist(checklist_items, f"{stage.upper()} 评审 Checklist")
-                    console.print(Panel(rendered, title="动态检查清单", style="green"))
-                else:
-                    click.echo("错误: 未找到设计文档")
-
-            elif stage == "test":
-                if file:
-                    doc_path = file
-                else:
-                    test_dir = Path(project_path) / "docs" / "03-test"
-                    doc_path = str(sorted(test_dir.glob("*.md"))[-1] if test_dir.exists() else "")
-
-                if doc_path and Path(doc_path).exists():
-                    checklist_items = generator.generate_test_checklist(doc_path)
-                    rendered = generator.render_checklist(checklist_items, f"{stage.upper()} 评审 Checklist")
-                    console.print(Panel(rendered, title="动态检查清单", style="green"))
-                else:
-                    click.echo("错误: 未找到测试文档")
 
         if new:
             workflow_engine.start_review(stage)
