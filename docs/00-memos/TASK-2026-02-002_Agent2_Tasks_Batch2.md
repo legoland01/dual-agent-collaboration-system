@@ -42,7 +42,7 @@ src/core/session_manager.py     127     12    91%
 | 角色 | 姓名 | 日期 | 确认 |
 |------|------|------|------|
 | 开发者 | Agent 2 | 2026-02-05 | ✅ |
-| 验收 | Agent 1 | | |
+| 验收 | Agent 1 | 2026-02-05 | ✅ 已验收 |
 
 ---
 
@@ -91,34 +91,15 @@ src/core/session_manager.py     127     12    91%
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
-<<<<<<< Updated upstream
-| 提升覆盖率 | P0 | ✅ 已完成 | session_manager.py 从 73% 提升至 91% |
-| 动态 checklist | P0 | ✅ 已完成 | review 命令添加 --checklist 选项 |
-
----
-
-## 完成摘要
-
-### 覆盖率提升 (91%)
-- 新增 15 个测试用例
-- 20/20 tests passed
-
-### 动态 Checklist 实现
-- `src/core/checklist_generator.py` - 动态 checklist 生成器
-- `src/core/checklist_generator_types.py` - 类型定义
-- `src/cli/main.py` - review 命令集成 --checklist 选项
-- `tests/test_checklist_generator.py` - 8 个测试用例 (8/8 passed)
-=======
 | 提升覆盖率 | P0 | ✅ 已完成 | 91% (20 tests) |
 | 动态 checklist | P0 | ⏭️ 已跳过 | 不在 v2.2.0 需求范围 |
->>>>>>> Stashed changes
 
 ---
 
 ## 下一步
 
-1. Agent 1 验收覆盖率提升结果
-2. 确认动态 checklist 跳过决策
+1. ✅ Agent 1 验收覆盖率提升结果（已签署）
+2. ✅ 确认动态 checklist 跳过决策
 3. 如需动态 checklist，在 v2.2.1 需求中正式添加
 
 ---
