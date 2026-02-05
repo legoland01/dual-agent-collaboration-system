@@ -32,6 +32,7 @@ v2.2.0 发布后，发现以下问题需要修复：
 | 协作实践 | 独自决策，跳过协作流程 | P1 | 职责边界提醒 |
 | 协作实践 | 不知道项目的仓库配置 | P2 | 动态仓库配置 |
 | **协作实践** | **变更载体不明确** | **P2** | **明确 PRD/RFC 角色分工** |
+| **协作实践** | **Agent 间任务管理混乱** | **P2** | **任务单 + 范围检查** |
 
 ### 1.3 主要变更
 
@@ -39,7 +40,8 @@ v2.2.0 发布后，发现以下问题需要修复：
 2. **签署流程改进**: 规范化签署模板和检查清单
 3. **会话起始引导**: Agent 新会话自动显示角色职责和使用指南
 4. **变更载体明确化**: 明确 PRD 与 RFC 的角色分工（可只用 PRD 承载变更，无需 RFC）
-5. **双代理认知免疫系统**:
+5. **任务管理机制**: 任务单 + 版本范围检查 + Agent 自主验证
+6. **双代理认知免疫系统**:
    - 困惑信号检测
    - 协作指南 Skill 自动加载
    - 职责边界提醒
@@ -312,7 +314,118 @@ def handle_violation(violation_type: str, context: dict) -> ViolationAction:
 
 ---
 
-## 3. 非功能需求
+## 3. 任务管理机制
+
+### 3.1 任务单管理
+
+**需求编号**: FR-TASK-MGMT-001
+
+**问题背景**:
+Agent 之间需要一种机制来传递工作要求，但目前没有系统化的任务管理。实践中发现 Agent 可能发布超出当前版本范围的任务，导致版本范围失控。
+
+**解决方案**:
+
+#### 3.1.1 任务单结构
+
+**文件格式** (`state/agent_tasks.yaml`):
+```yaml
+tasks:
+  - id: TASK-001
+    version: v2.2.0        # 关联版本
+    requirements_id: FR-SIGNOFF-001  # 关联需求ID
+    type: bugfix/feature   # 类型
+    from: agent1           # 任务发布方
+    to: agent2             # 任务接收方
+    description: 实现签署自动同步功能
+    status: pending       # pending/in_progress/completed
+    created_at: 2026-02-05T12:00:00
+    completed_at: null
+```
+
+#### 3.1.2 命令设计
+
+```bash
+# 分配任务
+oc-collab task assign --to agent2 --desc "实现签署自动同步功能" --version v2.2.0 --req-id FR-SIGNOFF-001
+
+# 查看分配给我的任务
+oc-collab task list --assigned-to agent2
+
+# 查看我发布的任务
+oc-collab task list --from agent1
+
+# 完成任务
+oc-collab task complete --id TASK-001
+
+# 验证任务范围（Agent 自主验证）
+oc-collab task list --for-agent agent2 --verify-requirements
+```
+
+### 3.2 版本范围检查
+
+**需求编号**: FR-TASK-MGMT-002
+
+**问题场景**:
+- Agent 1 发布任务："实现动态 checklist"
+- 但动态 checklist 不是 v2.2.0 的功能
+- Agent 2 盲目执行，导致版本范围失控
+
+**解决方案**:
+
+Agent 接受任务前，必须自主验证任务范围：
+
+```
+Agent 接受任务前，自动检查：
+  1. 任务是否关联到当前版本的需求？
+  2. 任务是否与当前 phase 匹配？
+  3. 任务类型是否正确？
+
+如果检查不通过，Agent 应拒绝任务或询问澄清。
+```
+
+**命令输出示例**:
+```bash
+$ oc-collab task list --for-agent agent2 --verify-requirements
+
+TASK-001 [v2.2.0] FR-SIGNOFF-001 ✅ 需求匹配
+TASK-002 [v2.3.0] FR-DYNAMIC-001 ⚠️ 非当前版本
+  建议：此任务属于 v2.3.0，请确认是否现在执行
+```
+
+### 3.3 任务与动态 Checklist 集成
+
+**需求编号**: FR-TASK-MGMT-003
+
+**描述**: 任务管理机制与动态 checklist 集成，在签署前强制检查任务范围。
+
+**集成方式**:
+| 检查项 | 说明 | 触发条件 |
+|--------|------|----------|
+| 版本匹配 | 任务是否关联到当前版本 | 签署前 |
+| 需求关联 | 任务是否有对应的需求 ID | 签署前 |
+| Phase 匹配 | 任务是否与当前阶段匹配 | 签署前 |
+
+**动态 Checklist 示例**:
+```
+签署前检查项：
+  ✓ [ ] 版本匹配 - TASK-001 关联到 v2.2.0
+  ✓ [ ] 需求关联 - TASK-001 有 FR-SIGNOFF-001
+  ⚠️ [ ] 任务范围 - TASK-002 属于 v2.3.0（建议延迟）
+```
+
+### 3.4 验收标准
+
+| 标准 | 验证方式 |
+|------|----------|
+| 任务单可创建 | CLI 测试 |
+| 任务可分配给 Agent | CLI 测试 |
+| 版本范围检查 | CLI 测试 + 集成测试 |
+| Agent 可自主验证任务范围 | CLI 测试 |
+| 动态 checklist 集成 | CLI 测试 |
+
+---
+
+## 4. 非功能需求
 
 ### 3.1 兼容性
 
