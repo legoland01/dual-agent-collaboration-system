@@ -14,7 +14,7 @@ AI Agent 不会拒绝工作，传统软件工程的所有经验和设想都可�
 
 ## 摘要（浓缩版）
 
-本文记录了一次针对 AI Agent 软件工程实践的系统性探索，通过 oc-collab 项目中"session_start"功能缺失的真实案例，展示**传统软件工程在 AI Agent 场景下的适用性**。
+本文记录了一次针对 AI Agent 软件工程实践的系统性探索，通过 oc-collab 项目中"session\_start"功能缺失的真实案例，展示**传统软件工程在 AI Agent 场景下的适用性**。
 
 **核心发现**：传统软件工程的设计假设本身是合理的——多人协作确实需要流程控制、文档规范、质量门禁。问题在于人类员工普遍抵触文档工作，导致流程失去载体。但这不意味着流程本身有问题，而是人类执行层面的问题。
 
@@ -71,7 +71,7 @@ oc-collab advance -p design
 
 ### 1.2 缺失的功能
 
-调查后，我们发现 oc-collab 的 v2.2.0 需求文档中有一个名为 "session_start" 的功能，旨在在每次会话开始时为 Agent 提供上下文信息。需求文档中写道：
+调查后，我们发现 oc-collab 的 v2.2.0 需求文档中有一个名为 "session\_start" 的功能，旨在在每次会话开始时为 Agent 提供上下文信息。需求文档中写道：
 
 > "每次会话开始 | Agent 启动 | '上次会话遗留问题: 3个'"
 
@@ -97,10 +97,10 @@ oc-collab advance -p design
 
 | 阶段 | 文档/代码 | 存在？ | 问题 |
 |------|-----------|--------|------|
-| 需求 | requirements_v2.2.0.md | ✅ | 有描述但不完整，缺乏具体性 |
-| 设计 | docs/02-design/*.md | ❌ | 没有任何设计文档涉及此功能 |
-| 测试 | docs/03-test/*.md | ❌ | 不存在测试用例 |
-| 代码 | src/**/*.py | ❌ | 没有实现 |
+| 需求 | requirements\_v2.2.0.md | ✅ | 有描述但不完整，缺乏具体性 |
+| 设计 | docs/02-design/\*.md | ❌ | 没有任何设计文档涉及此功能 |
+| 测试 | docs/03-test/\*.md | ❌ | 不存在测试用例 |
+| 代码 | src/\**/*.py | ❌ | 没有实现 |
 | 签署 | M1-M5 reviews | ✅ | 全部签署；无人发现缺失 |
 
 ### 2.2 来自一线的证据
@@ -161,9 +161,9 @@ $ grep -r "session_start" src/
 **核心结论**：
 
 > 不是"修正"传统软件工程的假设，而是"发现"传统软件工程在 AI 场景下可以完美适用。
->
+> 
 > 人类关于软件工程、流程管控的所有经验和设想，都可以在 AI Agent 开发工作中找到用武之地。
->
+> 
 > 核心问题从"如何让人类愿意执行流程"转变为"如何通过强制约束机制确保 AI Agent 完整执行流程"。
 
 ### 3.4 人类的核心价值
@@ -203,7 +203,7 @@ $ grep -r "session_start" src/
 **核心洞察**：
 
 > 传统软件工程起源于对多人团队的控制，设计假设本身是正确的。人类员工普遍抵触文档工作，导致流程失去载体——这是人类执行层面的问题，不是设计层面的问题。
->
+> 
 > AI Agent 不会拒绝工作，传统软件工程的所有经验和设想都可以在 AI Agent 开发中找到用武之地。核心问题从"如何让人类愿意执行流程"转变为"如何通过强制约束机制确保 AI Agent 完整执行流程"。
 
 ### 4.3 新原则
@@ -212,10 +212,10 @@ $ grep -r "session_start" src/
 
 | 原则 | 说明 | 传统方式的区别 |
 |------|------|----------------|
-| **强制约束 > 建议约束** | 不是"应该做"，而是"必须做" | 依赖人类自觉 |
-| **系统自动验证 > 人工检查** | 系统自动发现缺口 | 依赖人类注意力 |
-| **追溯关联 > 独立文档** | 需求-设计-代码-测试之间强制关联 | 文档独立存在 |
-| **持久化记忆 > 依赖记忆** | 强制记录，自动加载 | 依赖人类记忆 |
+| **强制约束 \> 建议约束** | 不是"应该做"，而是"必须做" | 依赖人类自觉 |
+| **系统自动验证 \> 人工检查** | 系统自动发现缺口 | 依赖人类注意力 |
+| **追溯关联 \> 独立文档** | 需求-设计-代码-测试之间强制关联 | 文档独立存在 |
+| **持久化记忆 \> 依赖记忆** | 强制记录，自动加载 | 依赖人类记忆 |
 
 ---
 
@@ -254,7 +254,7 @@ $ grep -r "session_start" src/
 
 ### 5.3 动态 Checklist 示例
 
-对于 FR-MEMORY-003 需求（缺失的 session_start 功能），动态 checklist 会生成：
+对于 FR-MEMORY-003 需求（缺失的 session\_start 功能），动态 checklist 会生成：
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -365,7 +365,7 @@ $ grep -r "session_start" src/
 
 ### 7.3 前行之路
 
-缺失的 session_start 功能不仅仅是一个 bug——它是 AI Agent 时代软件工程根本挑战的一扇窗口。通过系统性地调查这个缺口，我们已经开始绘制适合 AI Agent 的软件工程实践领域。
+缺失的 session\_start 功能不仅仅是一个 bug——它是 AI Agent 时代软件工程根本挑战的一扇窗口。通过系统性地调查这个缺口，我们已经开始绘制适合 AI Agent 的软件工程实践领域。
 
 这份论文记录的不仅仅是一个解决方案，更是一种**思考问题的方式**——如何通过人机协作，发现并修正隐含的假设，从而找到真正有效的解决方案。
 
@@ -451,14 +451,14 @@ oc-collab v2.2.0 于 2026-02-02 发布，包含以下核心功能：
 
 | 模块 | 功能 | 说明 |
 |------|------|------|
-| Agent 管理 | agent_manager.py | Agent 角色系统（6 种类型） |
-| 项目管理 | project_manager.py | 任务分配、依赖管理 |
-| 资源锁 | resource_lock.py | 资源锁机制 |
-| 会议管理 | meeting_manager.py | 会议管理 |
-| 用户故事 | story_manager.py | 用户故事管理 |
+| Agent 管理 | agent\_manager.py | Agent 角色系统（6 种类型） |
+| 项目管理 | project\_manager.py | 任务分配、依赖管理 |
+| 资源锁 | resource\_lock.py | 资源锁机制 |
+| 会议管理 | meeting\_manager.py | 会议管理 |
+| 用户故事 | story\_manager.py | 用户故事管理 |
 | 签署引擎 | signoff.py | 签署流程 |
-| 状态管理 | state_manager.py | 项目状态追踪 |
-| 记忆机制 | memory_manager.py | 问题模式、决策历史、经验教训 |
+| 状态管理 | state\_manager.py | 项目状态追踪 |
+| 记忆机制 | memory\_manager.py | 问题模式、决策历史、经验教训 |
 
 **测试覆盖**：164 测试，88% 覆盖率。
 
@@ -478,10 +478,10 @@ oc-collab 的协作流程基于传统软件工程的阶段划分：
 
 | 阶段 | 文档位置 | 文档类型 |
 |------|----------|----------|
-| 需求 | docs/01-requirements/ | requirements_v*.md, requirements_review_*.md |
-| 设计 | docs/02-design/ | detailed_design_*.md, design_review_*.md |
-| 测试 | docs/03-test/ | blackbox_test_cases_*.md, *REVIEW_REPORT*.md |
-| 部署 | docs/04-changelog/ | change_log.md, RELEASE_NOTES_*.md |
+| 需求 | docs/01-requirements/ | requirements\_v*.md, requirements\_review\_*.md |
+| 设计 | docs/02-design/ | detailed\_design\_*.md, design\_review\_*.md |
+| 测试 | docs/03-test/ | blackbox\_test\_cases\_*.md, *REVIEW\_REPORT\*.md |
+| 部署 | docs/04-changelog/ | change\_log.md, RELEASE\_NOTES\_\*.md |
 
 ### B.4 核心命令参考
 
@@ -547,13 +547,13 @@ oc-collab 的记忆机制用于解决 Agent 会话隔离问题：
 
 | 文档 | 路径 |
 |------|------|
-| 需求文档 | docs/01-requirements/requirements_v2.2.0.md |
-| 概要设计 | docs/02-design/OUTLINE_DESIGN_v2.2.0.md |
-| 详细设计 | docs/02-design/detailed_design_v2.1.0.md |
-| 测试用例 | docs/03-test/blackbox_test_cases_v2.2.0.md |
-| 测试报告 | docs/03-test/blackbox_test_results.md |
-| MEMO-2026-02-003 | docs/00-memos/MEMO-2026-02-003_oc-collab_Core_Design_Philosophy.md |
-| MEMO-2026-02-004 | docs/00-memos/MEMO-2026-02-004_AI_Agent_Engineering_Process.md |
+| 需求文档 | docs/01-requirements/requirements\_v2.2.0.md |
+| 概要设计 | docs/02-design/OUTLINE\_DESIGN\_v2.2.0.md |
+| 详细设计 | docs/02-design/detailed\_design\_v2.1.0.md |
+| 测试用例 | docs/03-test/blackbox\_test\_cases\_v2.2.0.md |
+| 测试报告 | docs/03-test/blackbox\_test\_results.md |
+| MEMO-2026-02-003 | docs/00-memos/MEMO-2026-02-003\_oc-collab\_Core\_Design\_Philosophy.md |
+| MEMO-2026-02-004 | docs/00-memos/MEMO-2026-02-004\_AI\_Agent\_Engineering\_Process.md |
 
 ---
 
@@ -561,7 +561,7 @@ oc-collab 的记忆机制用于解决 Agent 会话隔离问题：
 
 **标题**：AI Agent 时代的人机协同软件工程：一次深度探索
 
-**作者**：人类专家 + Agent 1（产品经理）
+**作者**：oc-collab软件Agent 1（产品经理兼测试，执笔）+ 人类专家（刘臻）
 
 **日期**：2026-02-03
 
