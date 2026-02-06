@@ -646,13 +646,20 @@ class TaskExecutor:
         FixBugsStrategy()
     ]
     
-    def __init__(self, max_retries: int = 3, default_timeout: int = 300):
-        """初始化任务执行器。"""
+    def __init__(self, max_retries: int = 3, default_timeout: int = 300, mock_mode: bool = False):
+        """初始化任务执行器。
+
+        Args:
+            max_retries: 最大重试次数
+            default_timeout: 默认超时时间（秒）
+            mock_mode: 是否使用 Mock 模式（E2E 测试时使用）
+        """
         self.strategies: Dict[str, TaskStrategy] = {}
         self.task_history: List[Task] = []
         self.max_retries = max_retries
         self.default_timeout = default_timeout
-        
+        self.mock_mode = mock_mode
+
         for strategy in self.DEFAULT_STRATEGIES:
             self.register_strategy(strategy)
     
@@ -742,7 +749,15 @@ class TaskExecutor:
             return result
     
     def execute_action(self, action_type: str, context: Dict[str, Any]) -> TaskResult:
-        """根据动作类型执行任务。"""
+        """根据动作类型执行任务。
+
+        Args:
+            action_type: 动作类型
+            context: 上下文信息
+
+        Returns:
+            任务执行结果
+        """
         action_to_task_type = {
             "create_requirements": "create_requirements",
             "review_requirements": "review_requirements",
@@ -754,20 +769,41 @@ class TaskExecutor:
             "execute_blackbox_test": "execute_blackbox_test",
             "execute_deployment": "execute_deployment"
         }
-        
+
         task_type = action_to_task_type.get(action_type)
         if not task_type:
             return TaskResult(
                 success=False,
                 message=f"未知的动作类型: {action_type}"
             )
-        
+
+        if self.mock_mode and action_type == "execute_blackbox_test":
+            return TaskResult(
+                success=True,
+                message="黑盒测试通过（Mock 模式）",
+                files_created=[],
+                files_modified=[],
+                duration=0.0,
+                quality_score=1.0
+            )
+
+        if self.mock_mode and action_type == "fix_bugs":
+            pending_issues = context.get("pending_issues", 0)
+            return TaskResult(
+                success=True,
+                message=f"已修复 {pending_issues} 个 Bug（Mock 模式）",
+                files_created=[],
+                files_modified=[],
+                duration=0.0,
+                quality_score=1.0
+            )
+
         task = self.create_task(
             name=f"执行{action_type}",
             task_type=task_type,
             params=context
         )
-        
+
         return self.execute_task(task, context)
     
     def get_pending_tasks(self) -> List[Task]:

@@ -1,0 +1,25 @@
+# E2E 测试环境配置文件
+# 用于隔离测试环境与生产环境
+
+environment:
+  name: "e2e_test"
+  python_command: "python3"
+  mock_mode: true
+
+blackbox_test:
+  enabled: true
+  mock_results:
+    - test_name: "test_basic_functionality"
+      passed: true
+    - test_name: "test_edge_cases"
+      passed: true
+    - test_name: "test_error_handling"
+      passed: true
+
+fix_bugs:
+  enabled: true
+  mock_pending_count: 0
+
+logging:
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

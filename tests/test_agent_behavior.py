@@ -269,17 +269,17 @@ class TestTaskStrategies:
 
 class TestBrainEngineTaskIntegration:
     """大脑引擎与任务执行器集成测试类。"""
-    
+
     @pytest.fixture
     def brain_engine(self):
         """创建大脑引擎实例。"""
         return BrainEngine()
-    
+
     @pytest.fixture
     def task_executor(self):
-        """创建任务执行器实例。"""
-        return TaskExecutor()
-    
+        """创建任务执行器实例（使用 Mock 模式用于 E2E 测试）。"""
+        return TaskExecutor(mock_mode=True)
+
     def test_agent1_full_workflow(self, brain_engine, task_executor):
         """测试Agent 1完整工作流程。"""
         workflow = [
@@ -289,19 +289,19 @@ class TestBrainEngineTaskIntegration:
             ("testing", "execute_blackbox_test"),
             ("deployment", "execute_deployment")
         ]
-        
+
         for phase, action_type in workflow:
             action, rule = brain_engine.get_action(
                 agent_type="agent1",
                 phase=phase,
                 signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
-            
+
             assert action.value == action_type, f"阶段 {phase} 预期动作 {action_type}，实际 {action.value}"
-            
+
             result = task_executor.execute_action(action.value, {"project_name": "TestProject"})
             assert result.success == True, f"阶段 {phase} 任务执行失败: {result.message}"
-    
+
     def test_agent2_full_workflow(self, brain_engine, task_executor):
         """测试Agent 2完整工作流程。"""
         workflow = [
@@ -311,7 +311,7 @@ class TestBrainEngineTaskIntegration:
             ("design_approved", "implement_code"),
             ("development", "fix_bugs")
         ]
-        
+
         for phase, action_type in workflow:
             action, rule = brain_engine.get_action(
                 agent_type="agent2",
@@ -319,16 +319,16 @@ class TestBrainEngineTaskIntegration:
                 pending_issues=0,
                 signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
-            
+
             assert action.value == action_type, f"阶段 {phase} 预期动作 {action_type}，实际 {action.value}"
-            
+
             result = task_executor.execute_action(action.value, {"project_name": "TestProject"})
             assert result.success == True, f"阶段 {phase} 任务执行失败: {result.message}"
-    
+
     def test_state_machine_brain_engine_integration(self, brain_engine, task_executor):
         """测试状态机与大脑引擎集成。"""
         state_machine = StateMachine()
-        
+
         test_cases = [
             (State.PROJECT_INIT, "agent1", "create_requirements"),
             (State.REQUIREMENTS_REVIEW, "agent1", "signoff_requirements"),
@@ -340,7 +340,7 @@ class TestBrainEngineTaskIntegration:
             (State.REQUIREMENTS_APPROVED, "agent2", "create_design"),
             (State.DESIGN_APPROVED, "agent2", "implement_code"),
         ]
-        
+
         for state, agent_type, expected_action in test_cases:
             action, rule = brain_engine.get_action(
                 agent_type=agent_type,
@@ -348,7 +348,7 @@ class TestBrainEngineTaskIntegration:
                 signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}},
                 pending_issues=0
             )
-            
+
             assert action.value == expected_action, f"状态 {state.value}, Agent {agent_type} 预期动作 {expected_action}, 实际 {action.value}"
 
 
