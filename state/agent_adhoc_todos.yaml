@@ -80,13 +80,13 @@ adhoc_todos:
     started_at: null
     completed_at: 2026-02-07T01:15:00
     confirmed_at: null
-  - id: TODO-009
+  - id: TODO-010
     from: agent1
     to: agent2
-    description: "任务：创建 v2.2.1 总体设计文档。文档路径：docs/02-design/OUTLINE_DESIGN_v2.2.1.md。内容：1) 系统架构图；2) 模块划分（M1-M5）；3) 模块间依赖关系；4) 技术选型；5) 与 v2.2.0 的差异。完成后发起评审。"
-    status: completed
+    description: "任务：开始 v2.2.1 开发阶段。参考设计文档：1) M1: 签署自动同步功能；2) M2: 变更载体明确化；3) M3: 签署流程改进；4) M4: 动态 Checklist 机制；5) M5: 双代理认知免疫系统。步骤：1) 按详细设计实现代码；2) 编写单元测试；3) 运行测试确保通过；4) 提交代码并推送。"
+    status: pending
     priority: P0
-    created_at: 2026-02-07T01:20:00
+    created_at: 2026-02-07T02:00:00
     started_at: null
-    completed_at: 2026-02-07T01:30:00
+    completed_at: null
     confirmed_at: null
