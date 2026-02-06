@@ -1,8 +1,10 @@
 requirements:
   agent1_signoff: true
+  agent2_signoff: true
+  status: APPROVED
 session_start:
   enabled: true
   show_pending: true
   show_responsibilities: true
   show_todo: true
-updated_at: '2026-02-06T19:37:37.523784'
+updated_at: '2026-02-07T00:25:00.000000'
