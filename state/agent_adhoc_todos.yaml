@@ -4,9 +4,19 @@ adhoc_todos:
     to: agent1
     description: 修复 BUG-20260205-001：Agent 流程合规性不足
     bug_id: BUG-20260205-001
-    status: pending
+    status: completed
     priority: P1
     created_at: 2026-02-05T22:50:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-06T00:00:00
+    confirmed_at: null
+  - id: TODO-002
+    from: agent1
+    to: agent2
+    description: "评审并签署以下文档：1) PLAN_BUGFIX_v2.2.1.md (签署); 2) requirements_v2.2.1_PATCH_002.md (评审签署); 3) COLLABORATION_GUIDE.md (v2 签署)"
+    status: completed
+    priority: P1
+    created_at: 2026-02-06T12:00:00
+    started_at: null
+    completed_at: 2026-02-06T22:50:00
     confirmed_at: null
