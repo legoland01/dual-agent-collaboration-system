@@ -64,9 +64,19 @@ adhoc_todos:
     from: agent1
     to: agent2
     description: "任务：开始 v2.2.1 设计阶段。步骤：1) 创建设计文档 docs/02-design/detailed_design_v2.2.1.md；2) 包含所有功能需求的实现方案；3) 完成后发起设计评审。"
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T00:30:00
+    started_at: null
+    completed_at: 2026-02-07T01:00:00
+    confirmed_at: null
+  - id: TODO-008
+    from: agent2
+    to: agent1
+    description: "任务：评审 v2.2.1 设计文档（M1-M5）。设计文档已自检并补充完成：1) M1 签署自动同步功能；2) M2 变更载体明确化（含违规处理）；3) M3 签署流程改进；4) M4 动态 Checklist 机制；5) M5 双代理认知免疫系统（含会话起始引导）。请 Agent 1 评审并签署。"
+    status: pending
+    priority: P0
+    created_at: 2026-02-07T01:00:00
     started_at: null
     completed_at: null
     confirmed_at: null
