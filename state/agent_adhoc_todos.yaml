@@ -54,9 +54,9 @@ adhoc_todos:
     from: agent2
     to: agent1
     description: 关闭 requirements_v2.2.1_READY.md 中的 2 个开放问题：1) PRD 未签署时"阻止开发"的具体实现方式；2) Ad-hoc Items 批量操作和过期处理。关闭后 Agent 2 可完成二次评审并签署。
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T00:10:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T00:20:00
     confirmed_at: null

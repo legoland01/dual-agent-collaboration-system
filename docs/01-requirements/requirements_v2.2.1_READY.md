@@ -1057,8 +1057,8 @@ cognitive_immunity:
 - FR-CHECKLIST-001: ✅ 可复用上一轮 checklist_generator.py
 
 **开放问题**:
-1. PRD 未签署时"阻止开发"的具体实现方式待确认
-2. Ad-hoc Items 批量操作和过期处理待定义
+1. ~~PRD 未签署时"阻止开发"的具体实现方式待确认~~ ✅ **已关闭** - 见 2.4.4 违规处理，使用 WARN 而非阻止
+2. ~~Ad-hoc Items 批量操作和过期处理待定义~~ ✅ **已关闭** - 见 v2.2.2 FR-ADHOC-004/005（后续版本）
 
 详细评审见: `requirements_v2.2.1_READY_Review_Agent2.md`
 
