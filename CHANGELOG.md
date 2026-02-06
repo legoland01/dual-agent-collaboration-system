@@ -1,56 +1,40 @@
 # Changelog
 
-## v2.2.0 - v2.2.0 Released
+## v2.2.0.post4 - v2.2.0 Bug Fix Release
 
-**Date**: 2026-02-02
-**Status**: ✅ **RELEASED** - All milestones completed
+**Date**: 2026-02-06
+**Status**: ✅ **RELEASED** - Bug fixes for v2.2.0
 
-### v2.2.0 Release Summary
+### Bug Fixes
 
-v2.2.0 completes all 5 milestones with 164 tests and 88% coverage.
+| Bug | Description | Fix |
+|-----|-------------|-----|
+| BUG-20260205-001 | Signoff rules required both agents to sign before either can sign | Fixed signoff condition logic in brain_engine.py |
+| BUG-20260205-002 | CLI method name typo | Fixed check_rfc_complianz -> check_rfc_compliance in main.py |
+| BUG-20260206-003 | Requirements review process breakdown | Updated test cases with correct signoff state |
+| - | python command not found in test environment | Changed to python3 in task_executor.py |
+| - | fix_bugs action not mapped | Added fix_bugs to action_to_task_type mapping |
+
+### Changes
+
+- **src/core/brain_engine.py** - Fixed signoff condition to check self signoff status
+- **src/cli/main.py** - Fixed method name typo
+- **src/core/task_executor.py** - Changed python to python3, added fix_bugs mapping
+- **src/utils/environment.py** - Added environment detection utility
 
 ### Test Results
 
-| Milestone | Tests | Passed | Coverage | Status |
-|-----------|-------|--------|----------|--------|
-| M1 Agent Manager | 20 | 20 | 90% | ✅ Signed |
-| M2 Project Manager | 41 | 41 | 82% | ✅ Signed |
-| M3 Meeting Manager | 21 | 21 | 86% | ✅ Signed |
-| M4 Story Manager | 34 | 34 | 90% | ✅ Signed |
-| M5 E2E Tests | 48 | 48 | 91% | ✅ Signed |
-| **Total** | **164** | **164** | **88%** | **✅ All Passed** |
-
-### Quality Gate
-
-| Criteria | Value | Status |
-|----------|-------|--------|
-| Test Coverage | >= 80% | ✅ 88% |
-| Core Module Coverage | >= 80% | ✅ 91% |
-| P0 Test Pass Rate | 100% | ✅ Passed |
-| P1 Test Pass Rate | 100% | ✅ Passed |
-
-### v2.2.0 Changes
-
-- **src/core/agent_manager.py** - Agent role system (6 types)
-- **src/core/project_manager.py** - Task assignment, dependency management
-- **src/core/resource_lock.py** - Resource lock mechanism
-- **src/core/meeting_manager.py** - Meeting management
-- **src/core/story_manager.py** - User story management
-- **tests/** - 164 unit tests + E2E tests
-
-### M5 Signoff
-
-| Milestone | Status | Signed By | Date |
-|-----------|--------|-----------|------|
-| M5 E2E Tests | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
-| M4 User Story | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
-| M3 Meeting | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
-| M2 Project | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
-| M1 Agent | ✅ | Agent 1 + Agent 2 | 2026-02-02 |
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| CLI Integrity | 11 | 11 | ✅ |
+| Agent Behavior | 26 | 26 | ✅ |
+| Signoff | 27 | 27 | ✅ |
+| Session Manager | 20 | 20 | ✅ |
+| **Total** | **84** | **84** | **✅ All Passed** |
 
 ---
 
-## v2.2.0 - M5 Milestone Completed
+## v2.2.0 - v2.2.0 Released
 
 ### M5: Complete Test Suite (Completed)
 
