@@ -2,9 +2,19 @@ requirements:
   agent1_signoff: true
   agent2_signoff: true
   status: APPROVED
+design:
+  agent1_signoff: false
+  agent2_signoff: true
+  status: IN_REVIEW
+  milestones:
+    m1: IN_REVIEW
+    m2: IN_REVIEW
+    m3: IN_REVIEW
+    m4: IN_REVIEW
+    m5: IN_REVIEW
 session_start:
   enabled: true
   show_pending: true
   show_responsibilities: true
   show_todo: true
-updated_at: '2026-02-07T00:25:00.000000'
+updated_at: '2026-02-07T00:30:00.000000'
