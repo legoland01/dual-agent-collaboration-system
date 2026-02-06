@@ -141,11 +141,11 @@ class BrainEngine:
                 agent_type=AgentType.AGENT_1,
                 conditions=[
                     Condition("phase_equals", {"value": "requirements_review"}),
-                    Condition("signoff_complete", {"stage": "requirements"})
+                    Condition("custom", {"function": lambda ctx: not ctx.get("signoff", {}).get("requirements", {}).get("pm_signoff", False)})
                 ],
                 action=ActionType.SIGNOFF_REQUIREMENTS,
                 priority=90,
-                description="当阶段为requirements_review且双方签署后，签署需求"
+                description="当阶段为requirements_review且Agent1未签署时，签署需求"
             ),
             Rule(
                 id="agent1-review-design",
@@ -191,11 +191,11 @@ class BrainEngine:
                 agent_type=AgentType.AGENT_2,
                 conditions=[
                     Condition("phase_equals", {"value": "requirements_review"}),
-                    Condition("signoff_complete", {"stage": "requirements"})
+                    Condition("custom", {"function": lambda ctx: not ctx.get("signoff", {}).get("requirements", {}).get("dev_signoff", False)})
                 ],
                 action=ActionType.SIGNOFF_REQUIREMENTS,
                 priority=95,
-                description="当阶段为requirements_review且双方签署后，签署需求"
+                description="当阶段为requirements_review且Agent2未签署时，签署需求"
             ),
             Rule(
                 id="agent2-create-design",

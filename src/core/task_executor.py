@@ -442,7 +442,7 @@ class ExecuteBlackboxTestStrategy(TaskStrategy):
             test_result_path = f"docs/03-test/test_report_{project_name}_v1.md"
             
             result = subprocess.run(
-                ["python", "-m", "pytest", "-v", "--tb=short"],
+                ["python3", "-m", "pytest", "-v", "--tb=short"],
                 capture_output=True,
                 text=True,
                 timeout=300

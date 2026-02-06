@@ -1229,7 +1229,7 @@ def compliance_command(prd: str, rfc: str, detect: bool):
                     click.echo(f"❌ {v}")
 
         if rfc:
-            result = checker.check_rfc_compliency(rfc, prd)
+            result = checker.check_rfc_compliance(rfc, prd)
             if result.valid:
                 click.echo("✅ RFC 合规")
             else:

@@ -92,7 +92,7 @@ class TestAgent1Rules:
             action, rule = brain_engine.get_action(
                 agent_type="agent1",
                 phase=phase,
-                signoff={"requirements": {"pm_signoff": True, "dev_signoff": True}}
+                signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
             assert action == expected_action, f"阶段 {phase} 预期动作 {expected_action}，实际 {action}"
 
@@ -178,7 +178,7 @@ class TestAgent2Rules:
                 agent_type="agent2",
                 phase=phase,
                 pending_issues=0,
-                signoff={"requirements": {"pm_signoff": True, "dev_signoff": True}}
+                signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
             assert action == expected_action, f"阶段 {phase} 预期动作 {expected_action}，实际 {action}"
 
@@ -294,7 +294,7 @@ class TestBrainEngineTaskIntegration:
             action, rule = brain_engine.get_action(
                 agent_type="agent1",
                 phase=phase,
-                signoff={"requirements": {"pm_signoff": True, "dev_signoff": True}}
+                signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
             
             assert action.value == action_type, f"阶段 {phase} 预期动作 {action_type}，实际 {action.value}"
@@ -317,7 +317,7 @@ class TestBrainEngineTaskIntegration:
                 agent_type="agent2",
                 phase=phase,
                 pending_issues=0,
-                signoff={"requirements": {"pm_signoff": True, "dev_signoff": True}}
+                signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}}
             )
             
             assert action.value == action_type, f"阶段 {phase} 预期动作 {action_type}，实际 {action.value}"
@@ -345,11 +345,11 @@ class TestBrainEngineTaskIntegration:
             action, rule = brain_engine.get_action(
                 agent_type=agent_type,
                 phase=state.value,
-                signoff={"requirements": {"pm_signoff": True, "dev_signoff": True}},
+                signoff={"requirements": {"pm_signoff": False, "dev_signoff": False}},
                 pending_issues=0
             )
             
-            assert action.value == expected_action, f"状态 {state.value}, Agent {agent_type} 预期动作 {expected_action}"
+            assert action.value == expected_action, f"状态 {state.value}, Agent {agent_type} 预期动作 {expected_action}, 实际 {action.value}"
 
 
 class TestRulePriority:
