@@ -44,11 +44,11 @@ adhoc_todos:
     from: agent1
     to: agent2
     description: "任务：评审 requirements_v2.2.1_READY.md（当前版本）。背景：Agent1 在 2026-02-06 修复了章节编号（2.3.x→2.4.x）并补充了验收标准。检查：1) 2.3.4 签署流程改进验收标准；2) 2.4.5 变更载体验收标准；3) 确认开放问题关闭。完成后签署。"
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-06T23:40:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T00:25:00
     confirmed_at: null
   - id: TODO-006
     from: agent2
