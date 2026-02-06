@@ -2,7 +2,7 @@ requirements:
   agent1_signoff: true
 session_start:
   enabled: true
+  show_pending: true
   show_responsibilities: true
   show_todo: true
-  show_pending: true
-updated_at: '2026-02-05T12:49:48.058926'
+updated_at: '2026-02-06T18:16:39.950667'

@@ -749,9 +749,10 @@ class TaskExecutor:
             "signoff_requirements": "signoff_requirements",
             "create_design": "create_design",
             "review_design": "review_design",
+            "implement_code": "implement_code",
+            "fix_bugs": "fix_bugs",
             "execute_blackbox_test": "execute_blackbox_test",
-            "execute_deployment": "execute_deployment",
-            "implement_code": "implement_code"
+            "execute_deployment": "execute_deployment"
         }
         
         task_type = action_to_task_type.get(action_type)
