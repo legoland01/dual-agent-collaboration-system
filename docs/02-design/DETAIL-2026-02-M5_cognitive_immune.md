@@ -14,12 +14,19 @@
 
 检测 Agent 的困惑信号，自动加载协作指南 Skill，提供职责边界提醒，动态仓库配置。
 
-### 1.2 相关需求
-
-- 困惑信号检测
+**核心功能**:
+- 会话起始引导：Agent 新会话自动显示角色职责
+- 困惑信号检测：检测 Agent 的困惑信号
 - 协作指南 Skill 自动加载
 - 职责边界提醒
 - 动态仓库配置
+
+### 1.2 相关需求
+
+- FR-COGNITIVE-001: 会话起始引导
+- FR-COGNITIVE-002: 困惑信号检测
+- FR-COGNITIVE-003: 协作指南 Skill 自动加载
+- FR-COGNITIVE-004: 职责边界提醒
 
 ---
 
@@ -32,13 +39,14 @@
 │              双代理认知免疫系统                           │
 ├─────────────────────────────────────────────────────────┤
 │  检测层                                                  │
+│  ├── 会话起始引导器 (SessionStarter)                     │
 │  ├── 困惑信号检测器 (ConfusionDetector)                  │
 │  ├── 职责边界检测器 (ResponsibilityDetector)             │
 │  └── 仓库配置检测器 (RepositoryDetector)                 │
 ├─────────────────────────────────────────────────────────┤
 │  响应层                                                  │
-│  ├── Skill 自动加载器 (SkillLoader)                      │
-│  └── 提醒生成器 (ReminderGenerator)                      │
+│  ├── Skill 自动加载器 (SkillLoader)                     │
+│  └── 提醒生成器 (ReminderGenerator)                       │
 ├─────────────────────────────────────────────────────────┤
 │  配置层                                                  │
 │  ├── 协作指南 Skill                                      │
@@ -46,7 +54,47 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 困惑信号检测
+### 2.2 会话起始引导
+
+```python
+class SessionStarter:
+    """会话起始引导器"""
+
+    def __init__(self, project_path: str):
+        self.project_path = project_path
+        self.state_manager = StateManager(project_path)
+
+    def get_welcome_message(self, agent_id: str) -> str:
+        """生成欢迎消息和上下文信息"""
+        state = self.state_manager.get_state()
+        responsibilities = self._get_responsibilities(agent_id)
+
+        message = f"""=== {agent_id} ===
+
+当前项目: {state.get('project_name', 'unknown')}
+当前阶段: {state.get('phase', 'unknown')}
+当前里程碑: {state.get('milestone', 'unknown')}
+
+你的职责:
+{self._format_responsibilities(responsibilities)}
+
+待办事项:
+{self._format_todos(agent_id)}
+
+常用命令:
+  - oc-collab status    查看状态
+  - oc-collab review    评审
+  - oc-collab signoff   签署
+"""
+        return message
+
+    def display_welcome(self, agent_id: str):
+        """显示欢迎消息"""
+        message = self.get_welcome_message(agent_id)
+        click.echo(message)
+```
+
+### 2.3 困惑信号检测
 
 ```python
 CONFUSION_SIGNALS = [

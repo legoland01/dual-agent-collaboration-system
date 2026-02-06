@@ -106,6 +106,32 @@ oc-collab compliance detect --prd requirements_v2.2.1.md --rfc RFC-2026-02-001.m
 oc-collab compliance rules
 ```
 
+### 3.4 违规处理
+
+```python
+class ViolationAction(Enum):
+    WARN = "提醒"
+    BLOCK = "阻止"
+    ALLOW = "允许"
+
+def handle_violation(violation_type: str, context: dict) -> ViolationAction:
+    """处理流程违规"""
+    if violation_type == "UNSIGNED_PRD":
+        return ViolationAction.WARN  # 提醒 PRD 未签署，需人工确认
+    elif violation_type == "DEV_BEFORE_SIGNOFF":
+        return ViolationAction.WARN  # 提醒开发前需签署
+    elif violation_type == "SKIP_REVIEW":
+        return ViolationAction.WARN  # 提醒需评审
+```
+
+**错误消息示例**:
+```
+⚠️ 警告：PRD 尚未签署
+当前版本: v2.2.1
+建议：请确认是否继续开发
+操作: (c) 继续 / (q) 取消
+```
+
 ---
 
 ## 4. 测试用例
