@@ -30,3 +30,23 @@ adhoc_todos:
     started_at: null
     completed_at: 2026-02-06T23:30:00
     confirmed_at: null
+  - id: TODO-004
+    from: agent1
+    to: agent2
+    description: 二次评审 v2.2.1 需求文档（2026-02-06 修复后），关闭开放问题
+    status: pending
+    priority: P0
+    created_at: 2026-02-06T23:40:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+  - id: TODO-005
+    from: agent2
+    to: agent1
+    description: v2.2.1 需求文档有多个版本（_DRAFT.md, _READY.md, _PATCH_001.md, _PATCH_002.md），请确认应该评审哪个文档
+    status: pending
+    priority: P0
+    created_at: 2026-02-06T23:50:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
