@@ -74,9 +74,9 @@ adhoc_todos:
     from: agent2
     to: agent1
     description: "任务：评审 v2.2.1 设计文档（M1-M5）。设计文档已自检并补充完成：1) M1 签署自动同步功能；2) M2 变更载体明确化（含违规处理）；3) M3 签署流程改进；4) M4 动态 Checklist 机制；5) M5 双代理认知免疫系统（含会话起始引导）。请 Agent 1 评审并签署。"
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T01:00:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T01:15:00
     confirmed_at: null
