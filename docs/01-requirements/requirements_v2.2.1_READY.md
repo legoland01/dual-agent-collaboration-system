@@ -777,7 +777,217 @@ $ oc-collab review requirements --checklist
 
 ---
 
-## 5. 非功能需求
+## 5. 双代理认知免疫系统
+
+**需求编号**: FR-COGNITIVE
+
+**问题背景**:
+AI Agent 与人类协作者有本质区别：Agent 不会主动检查问题、不会质疑不完整、不会发现缺失。这导致 v2.2.0 出现严重的协作问题：
+- Agent 不知道 oc-collab 的存在
+- Agent 不知道自己的角色和职责
+- Agent 会丢失协作意识，独自决策
+- Agent 无法在会话开始时获取必要上下文
+
+**核心概念**:
+```
+┌─────────────────────────────────────────────────────────────┐
+│  双代理认知免疫系统                                         │
+│  ├── 会话起始引导（session_start）                          │
+│  ├── 困惑信号检测                                           │
+│  ├── 协作指南 Skill 自动加载                                │
+│  └── 职责边界提醒                                           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.1 会话起始引导（Session Start）
+
+**需求编号**: FR-COGNITIVE-001
+
+**问题背景**:
+Agent 每次新会话开始时，无法获得必要的上下文信息（项目状态、当前阶段、待办任务），导致协作混乱。
+
+**解决方案**:
+Agent 切换或会话开始时，自动显示上下文信息。
+
+**命令格式**:
+```bash
+oc-collab status
+```
+
+**输出示例**:
+```
+=== Agent 2 (开发负责人) ===
+
+当前项目: dual-agent-collaboration-system
+当前阶段: requirements_review
+当前里程碑: v2.2.1
+
+你的职责:
+  - 评审需求文档
+  - 编写详细设计
+  - 签署确认
+
+待办事项:
+  [ ] 评审 requirements_v2.2.1_DRAFT.md
+  [ ] 签署需求确认
+
+常用命令:
+  - oc-collab status    查看状态
+  - oc-collab review    评审
+  - oc-collab signoff   签署
+```
+
+**验收标准**:
+
+| 标准 | 验证方式 |
+|------|----------|
+| Agent 切换后显示上下文 | CLI 测试 |
+| 显示当前 Agent 职责 | 输出检查 |
+| 显示待办事项 | 输出检查 |
+
+---
+
+### 5.2 困惑信号检测
+
+**需求编号**: FR-COGNITIVE-002
+
+**问题背景**:
+Agent 在协作过程中可能会出现困惑，但系统无法识别和提醒，导致：
+- Agent 独自决策，跳过协作流程
+- Agent 忘记遵循 oc-collab 规范
+- Agent 不知道另一个 Agent 在做什么
+
+**解决方案**:
+检测 Agent 的困惑信号，主动提醒。
+
+**检测场景**:
+
+| 困惑信号 | 检测方式 | 提醒 |
+|----------|----------|------|
+| 跳过评审直接开发 | 检查开发时间 vs 评审时间 | ⚠️ 请先完成评审 |
+| 签署前未检查待办 | 检查是否有未完成的 Ad-hoc Items | ⚠️ 请先处理待办事项 |
+| 独自修改核心模块 | 检查 git log 中的操作者 | ⚠️ 请通知另一个 Agent |
+| 多次重复错误 | 检查错误历史 | ⚠️ 参考历史解决方案 |
+
+**检测规则**:
+
+```python
+CONFUSION_DETECTION_RULES = {
+    "skip_review_before_develop": True,    # 跳过评审直接开发
+    "develop_without_signoff": True,       # 未签署就开发
+    "modify_without_notification": True,   # 修改未通知
+    "repeated_errors": True,               # 重复错误
+}
+```
+
+**验收标准**:
+
+| 标准 | 验证方式 |
+|------|----------|
+| 检测到跳过评审行为 | CLI 测试 |
+| 检测到未签署开发 | CLI 测试 |
+| 提醒消息清晰 | 代码审查 |
+
+---
+
+### 5.3 协作指南 Skill 自动加载
+
+**需求编号**: FR-COGNITIVE-003
+
+**问题背景**:
+Agent 不知道 oc-collab 的协作规范，不知道应该遵循什么流程。虽然有 `docs/COLLABORATION_GUIDE.md`，但 Agent 不会主动阅读。
+
+**解决方案**:
+将协作指南转换为 Skill，自动加载到 Agent 上下文中。
+
+**实现方式**:
+
+```
+skills/
+└── oc_collab_collaboration_guide/
+    ├── skill.json          # Skill 元数据
+    ├── manifest.yaml       # Skill 配置
+    └── content.md          # 协作指南内容（从 COLLABORATION_GUIDE.md 提取）
+```
+
+**Skill 内容**:
+
+| 章节 | 说明 |
+|------|------|
+| Agent 角色定义 | Agent 1 vs Agent 2 的职责边界 |
+| 工作流程 | 4 个阶段的完整流程 |
+| Git 使用规范 | 分支、提交、标签规范 |
+| 文件命名规范 | 各类文档的命名约定 |
+| 状态文件规则 | project_state.yaml 的更新规则 |
+| 流程合规检查 | 启动检查、决策点检查 |
+| 任务触发流程 | Agent 2 必须等待任务指派 |
+| MEMO 处理流程 | MEMO 到需求的转化 |
+
+**验收标准**:
+
+| 标准 | 验证方式 |
+|------|----------|
+| Skill 文件结构正确 | 代码审查 |
+| Skill 内容完整 | 与 COLLABORATION_GUIDE.md 对比 |
+| Skill 可加载 | CLI 测试 |
+
+---
+
+### 5.4 职责边界提醒
+
+**需求编号**: FR-COGNITIVE-004
+
+**问题背景**:
+Agent 可能会越界工作：
+- Agent 2 主动开始开发，未经任务指派
+- Agent 1 独自修改设计，未经评审
+- Agent 忘记自己的职责范围
+
+**解决方案**:
+在关键操作前，主动提醒 Agent 的职责边界。
+
+**提醒场景**:
+
+| 场景 | Agent 1 | Agent 2 |
+|------|---------|---------|
+| 开始工作前 | 你是产品经理，负责需求和评审 | 你是开发，负责实现和签署 |
+| 提交代码前 | - | 代码是否已完成白盒测试？ |
+| 签署前 | 所有 Ad-hoc Items 是否完成？ | 所有 Ad-hoc Items 是否完成？ |
+| 越界操作时 | 这是开发的工作，请通知 Agent 2 | 这是产品的工作，请通知 Agent 1 |
+
+**提醒配置** (`config.yaml`):
+
+```yaml
+cognitive_immunity:
+  enabled: true
+  reminders:
+    agent_role_reminder: true     # 工作前提醒角色
+    test_reminder: true           # 提交代码前提醒测试
+    signoff_reminder: true        # 签署前提醒检查
+    boundary_reminder: true       # 越界操作时提醒
+```
+
+**验收标准**:
+
+| 标准 | 验证方式 |
+|------|----------|
+| 工作前提醒角色 | CLI 测试 |
+| 提交前提醒测试 | CLI 测试 |
+| 签署前提醒检查 | CLI 测试 |
+| 越界操作提醒 | CLI 测试 |
+
+---
+
+### 5.5 相关 MEMO
+
+| MEMO 编号 | MEMO 名称 | 说明 |
+|-----------|-----------|------|
+| MEMO-2026-02-003 | oc-collab 核心设计哲学 | 约束分层、决策分配 |
+| MEMO-2026-02-004 | AI Agent 软件工程流程 | 会话引导、追溯关联 |
+
+---
+
+## 6. 非功能需求
 
 ### 6.1 兼容性
 
@@ -796,26 +1006,29 @@ $ oc-collab review requirements --checklist
 
 ---
 
-## 6. 里程碑
+## 7. 里程碑
 
-| 里程碑 | 内容 | 交付物 |
-|--------|------|--------|
-| M1 | 签署自动同步功能 | signoff.py + CLI --sync 选项 |
-| M2 | 变更载体明确化 | PRD/RFC 角色分工指南 + 合规检测 |
-| M3 | 签署流程改进 | 模板 + 检查清单 + 记录持久化 |
-| M4 | 动态 Checklist 机制 | checklist_generator.py + CLI --checklist 选项 |
-| M5 | 双代理认知免疫系统 | Skill + 检测机制 + 提醒 |
-| M6 | 测试和签署 | 测试用例 + 签署 |
+| 里程碑 | 内容 | 交付物 | 章节 |
+|--------|------|--------|------|
+| M1 | 签署自动同步功能 | signoff.py + CLI --sync 选项 | FR-SIGNOFF-AUTO-001 |
+| M2 | 变更载体明确化 | PRD/RFC 角色分工指南 + 合规检测 | FR-CHANGE-CLARITY-001 |
+| M3 | 签署流程改进 | 模板 + 检查清单 + 记录持久化 | FR-SIGNOFF-IMPROVE-001 |
+| M4 | 动态 Checklist 机制 | checklist_generator.py + CLI --checklist 选项 | FR-CHECKLIST-001 |
+| M5 | 双代理认知免疫系统 | Skill + 检测机制 + 提醒 | FR-COGNITIVE |
+| M6 | 测试和签署 | 测试用例 + 签署 | - |
 
 ---
 
-## 7. 相关文档
+## 8. 相关文档
 
 | 文档 | 说明 |
 |------|------|
 | `docs/bugs/BUG-20260202-001_Combined.md` | Bug 报告整合 |
 | `docs/01-requirements/requirements_v2.2.0.md` | v2.2.0 需求 |
-| `skills/oc_collab_collaboration_guide/` | 协作指南 Skill（待创建） |
+| `docs/00-memos/MEMO-2026-02-003.md` | oc-collab 核心设计哲学 |
+| `docs/00-memos/MEMO-2026-02-004.md` | AI Agent 软件工程流程 |
+| `docs/COLLABORATION_GUIDE.md` | 协作指南 |
+| `skills/oc_collab_collaboration_guide/` | 协作指南 Skill |
 
 ---
 
