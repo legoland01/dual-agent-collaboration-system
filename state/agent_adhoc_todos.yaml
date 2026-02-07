@@ -2,6 +2,19 @@
 # DO NOT EDIT MANUALLY - Use oc-collab todo commands
 
 adhoc_todos:
+  # v2.2.4 New Requirements
+  - id: TODO-035
+    from: agent2
+    to: agent1
+    description: "任务：评审 REQ-INIT-001 oc-collab init 智能初始化。核心设计：检测 .a 文件，已存在则跳过初始化；不存在则创建 .a, docs/, state/；完成后自动打开 OpenCode。工时：3h。"
+    phase: requirements_review
+    status: pending
+    priority: P0
+    created_at: 2026-02-07T22:30:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+
   # v2.2.3 New Requirements
   - id: TODO-034
     from: agent2
