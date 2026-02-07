@@ -216,3 +216,14 @@ adhoc_todos:
     completed_at: null
     confirmed_at: null
     depends_on: TODO-022
+  - id: TODO-024
+    from: agent1
+    to: agent2
+    description: "任务：评审 PROPOSAL_v2.2.2_Deployment_Automation.md 部署自动化提案。技术评审要点：1) deployment.yaml 配置文件结构是否合理；2) oc-collab deployment configure 命令的技术实现方案；3) 敏感信息存储方案（环境变量 vs 密钥管理）；4) 发布前确认和回滚机制必要性；5) 与现有 phase-advance 集成的技术方案。完成后签署技术评审意见。"
+    phase: proposal_review
+    status: pending
+    priority: P0
+    created_at: 2026-02-07T04:30:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
