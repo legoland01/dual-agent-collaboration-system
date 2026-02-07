@@ -2,24 +2,11 @@
 # DO NOT EDIT MANUALLY - Use oc-collab todo commands
 
 adhoc_todos:
-  # v2.2.4 New Requirements
-  - id: TODO-035
-    from: agent2
-    to: agent1
-    description: "任务：评审 REQ-INIT-001 oc-collab init 智能初始化。核心设计：检测 .a 文件，已存在则跳过初始化；不存在则创建 .a, docs/, state/；完成后自动打开 OpenCode。工时：3h。"
-    phase: requirements_review
-    status: pending
-    priority: P0
-    created_at: 2026-02-07T22:30:00
-    started_at: null
-    completed_at: null
-    confirmed_at: null
-
-  # v2.2.3 New Requirements
+  # v2.2.3 New Requirements (已合并并整理完毕)
   - id: TODO-034
     from: agent2
     to: agent1
-    description: "任务：评审 REQ-CONTEXT-001 Agent 上下文自动恢复机制。核心设计：用户说'你是 agent1'，AI 自动读取 .a 文件了解协作规则。文件名 .a 最简短。验收：用户只需记住一句话，无需记住文件名。"
+    description: "任务：评审 v2.2.3 需求文档。范围：REQ-CONTEXT+REQ-INIT(.a), F-AUTO-002, F-REVIEW-001, F-AUTO-001/003/004, F-IDENTITY-001, F-PROC-002/003。文档已创建：requirements_v2.2.3_DRAFT.md"
     phase: requirements_review
     status: pending
     priority: P0
@@ -28,17 +15,17 @@ adhoc_todos:
     completed_at: null
     confirmed_at: null
 
-  # v2.2.2 Design Phase
+  # v2.2.2 Design Phase (产品决策：聚焦核心功能)
   - id: TODO-033
     from: agent1
-    to: agent1
-    description: "任务：进入 v2.2.2 设计阶段。前提：Agent2 完成 v1.3/v2.2/v2.3/v2.4 评审。设计顺序（Agent2 建议）：1) F-PROC-003 Todo 编号唯一性；2) F-PROC-002 任务感知机制；3) F-PROC-001.1/001.2/001.3 协作规范强制执行；4) F-GIT-001 Git 同步强制机制。"
+    to: agent2
+    description: "任务：创建 v2.2.2 详细设计文档。设计范围：1) F-PROC-001 协作规范强制执行（角色边界、文档状态绑定、完整性门禁）；2) F-GIT-001 Git 同步集成机制（集成 auto_git_sync.py，非重写）。设计完成后 Agent1 评审。"
     phase: design
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T21:35:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T23:00:00
     confirmed_at: null
 
   # v2.2.2 Requirements (Completed)
