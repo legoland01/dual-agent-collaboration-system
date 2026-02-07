@@ -1,10 +1,10 @@
 # 需求规格说明书：oc-collab v2.2.2
 
-**版本**: v2.2
+**版本**: v2.4
 **创建日期**: 2026-02-07
 **作者**: Agent 1 (产品经理)
 **版本号**: 2.2.2
-**状态**: APPROVED (Agent2 评审通过)
+**状态**: DRAFT (待 Agent2 评审 v2.4)
 
 ---
 
@@ -65,6 +65,7 @@ v2.2.1 发布后，发现以下问题需要解决：
 9. **完整性门禁**: 不允许部分评审（v1.3 新增）
 10. **任务感知机制**: 自动感知分配给自己的待办任务（v2.2 新增）
 11. **Todo 编号唯一性**: Agent 专属前缀，完全避免冲突（v2.3 新增）
+12. **Git 同步强制机制**: 修改即同步，session 重启不丢失（v2.4 新增）
 
 ---
 
@@ -636,6 +637,82 @@ Agent2 创建 todo → 也想用 TODO-001
 
 ---
 
+### 2.10 F-GIT-001: Git 同步强制机制
+
+**需求编号**: FR-GIT-001
+
+**背景**: 用户原话 - "我需要体制性的保障，而不是你的承诺。你的承诺在 compaction 或 session 重启之后将是一张废纸。"
+
+#### 2.10.1 问题场景
+
+| 场景 | 当前行为 | 问题 |
+|------|----------|------|
+| 文件修改后 | git sync 依赖人工操作 | 容易遗忘 |
+| session 重启 | Agent 承诺不可延续 | 协作上下文丢失 |
+| 多人协作 | 各自为政 | 版本混乱 |
+
+#### 2.10.2 解决方案
+
+**描述**: 在关键节点自动触发或强制提醒 git sync，确保修改即时同步。
+
+**实现方式**:
+
+| 触发点 | 行为 |
+|--------|------|
+| `oc-collab phase-advance` | 自动执行 git add → commit → push |
+| `oc-collab todo done` | 自动执行 git add → commit |
+| `oc-collab signoff` | 自动执行 git add → commit → push |
+
+**新增命令**:
+```bash
+# 手动触发同步
+oc-collab git sync
+
+# 同步并显示状态
+oc-collab git sync --status
+
+# 强制同步（跳过确认）
+oc-collab git sync --force
+```
+
+#### 2.10.3 未同步警告
+
+**描述**: 当存在未同步的修改时，在关键操作前显示警告。
+
+**用户界面**:
+```
+$ oc-collab todo done 1
+
+⚠️  警告: 您有未同步的修改。
+  - state/agent_adhoc_todos.yaml 已修改
+  - docs/01-requirements/requirements_v2.2.2_READY.md 已修改
+
+建议: 执行 oc-collab git sync --status 查看详情
+```
+
+#### 2.10.4 验收标准
+
+- [ ] `oc-collab phase-advance` 自动执行 git sync
+- [ ] `oc-collab todo done` 自动执行 git add → commit
+- [ ] `oc-collab git sync` 命令可用
+- [ ] 未同步修改时显示警告
+- [ ] 支持查看同步状态
+- [ ] sync 失败时有明确错误提示
+
+#### 2.10.5 工时预估
+
+| 功能 | 预估时间 | 复杂度 |
+|------|----------|--------|
+| 修改 phase-advance | 2h | 低 |
+| 修改 todo done | 1h | 低 |
+| 新增 git sync 命令 | 3h | 中 |
+| 未同步警告机制 | 2h | 低 |
+| 错误处理 | 1h | 低 |
+
+**总计**: 9h
+
+---
+
 ## 3. 非功能需求
 
 ### 3.1 性能需求
@@ -707,6 +784,10 @@ Agent2 创建 todo → 也想用 TODO-001
 | F-PROC-003 | Agent2 编号格式为 2-xxx | ⏳ |
 | F-PROC-003 | 同一 Agent 内编号递增 | ⏳ |
 | F-PROC-003 | 废弃编号不重新使用 | ⏳ |
+| F-GIT-001 | oc-collab phase-advance 自动执行 git sync | ⏳ |
+| F-GIT-001 | oc-collab todo done 自动执行 git add → commit | ⏳ |
+| F-GIT-001 | oc-collab git sync 命令可用 | ⏳ |
+| F-GIT-001 | 未同步修改时显示警告 | ⏳ |
 
 ---
 
@@ -722,11 +803,12 @@ Agent2 创建 todo → 也想用 TODO-001
 | 4 | F-PROC-003 Todo 编号唯一性 | 解决异步协作冲突（最优先） |
 | 5 | F-AUTO-002 任务状态自动同步 | 数据层依赖 |
 | 6 | F-PROC-002 任务感知机制 | 表现层，依赖 F-AUTO-002 |
-| 7 | F-REVIEW-001 动态评审 Checklist | 核心价值，复用现有架构 |
-| 8 | F-AUTO-001 部署发布自动化 | 配置驱动，实现简单 |
-| 9 | F-AUTO-003 测试覆盖率门禁 | CI/CD 集成 |
-| 10 | F-IDENTITY-001 Agent 身份自动识别 | 涉及多模块改造 |
-| 11 | F-AUTO-004 文档版本管理 | 工具性质，放在最后 |
+| 7 | F-GIT-001 Git 同步强制 | 自动 sync，降低遗忘风险 |
+| 8 | F-REVIEW-001 动态评审 Checklist | 核心价值，复用现有架构 |
+| 9 | F-AUTO-001 部署发布自动化 | 配置驱动，实现简单 |
+| 10 | F-AUTO-003 测试覆盖率门禁 | CI/CD 集成 |
+| 11 | F-IDENTITY-001 Agent 身份自动识别 | 涉及多模块改造 |
+| 12 | F-AUTO-004 文档版本管理 | 工具性质，放在最后 |
 
 ---
 
@@ -739,6 +821,7 @@ Agent2 创建 todo → 也想用 TODO-001
 | F-PROC-001.3 完整性门禁 | 2h | 低 | 低 |
 | F-PROC-003 Todo 编号唯一性 | 2h | 低 | 低 |
 | F-PROC-002 任务感知机制 | 2h | 低 | 低 |
+| F-GIT-001 Git 同步强制 | 9h | 中 | 低 |
 | F-REVIEW-001 | 4-6h | 中 | 低 |
 | F-AUTO-001 | 2-4h | 低 | 低 |
 | F-AUTO-002 | 1-2h | 低 | 低 |
@@ -746,7 +829,7 @@ Agent2 创建 todo → 也想用 TODO-001
 | F-AUTO-004 | 2-3h | 低 | 低 |
 | F-IDENTITY-001 | 4-8h | 中 | 中 |
 
-**总计**: 28-44h（F-PROC-001 约 9h + F-PROC-002/003 约 4h）
+**总计**: 39-57h（F-PROC-001 约 9h + F-PROC-002/003 约 4h + F-GIT-001 约 9h）
 
 ---
 
@@ -778,14 +861,16 @@ Agent2 创建 todo → 也想用 TODO-001
 | F-PROC-001 协作流程规范强制执行 | ✅ 通过 | v1.3 |
 | F-PROC-002 任务感知机制 | ⏳ 待评审 | v2.2 |
 | F-PROC-003 Todo 编号唯一性 | ⏳ 待评审 | v2.3 |
+| F-GIT-001 Git 同步强制机制 | ⏳ 待评审 | v2.4 |
 
 ### 8.2 v1.2/v1.3 评审结论
 
 **总体结论**: v2.1 及之前版本需求文档所有功能设计合理，技术可行，同意进入开发阶段。
 
-**v2.2/v2.3 新增待评审功能**:
+**v2.2/v2.3/v2.4 新增待评审功能**:
 - F-PROC-002 任务感知机制
 - F-PROC-003 Todo 编号唯一性
+- F-GIT-001 Git 同步强制机制
 
 ### 8.3 v1.3 评审结论
 
@@ -798,6 +883,7 @@ Agent2 创建 todo → 也想用 TODO-001
 
 **参考**: REVIEW_v2.2.2_Technical_Review.md (v1.2/v1.3 评审)
 **F-AUTO-004 专项评审**: REVIEW_F-AUTO-004_DocVersioning.md
+**F-GIT-001 提案**: PROPOSAL_v2.2.3_Git_Sync_Mandatory.md
 
 ---
 
@@ -811,6 +897,7 @@ Agent2 创建 todo → 也想用 TODO-001
 | 产品负责人 | Agent 1 | 2026-02-07 | ✅ (v1.3, F-PROC-001) |
 | 产品负责人 | Agent 1 | 2026-02-07 | ✅ (v2.2, F-PROC-002) |
 | 产品负责人 | Agent 1 | 2026-02-07 | ✅ (v2.3, F-PROC-003) |
+| 产品负责人 | Agent 1 | 2026-02-07 | ✅ (v2.4, F-GIT-001) |
 
 ### Agent 2 技术评审
 
@@ -827,17 +914,19 @@ Agent2 创建 todo → 也想用 TODO-001
 | F-PROC-001.3 完整性门禁设计 | ✅ 通过 | v1.3 |
 | F-PROC-002 任务感知机制 | ⏳ 待评审 | v2.2 |
 | F-PROC-003 Todo 编号唯一性 | ⏳ 待评审 | v2.3 |
+| F-GIT-001 Git 同步强制 | ⏳ 待评审 | v2.4 |
 
 | 角色 | 姓名 | 日期 | 确认 |
 |------|------|------|------|
 | 开发负责人 | Agent 2 | 2026-02-07 | ✅ (v1.2 + v1.3) |
 
 **评审文档**: REVIEW_v2.2.2_Technical_Review.md (v1.2/v1.3)
+**F-GIT-001 提案**: PROPOSAL_v2.2.3_Git_Sync_Mandatory.md
 
 ---
 
-**文档版本**: v2.3
+**文档版本**: v2.4
 **创建日期**: 2026-02-07
 **修订日期**: 2026-02-07
 **评审日期**: 2026-02-07
-**状态**: APPROVED (v1.2/v1.3) / DRAFT (v2.2/v2.3, 待评审)
+**状态**: APPROVED (v1.2/v1.3) / DRAFT (v2.2/v2.3/v2.4, 待 Agent2 评审)
