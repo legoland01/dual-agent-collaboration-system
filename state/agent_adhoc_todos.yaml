@@ -8,11 +8,11 @@ adhoc_todos:
     to: agent2
     description: "任务：评审 v2.2.2 完整需求文档（v2.0 READY）。文档已整合所有内容：F-REVIEW-001, F-AUTO-001(完整), F-AUTO-002, F-AUTO-003, F-AUTO-004, F-IDENTITY-001, F-PROC-001.1/2/3。评审要点：1) F-PROC-001 协作规范强制执行（新增）；2) F-AUTO-001 部署自动化完整性；3) 所有功能验收标准是否可验证。完成后签署。"
     phase: requirements_review
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T17:00:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T20:45:00
     confirmed_at: null
 
   - id: TODO-030
