@@ -1,5 +1,40 @@
 # Changelog
 
+## v2.2.1.post1 - v2.2.1 Patch Release
+
+**Date**: 2026-02-07
+**Status**: 🔧 **PATCH** - Skill files fix
+
+### Bug Fixes
+
+| Module | Description | Fix |
+|--------|-------------|-----|
+| M5 | Cognitive Immune System SkillLoader requires skill files | Added missing skill files |
+
+### Changes
+
+- **skills/oc_collab_collaboration_guide/skill.json** - Skill metadata for collaboration guide
+- **skills/oc_collab_collaboration_guide/content.md** - Skill content extracted from COLLABORATION_GUIDE.md
+
+### Contents
+
+| Item | Description |
+|------|-------------|
+| Agent Role Definitions | Agent1 vs Agent2 responsibilities |
+| 4-Phase Workflow | Requirements → Design → Development → Deployment |
+| Git Conventions | commit-msg format, branch naming |
+| File Naming | proposal, retrospective, todo patterns |
+| State Update Rules | When to update state files |
+
+### Commands
+
+```bash
+# Run cognitive immune tests
+python3 -m pytest tests/test_cognitive_immune.py -v
+```
+
+---
+
 ## v2.2.1 - v2.2.1 Released
 
 **Date**: 2026-02-07
@@ -685,4 +720,4 @@ oc-collab status
 
 **Full Changelog**: [View Git History](https://github.com/opencode/dual-agent-collaboration/commits/main)
 
-**Next Version**: v2.2.1 (planned)
+**Next Version**: v2.2.1.post2 (planned)

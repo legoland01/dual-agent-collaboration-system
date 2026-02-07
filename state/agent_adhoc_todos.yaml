@@ -1,4 +1,33 @@
+# Agent Ad-hoc Todos
+# DO NOT EDIT MANUALLY - Use oc-collab todo commands
+
 adhoc_todos:
+  # v2.2.2 Current Tasks
+  - id: TODO-031
+    from: agent1
+    to: agent2
+    description: "任务：评审 v2.2.2 完整需求文档（v2.0 READY）。文档已整合所有内容：F-REVIEW-001, F-AUTO-001(完整), F-AUTO-002, F-AUTO-003, F-AUTO-004, F-IDENTITY-001, F-PROC-001.1/2/3。评审要点：1) F-PROC-001 协作规范强制执行（新增）；2) F-AUTO-001 部署自动化完整性；3) 所有功能验收标准是否可验证。完成后签署。"
+    phase: requirements_review
+    status: pending
+    priority: P0
+    created_at: 2026-02-07T17:00:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+
+  - id: TODO-030
+    from: agent1
+    to: agent1
+    description: "任务：进入 v2.2.2 设计阶段。前提：Agent2 完成 v1.3 评审。设计顺序：1) F-PROC-001.1 角色边界检查；2) F-PROC-001.2 文档状态绑定；3) F-PROC-001.3 完整性门禁；4) F-AUTO-002 任务同步；5) F-REVIEW-001 动态评审；6) F-AUTO-001 部署自动化；7) F-AUTO-003 覆盖率门禁；8) F-IDENTITY-001 身份识别；9) F-AUTO-004 版本管理。"
+    phase: design
+    status: pending
+    priority: P0
+    created_at: 2026-02-07T15:10:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+
+  # v2.2.1 Deployment (Not Started)
   - id: TODO-021
     from: agent1
     to: agent1
@@ -10,170 +39,36 @@ adhoc_todos:
     started_at: null
     completed_at: null
     confirmed_at: null
-  - id: TODO-022
+
+  # Completed Tasks
+  - id: TODO-027
     from: agent1
     to: agent1
-    description: "任务：创建 v2.2.2 需求文档。参考 PROPOSAL_v2.2.2_Scope_Split.md。需求：1) FR-AUTO-003 需求文档版本追踪；2) FR-AUTO-001 需求完整性自动检查；3) FR-AUTO-002 阶段推进门槛检查。创建 docs/01-requirements/requirements_v2.2.2.md，完成后发布给 Agent2 评审。"
-    phase: requirements
-    status: pending
+    description: "任务：进入 v2.2.2 设计阶段。步骤：1) 确认所有需求评审完成（F-AUTO-004 已评审通过）；2) 按开发顺序创建设计文档..."
+    phase: design
+    status: completed
     priority: P0
-    created_at: 2026-02-07T04:15:00
+    created_at: 2026-02-07T14:35:00
     started_at: null
-    completed_at: null
-    confirmed_at: null
-    depends_on: TODO-021
-  - id: TODO-023
+    completed_at: 2026-02-07T15:00:00
+    confirmed_at: 2026-02-07T15:00:00
+
+  - id: TODO-025
     from: agent1
     to: agent2
-    description: "任务：评审 v2.2.2 需求文档。参考 requirements_v2.2.2.md。评审要点：1) FR-AUTO-003 版本追踪机制合理性；2) FR-AUTO-001 完整性检查覆盖范围；3) FR-AUTO-002 门槛检查触发条件。完成后签署。"
+    description: "任务：评审 F-AUTO-004 文档版本管理设计方案。参考 REVIEW_F-AUTO-004_DocVersioning.md..."
     phase: requirements_review
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-07T04:20:00
     started_at: null
-    completed_at: null
-    confirmed_at: null
-    depends_on: TODO-022
-  - id: TODO-001
-    from: human
-    to: agent1
-    description: 修复 BUG-20260205-001：Agent 流程合规性不足
-    bug_id: BUG-20260205-001
-    status: completed
-    priority: P1
-    created_at: 2026-02-05T22:50:00
-    started_at: null
-    completed_at: 2026-02-06T00:00:00
-    confirmed_at: null
-  - id: TODO-002
-    from: agent1
-    to: agent2
-    description: "评审并签署以下文档：1) PLAN_BUGFIX_v2.2.1.md (签署); 2) requirements_v2.2.1_PATCH_002.md (评审签署); 3) COLLABORATION_GUIDE.md (v2 签署)"
-    status: completed
-    priority: P1
-    created_at: 2026-02-06T12:00:00
-    started_at: null
-    completed_at: 2026-02-06T22:50:00
-    confirmed_at: null
-  - id: TODO-003
-    from: agent1
-    to: agent2
-    description: 评审 MEMO-2026-02-007 并评审 PROPOSAL_v2.2.2_Scope_Split.md，确认范围划分方案
-    status: completed
-    priority: P1
-    created_at: 2026-02-06T23:00:00
-    started_at: null
-    completed_at: 2026-02-06T23:30:00
-    confirmed_at: null
-  - id: TODO-005
-    from: agent2
-    to: agent1
-    description: v2.2.1 需求文档有多个版本（_DRAFT.md, _READY.md, _PATCH_001.md, _PATCH_002.md），请确认应该评审哪个文档
-    status: completed
-    priority: P0
-    created_at: 2026-02-06T23:50:00
-    started_at: null
-    completed_at: 2026-02-06T23:55:00
-    confirmed_at: null
-  - id: TODO-004
-    from: agent1
-    to: agent2
-    description: "任务：评审 requirements_v2.2.1_READY.md（当前版本）。背景：Agent1 在 2026-02-06 修复了章节编号（2.3.x→2.4.x）并补充了验收标准。检查：1) 2.3.4 签署流程改进验收标准；2) 2.4.5 变更载体验收标准；3) 确认开放问题关闭。完成后签署。"
-    status: completed
-    priority: P0
-    created_at: 2026-02-06T23:40:00
-    started_at: null
-    completed_at: 2026-02-07T00:25:00
-    confirmed_at: null
-  - id: TODO-006
-    from: agent2
-    to: agent1
-    description: 关闭 requirements_v2.2.1_READY.md 中的 2 个开放问题：1) PRD 未签署时"阻止开发"的具体实现方式；2) Ad-hoc Items 批量操作和过期处理。关闭后 Agent 2 可完成二次评审并签署。
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T00:10:00
-    started_at: null
-    completed_at: 2026-02-07T00:20:00
-    confirmed_at: null
-  - id: TODO-007
-    from: agent1
-    to: agent2
-    description: "任务：开始 v2.2.1 设计阶段。步骤：1) 创建设计文档 docs/02-design/detailed_design_v2.2.1.md；2) 包含所有功能需求的实现方案；3) 完成后发起设计评审。"
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T00:30:00
-    started_at: null
-    completed_at: 2026-02-07T01:00:00
-    confirmed_at: null
-  - id: TODO-008
-    from: agent2
-    to: agent1
-    description: "任务：评审 v2.2.1 设计文档（M1-M5）。设计文档已自检并补充完成：1) M1 签署自动同步功能；2) M2 变更载体明确化（含违规处理）；3) M3 签署流程改进；4) M4 动态 Checklist 机制；5) M5 双代理认知免疫系统（含会话起始引导）。请 Agent 1 评审并签署。"
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T01:00:00
-    started_at: null
-    completed_at: 2026-02-07T02:00:00
-    confirmed_at: null
-  - id: TODO-010
-    from: agent1
-    to: agent2
-    description: "任务：开始 v2.2.1 开发阶段（M1）。参考设计文档 DETAIL-2026-02-M1_signoff_sync.md。步骤：1) 实现签署自动同步功能（M1）；2) 编写对应单元测试；3) 运行测试确保通过。"
-    module: M1
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T02:00:00
-    started_at: null
-    completed_at: 2026-02-07T02:30:00
-    confirmed_at: null
-  - id: TODO-011
-    from: agent1
-    to: agent2
-    description: "任务：实现 v2.2.1 M2 变更载体明确化。参考设计文档 DETAIL-2026-02-M2_change_clarity.md。步骤：1) 实现变更载体明确化功能（M2）；2) 编写对应单元测试；3) 运行测试确保通过。"
-    module: M2
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T02:05:00
-    started_at: null
-    completed_at: 2026-02-07T02:40:00
-    confirmed_at: null
-  - id: TODO-012
-    from: agent1
-    to: agent2
-    description: "任务：实现 v2.2.1 M3 签署流程改进。参考设计文档 DETAIL-2026-02-M3_signoff_improve.md。步骤：1) 实现签署流程改进功能（M3）；2) 编写对应单元测试；3) 运行测试确保通过。"
-    module: M3
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T02:06:00
-    started_at: null
-    completed_at: 2026-02-07T02:50:00
-    confirmed_at: null
-  - id: TODO-013
-    from: agent1
-    to: agent2
-    description: "任务：实现 v2.2.1 M4 动态 Checklist 机制。参考设计文档 DETAIL-2026-02-M4_dynamic_checklist.md。步骤：1) 实现动态 Checklist 功能（M4）；2) 编写对应单元测试；3) 运行测试确保通过。"
-    module: M4
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T02:07:00
-    started_at: null
-    completed_at: 2026-02-07T03:00:00
-    confirmed_at: null
-  - id: TODO-014
-    from: agent1
-    to: agent2
-    description: "任务：实现 v2.2.1 M5 双代理认知免疫系统。参考设计文档 DETAIL-2026-02-M5_cognitive_immune.md。步骤：1) 实现认知免疫系统功能（M5）；2) 编写对应单元测试；3) 运行测试确保通过。"
-    module: M5
-    status: completed
-    priority: P0
-    created_at: 2026-02-07T02:08:00
-    started_at: null
-    completed_at: 2026-02-07T03:10:00
-    confirmed_at: null
+    completed_at: 2026-02-07T14:30:00
+    confirmed_at: 2026-02-07T14:30:00
+
   - id: TODO-020
     from: agent2
     to: agent1
-    description: "任务：验收 v2.2.1 开发成果（M1-M5）。开发已完成：1) M1 签署自动同步 - signoff.py + test_signoff.py；2) M2 变更合规检查 - change_compliance.py + test_change_compliance.py；3) M3 签署改进 - signoff_record_manager.py + test_signoff_record_manager.py；4) M4 动态 Checklist - extended_checklist.py + test_extended_checklist.py；5) M5 认知免疫 - cognitive_immune.py + test_cognitive_immune.py。请 Agent 1 验收。"
+    description: "任务：验收 v2.2.1 开发成果（M1-M5）..."
     module: verification
     status: completed
     priority: P0
@@ -181,49 +76,154 @@ adhoc_todos:
     started_at: null
     completed_at: 2026-02-07T04:00:00
     confirmed_at: null
-  - id: TODO-021
-    from: agent1
-    to: agent1
-    description: "任务：完成 v2.2.1 测试签署和阶段推进。步骤：1) 签署测试确认 (Agent1 signoff)；2) 打标签 test-v2.2.1-passed；3) 执行 oc-collab phase-advance 推进到 deployment；4) 更新 CHANGELOG.md。"
-    phase: deployment_prep
-    status: pending
-    priority: P0
-    created_at: 2026-02-07T04:10:00
-    started_at: null
-    completed_at: null
-    confirmed_at: null
-  - id: TODO-022
-    from: agent1
-    to: agent1
-    description: "任务：创建 v2.2.2 需求文档。参考 PROPOSAL_v2.2.2_Scope_Split.md。需求：1) FR-AUTO-003 需求文档版本追踪；2) FR-AUTO-001 需求完整性自动检查；3) FR-AUTO-002 阶段推进门槛检查。创建 docs/01-requirements/requirements_v2.2.2.md，完成后发布给 Agent2 评审。"
-    phase: requirements
-    status: pending
-    priority: P0
-    created_at: 2026-02-07T04:15:00
-    started_at: null
-    completed_at: null
-    confirmed_at: null
-    depends_on: TODO-021
-  - id: TODO-023
+
+  - id: TODO-014
     from: agent1
     to: agent2
-    description: "任务：评审 v2.2.2 需求文档。参考 requirements_v2.2.2.md。评审要点：1) FR-AUTO-003 版本追踪机制合理性；2) FR-AUTO-001 完整性检查覆盖范围；3) FR-AUTO-002 门槛检查触发条件。完成后签署。"
-    phase: requirements_review
-    status: pending
+    description: "任务：实现 v2.2.1 M5 双代理认知免疫系统..."
+    module: M5
+    status: completed
     priority: P0
-    created_at: 2026-02-07T04:20:00
+    created_at: 2026-02-07T02:08:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T03:10:00
     confirmed_at: null
-    depends_on: TODO-022
-  - id: TODO-024
+
+  - id: TODO-013
     from: agent1
     to: agent2
-    description: "任务：评审 PROPOSAL_v2.2.2_Deployment_Automation.md 部署自动化提案。技术评审要点：1) deployment.yaml 配置文件结构是否合理；2) oc-collab deployment configure 命令的技术实现方案；3) 敏感信息存储方案（环境变量 vs 密钥管理）；4) 发布前确认和回滚机制必要性；5) 与现有 phase-advance 集成的技术方案。完成后签署技术评审意见。"
-    phase: proposal_review
-    status: pending
+    description: "任务：实现 v2.2.1 M4 动态 Checklist 机制..."
+    module: M4
+    status: completed
     priority: P0
-    created_at: 2026-02-07T04:30:00
+    created_at: 2026-02-07T02:07:00
     started_at: null
-    completed_at: null
+    completed_at: 2026-02-07T03:00:00
     confirmed_at: null
+
+  - id: TODO-012
+    from: agent1
+    to: agent2
+    description: "任务：实现 v2.2.1 M3 签署流程改进..."
+    module: M3
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T02:06:00
+    started_at: null
+    completed_at: 2026-02-07T02:50:00
+    confirmed_at: null
+
+  - id: TODO-011
+    from: agent1
+    to: agent2
+    description: "任务：实现 v2.2.1 M2 变更载体明确化..."
+    module: M2
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T02:05:00
+    started_at: null
+    completed_at: 2026-02-07T02:40:00
+    confirmed_at: null
+
+  - id: TODO-010
+    from: agent1
+    to: agent2
+    description: "任务：开始 v2.2.1 开发阶段（M1）..."
+    module: M1
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T02:00:00
+    started_at: null
+    completed_at: 2026-02-07T02:30:00
+    confirmed_at: null
+
+  - id: TODO-008
+    from: agent2
+    to: agent1
+    description: "任务：评审 v2.2.1 设计文档（M1-M5）..."
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T01:00:00
+    started_at: null
+    completed_at: 2026-02-07T02:00:00
+    confirmed_at: null
+
+  - id: TODO-007
+    from: agent1
+    to: agent2
+    description: "任务：开始 v2.2.1 设计阶段..."
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T00:30:00
+    started_at: null
+    completed_at: 2026-02-07T01:00:00
+    confirmed_at: null
+
+  - id: TODO-006
+    from: agent2
+    to: agent1
+    description: "关闭 requirements_v2.2.1_READY.md 中的 2 个开放问题..."
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T00:10:00
+    started_at: null
+    completed_at: 2026-02-07T00:20:00
+    confirmed_at: null
+
+  - id: TODO-004
+    from: agent1
+    to: agent2
+    description: "任务：评审 requirements_v2.2.1_READY.md（当前版本）..."
+    status: completed
+    priority: P0
+    created_at: 2026-02-06T23:40:00
+    started_at: null
+    completed_at: 2026-02-07T00:25:00
+    confirmed_at: null
+
+  - id: TODO-005
+    from: agent2
+    to: agent1
+    description: "v2.2.1 需求文档有多个版本，请确认应该评审哪个文档"
+    status: completed
+    priority: P0
+    created_at: 2026-02-06T23:50:00
+    started_at: null
+    completed_at: 2026-02-06T23:55:00
+    confirmed_at: null
+
+  - id: TODO-003
+    from: agent1
+    to: agent2
+    description: "评审 MEMO-2026-02-007 并评审 PROPOSAL_v2.2.2_Scope_Split.md..."
+    status: completed
+    priority: P1
+    created_at: 2026-02-06T23:00:00
+    started_at: null
+    completed_at: 2026-02-06T23:30:00
+    confirmed_at: null
+
+  - id: TODO-002
+    from: agent1
+    to: agent2
+    description: "评审并签署以下文档..."
+    status: completed
+    priority: P1
+    created_at: 2026-02-06T12:00:00
+    started_at: null
+    completed_at: 2026-02-06T22:50:00
+    confirmed_at: null
+
+  - id: TODO-001
+    from: human
+    to: agent1
+    description: "修复 BUG-20260205-001：Agent 流程合规性不足"
+    bug_id: BUG-20260205-001
+    status: completed
+    priority: P1
+    created_at: 2026-02-05T22:50:00
+    started_at: null
+    completed_at: 2026-02-06T00:00:00
+    confirmed_at: null
+
+total: 18
