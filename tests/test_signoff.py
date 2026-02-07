@@ -391,6 +391,295 @@ class TestSignoffEngineExtended:
 
         assert can_sign is True
 
+    def test_get_stage_data_design_empty_list(self):
+        """测试设计阶段空列表。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        state = {"design": []}
+        result = engine._get_stage_data("design", state)
+
+        assert result == {}
+
+    def test_get_stage_data_design_first_fallback(self):
+        """测试设计阶段找不到进行中时返回第一个。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        state = {"design": [{"name": "设计1", "status": "draft"}]}
+        result = engine._get_stage_data("design", state)
+
+        assert result["name"] == "设计1"
+
+
+class TestSignoffReject:
+    """签署拒签测试。"""
+
+    def test_reject_success(self):
+        """测试拒签成功。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "review"}
+        }
+        state_manager.add_history = Mock()
+
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.reject("requirements", "agent1", "代码需要修改完善逻辑")
+
+        assert result["stage"] == "requirements"
+        assert result["agent"] == "agent1"
+        assert result["rejected"] is True
+        assert len(result["reason"]) >= 10
+
+    def test_reject_reason_too_short(self):
+        """测试拒签原因太短。"""
+        from src.core.signoff import SignoffEngine, RejectionError
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        with pytest.raises(RejectionError):
+            engine.reject("requirements", "agent1", "太短")
+
+
+class TestSignoffSummary:
+    """签署摘要测试。"""
+
+    def test_get_signoff_summary_unknown_stage(self):
+        """测试获取未知阶段的签署摘要。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.get_signoff_summary("unknown")
+
+        assert "error" in result
+
+    def test_get_signoff_summary_with_data(self):
+        """测试获取签署摘要（带数据）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"pm_signoff": True, "dev_signoff": True}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.get_signoff_summary("requirements")
+
+        assert result["pm_signoff"] is True
+        assert result["dev_signoff"] is True
+        assert result["both_signed"] is True
+
+    def test_get_signoff_summary_with_rejection(self):
+        """测试获取签署摘要（带拒签）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {
+                "pm_signoff": True,
+                "dev_signoff": False,
+                "pm_rejected": False,
+                "dev_rejected": True
+            }
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.get_signoff_summary("requirements")
+
+        assert result["dev_rejected"] is True
+        assert result["both_signed"] is False
+
+
+class TestSignoffCheckAllSigned:
+    """检查所有签署测试。"""
+
+    def test_check_all_signed_empty_stages(self):
+        """测试检查所有阶段签署（空列表）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed([])
+
+        assert result is True
+
+    def test_check_all_signed_with_stages(self):
+        """测试检查所有阶段签署（指定阶段）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"pm_signoff": True, "dev_signoff": True}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed(["requirements"])
+
+        assert result is True
+
+    def test_check_all_signed_with_rejection(self):
+        """测试检查所有阶段签署（包含拒签）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {
+                "pm_signoff": True,
+                "dev_signoff": False,
+                "pm_rejected": False,
+                "dev_rejected": True
+            }
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed(["requirements"])
+
+        assert result is False
+
+    def test_check_all_signed_with_unknown_stage(self):
+        """测试检查所有阶段签署（包含未知阶段）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed(["unknown_stage"])
+
+        assert result is True
+
+    def test_check_all_signed_default_stages(self):
+        """测试检查所有阶段签署（默认阶段列表）。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"pm_signoff": True, "dev_signoff": True},
+            "design": {"pm_signoff": True, "dev_signoff": True}
+        }
+        workflow_engine = Mock()
+
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.check_all_signed()
+
+        assert result is True
+
+
+class TestSignoffWithSync:
+    """签署同步功能测试。"""
+
+    def test_signoff_with_sync_success(self):
+        """测试签署并同步成功。"""
+        from src.core.signoff import SignoffEngine, SignoffResult
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "review"}
+        }
+        state_manager.add_history = Mock()
+
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        git_helper = Mock()
+        git_helper.push.return_value = None
+
+        result = engine.signoff_with_sync("requirements", "agent1", "同意", git_helper)
+
+        assert result.success is True
+        assert result.synced is True
+        assert "已同步到远程仓库" in result.message
+        git_helper.push.assert_called_once()
+
+    def test_signoff_with_sync_git_failed(self):
+        """测试签署成功但同步失败。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "review"}
+        }
+        state_manager.add_history = Mock()
+
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        git_helper = Mock()
+        git_helper.push.side_effect = Exception("Network error")
+
+        result = engine.signoff_with_sync("requirements", "agent1", "同意", git_helper)
+
+        assert result.success is True
+        assert result.synced is False
+        assert result.sync_error == "Network error"
+        assert "同步失败" in result.message
+
+    def test_signoff_with_sync_no_git_helper(self):
+        """测试没有 Git helper 时签署成功。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "review"}
+        }
+        state_manager.add_history = Mock()
+
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        result = engine.signoff_with_sync("requirements", "agent1", "同意", git_helper=None)
+
+        assert result.success is True
+        assert result.synced is False
+        assert result.sync_error is None
+
+    def test_signoff_with_sync_sign_fail(self):
+        """测试签署失败时返回失败结果。"""
+        from src.core.signoff import SignoffEngine
+
+        state_manager = Mock()
+        state_manager.load_state.return_value = {
+            "requirements": {"status": "pending"}
+        }
+
+        workflow_engine = Mock()
+        engine = SignoffEngine(state_manager, workflow_engine)
+
+        git_helper = Mock()
+
+        result = engine.signoff_with_sync("requirements", "agent1", "同意", git_helper)
+
+        assert result.success is False
+        assert "签署失败" in result.message
+        assert result.synced is False
+        git_helper.push.assert_not_called()
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

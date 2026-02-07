@@ -1,6 +1,6 @@
 """变更合规检查器模块。"""
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 import re
 import logging
@@ -58,7 +58,7 @@ class ChangeComplianceChecker:
 
         return result
 
-    def check_rfc_compliance(self, rfc_file: str, prd_file: str = None) -> ComplianceResult:
+    def check_rfc_compliance(self, rfc_file: str, prd_file: Optional[str] = None) -> ComplianceResult:
         """检查 RFC 合规性"""
         result = ComplianceResult(valid=True)
 
@@ -110,3 +110,34 @@ class ChangeComplianceChecker:
                     ))
 
         return conflicts
+
+    def handle_violation(self, violation_type: str) -> Dict[str, str]:
+        """处理违规行为"""
+        violation_handlers = {
+            "missing_signoff": {
+                "action": "block",
+                "message": "缺少签署确认章节，无法继续",
+                "severity": "error"
+            },
+            "missing_requirements_id": {
+                "action": "warn",
+                "message": "未找到需求 ID，请检查文档格式",
+                "severity": "warning"
+            },
+            "conflict_detected": {
+                "action": "block",
+                "message": "检测到内容冲突，请先解决冲突",
+                "severity": "error"
+            },
+            "rfc_already_in_prd": {
+                "action": "suggest",
+                "message": "RFC 内容可能已包含在 PRD 中，可考虑合并",
+                "severity": "info"
+            }
+        }
+
+        return violation_handlers.get(violation_type, {
+            "action": "unknown",
+            "message": f"未知的违规类型: {violation_type}",
+            "severity": "error"
+        })
