@@ -1,5 +1,46 @@
 # Changelog
 
+## v2.2.1 - v2.2.1 Released
+
+**Date**: 2026-02-07
+**Status**: ✅ **RELEASED** - Testing automation enhancements
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| M1 | Signoff Auto-Sync | ✅ |
+| M2 | Change Carrier Clarity | ✅ |
+| M3 | Signoff Process Improvement | ✅ |
+| M4 | Dynamic Checklist | ✅ |
+| M5 | Cognitive Immunity System | ✅ |
+
+### Changes
+
+- **src/core/auto_git_sync.py** - AutoGitSyncEngine for automatic git sync after signoff
+- **src/core/change_compliance.py** - ChangeComplianceChecker for PRD/RFC validation
+- **src/core/signoff.py** - SignoffEngine updated with phase advance logic
+- **src/core/signoff_record_manager.py** - SignoffRecordManager for tracking signoffs
+- **src/core/extended_checklist.py** - ExtendedChecklistGenerator for dynamic checklist
+- **src/core/cognitive_immune.py** - CognitiveImmuneSystem for confusion detection
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Blackbox Tests | 55 | 55 | ✅ |
+| E2E Tests | 32 | 32 | ✅ |
+| **Total** | **87** | **87** | **✅ All Passed** |
+
+### Commands
+
+```bash
+# Run tests
+python3 -m pytest tests/test_blackbox_v221.py tests/test_e2e_v221.py -v
+```
+
+---
+
 ## v2.2.0.post4 - v2.2.0 Bug Fix Release
 
 **Date**: 2026-02-06
