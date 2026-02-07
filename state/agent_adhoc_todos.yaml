@@ -2,11 +2,24 @@
 # DO NOT EDIT MANUALLY - Use oc-collab todo commands
 
 adhoc_todos:
-  # v2.2.3 New Requirements (已合并并整理完毕)
+  # v2.2.2 Design Phase (已完成)
+  - id: TODO-033
+    from: agent1
+    to: agent2
+    description: "任务：创建 v2.2.2 详细设计文档。设计范围：F-PROC-001 + F-GIT-001。评审通过：Agent1 ✅ 2026-02-08。"
+    phase: design
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T21:35:00
+    started_at: null
+    completed_at: 2026-02-08T00:00:00
+    confirmed_at: null
+
+  # v2.2.3 Requirements (暂停)
   - id: TODO-034
     from: agent2
     to: agent1
-    description: "任务：评审 v2.2.3 需求文档。范围：REQ-CONTEXT+REQ-INIT(.a), F-AUTO-002, F-REVIEW-001, F-AUTO-001/003/004, F-IDENTITY-001, F-PROC-002/003。文档已创建：requirements_v2.2.3_DRAFT.md"
+    description: "任务：评审 v2.2.3 需求文档。范围：REQ-CONTEXT+REQ-INIT(.a), F-AUTO-002, F-REVIEW-001 等。状态：暂停，待 v2.2.2 开发完成后继续。"
     phase: requirements_review
     status: pending
     priority: P0
@@ -15,17 +28,53 @@ adhoc_todos:
     completed_at: null
     confirmed_at: null
 
-  # v2.2.2 Design Phase (产品决策：聚焦核心功能)
+  # v2.2.2 Development Phase
+  - id: TODO-038
+    from: agent1
+    to: agent2
+    description: "任务：开发 v2.2.2。M1: ComplianceEngine; M2: RoleBoundaryChecker; M3: DocumentStateBinder; M4: GitSyncIntegrator; M5: 测试与签署。"
+    phase: development
+    status: pending
+    priority: P0
+    created_at: 2026-02-08T00:05:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+  - id: TODO-036
+    from: agent1
+    to: agent1
+    description: "任务：创建 MEMO-2026-02-008_v2.2.2_Chaos_Review.md。状态：已完成，暂不评审。"
+    phase: memo
+    status: completed
+    priority: P0
+    created_at: 2026-02-07T23:55:00
+    started_at: null
+    completed_at: 2026-02-07T23:55:00
+    confirmed_at: null
+
+  # v2.2.2 Design Phase (已完成)
   - id: TODO-033
     from: agent1
     to: agent2
-    description: "任务：创建 v2.2.2 详细设计文档。设计范围：1) F-PROC-001 协作规范强制执行（角色边界、文档状态绑定、完整性门禁）；2) F-GIT-001 Git 同步集成机制（集成 auto_git_sync.py，非重写）。设计完成后 Agent1 评审。"
+    description: "任务：创建 v2.2.2 详细设计文档。设计范围：F-PROC-001 + F-GIT-001。评审通过：Agent1 ✅ 2026-02-08。"
     phase: design
     status: completed
     priority: P0
     created_at: 2026-02-07T21:35:00
     started_at: null
-    completed_at: 2026-02-07T23:00:00
+    completed_at: 2026-02-08T00:00:00
+    confirmed_at: null
+
+  - id: TODO-037
+    from: agent1
+    to: agent1
+    description: "任务：明确评审优先级规则。Critical Review 自动覆盖 Technical Review。规则写入协作指南。"
+    phase: process_improvement
+    status: pending
+    priority: P1
+    created_at: 2026-02-07T23:55:00
+    started_at: null
+    completed_at: null
     confirmed_at: null
 
   # v2.2.2 Requirements (Completed)
