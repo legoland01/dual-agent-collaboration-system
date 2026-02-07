@@ -1,444 +1,352 @@
-# v2.2.2 技术评审报告（F-PROC-001 专项评审）
+# v2.2.2 技术评审报告（v2.2/v2.3/v2.4 专项）
 
-**评审ID**: REVIEW-2026-02-002
-**版本**: v1.3
+**评审ID**: REVIEW-2026-02-003
+**版本**: v1
 **日期**: 2026-02-07
 **评审人**: Agent 2 (开发负责人)
-**评审对象**: requirements_v2.2.2_READY.md (v2.0, v1.3 新增内容)
+**评审对象**: requirements_v2.2.2_READY.md (v2.4)
 **状态**: ✅ 通过
 
 ---
 
 ## 评审范围
 
-**v1.2 已评审通过的功能**（参考历史记录）:
-- ✅ F-REVIEW-001 动态评审 Checklist
-- ✅ F-AUTO-001 部署发布自动化
-- ✅ F-AUTO-002 任务状态自动同步
-- ✅ F-AUTO-003 测试覆盖率门禁
-- ✅ F-IDENTITY-001 Agent 身份自动识别
-
-**v1.3 新增待评审功能**:
-- ⏳ F-PROC-001.1 角色边界强制检查
-- ⏳ F-PROC-001.2 文档状态阶段绑定
-- ⏳ F-PROC-001.3 完整性门禁
+| 版本 | 功能 | 状态 |
+|------|------|------|
+| v1.2 | F-REVIEW-001, F-AUTO-001/002/003/004, F-IDENTITY-001 | ✅ 之前已评审 |
+| v1.3 | F-PROC-001.1/001.2/001.3 | ✅ 之前已评审 |
+| **v2.2** | **F-PROC-002 任务感知机制** | ⏳ **待评审** |
+| **v2.3** | **F-PROC-003 Todo 编号唯一性** | ⏳ **待评审** |
+| **v2.4** | **F-GIT-001 Git 同步强制机制** | ⏳ **待评审** |
 
 ---
 
-## 1. F-PROC-001.1: 角色边界强制检查
+## 1. F-PROC-002: 任务感知机制 (v2.2)
 
 ### 1.1 评审结论
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
-| 设计合理性 | ⭐⭐⭐⭐⭐ | 直击协作痛点，边界清晰 |
-| 技术可行性 | ⭐⭐⭐⭐ | 基于现有路径检查机制扩展 |
-| 实现复杂度 | ⭐⭐⭐ | 中等复杂度，需新增权限检查层 |
-| 用户体验 | ⭐⭐⭐⭐ | 错误提示友好，提供解决方案 |
+| 设计合理性 | ⭐⭐⭐⭐ | 问题定义清晰，解决方案直接 |
+| 技术可行性 | ⭐⭐⭐⭐ | 基于 F-AUTO-002 数据层，逻辑简单 |
+| 实现复杂度 | ⭐⭐ | 低复杂度，表现层功能 |
+| 用户体验 | ⭐⭐⭐⭐ | 任务感知零延迟，提升协作效率 |
 
 **结论**: ✅ 通过
 
 ### 1.2 设计分析
 
-**触发条件设计合理**:
+**问题场景**:
 ```
-✓ Agent1 无法创建/修改设计文档 (docs/02-design/)
-✓ Agent1 无法创建/修改代码文件 (src/)
-✓ Agent2 无法修改需求文档（评审除外）
-✓ Agent2 无法签署自己创建的需求文档
+Agent1 创建 todo → 分配给 Agent2
+    ↓
+Agent1: 完成 ✓
+    ↓
+Agent2: 手动拉取代码 → 查找 todo → 看到任务
+    ↓
+问题: 感知延迟，无法及时响应
 ```
 
-**边界定义清晰**:
-- Agent1: 需求定义、评审发起、验收确认
-- Agent2: 设计、实现、测试、部署
+**解决方案**:
+```
+oc-collab start 时
+    ↓
+读取 state/agent_adhoc_todos.yaml
+    ↓
+过滤: to == 当前 Agent ID
+    ↓
+显示: 编号、优先级、描述
+```
 
 ### 1.3 技术实现建议
 
 ```python
-# 角色边界检查器
-class RoleBoundaryChecker:
-    """角色边界强制检查器"""
+# 任务感知过滤器
+class TaskPerceptionFilter:
+    """任务感知过滤器"""
 
-    AGENT1_RESTRICTED_PATHS = [
-        "docs/02-design/",
-        "src/",
-    ]
+    def filter_my_tasks(self, todos: List[TODOItem], agent_id: str) -> List[TODOItem]:
+        """过滤分配给自己的任务"""
+        return [todo for todo in todos if todo.to == agent_id and todo.status != "completed"]
 
-    AGENT2_RESTRICTED_PATHS = [
-        "docs/01-requirements/",  # 评审除外
-    ]
-
-    def check_permission(self, agent_id: str, file_path: str, action: str) -> tuple[bool, str]:
-        """检查权限边界"""
-        if agent_id == "agent1":
-            for path in self.AGENT1_RESTRICTED_PATHS:
-                if file_path.startswith(path):
-                    return False, f"权限拒绝: Agent1 无法{action}设计/代码文件。"
-            # 检查是否是签署自己创建的需求
-            if "requirements" in file_path and action == "signoff":
-                if self.is_document_creator(agent_id, file_path):
-                    return False, "权限拒绝: Agent2 无法签署自己创建的需求文档。"
-
-        elif agent_id == "agent2":
-            for path in self.AGENT2_RESTRICTED_PATHS:
-                if file_path.startswith(path):
-                    return False, f"权限拒绝: Agent2 无法{action}需求文档（评审除外）。"
-
-        return True, "权限通过"
+    def sort_by_priority(self, tasks: List[TODOItem]) -> List[TODOItem]:
+        """按优先级排序: P0 > P1 > P2"""
+        priority_order = {"P0": 0, "P1": 1, "P2": 2}
+        return sorted(tasks, key=lambda t: priority_order.get(t.priority, 99))
 ```
 
 ### 1.4 验收标准确认
 
 | 标准 | 状态 | 说明 |
 |------|------|------|
-| Agent1 无法创建/修改设计文档 | ✅ | 路径检查，清晰明确 |
-| Agent1 无法创建/修改代码文件 | ✅ | 同上 |
-| Agent2 无法修改需求文档（只能评审） | ✅ | 路径 + 动作检查 |
-| Agent2 无法签署自己创建的需求 | ✅ | 创作者检查 |
-| 明确的错误提示，告知权限边界 | ✅ | 提供解决方案 |
+| `oc-collab start` 时自动显示待办任务 | ✅ | 触发条件清晰 |
+| 只显示 `to` 字段匹配当前 Agent ID | ✅ | 过滤逻辑简单 |
+| 显示任务编号、优先级、描述 | ✅ | 信息完整 |
+| 按优先级排序（P0 > P1 > P2） | ✅ | 排序规则明确 |
+| 显示"下一步"建议 | ✅ | 引导用户操作 |
 
-### 1.5 风险与缓解
+### 1.5 与 F-AUTO-002 的关系确认
+
+| 功能 | 职责 | 依赖 |
+|------|------|------|
+| F-AUTO-002 | todowrite 自动同步（数据层） | ✅ 基础 |
+| F-PROC-002 | 任务感知和展示（表现层） | ✅ 依赖 F-AUTO-002 |
+
+### 1.6 风险与缓解
 
 | 风险 | 可能性 | 影响 | 缓解措施 |
 |------|--------|------|----------|
-| 误判合法操作 | 低 | 中 | 提供 `oc-collab admin override` 紧急通道 |
-| 规则覆盖不全 | 低 | 中 | 持续完善规则，参考历史违规记录 |
+| 大文件解析性能 | 低 | 低 | todowrite 已优化 |
+| 过滤逻辑错误 | 低 | 中 | 单元测试覆盖 |
 
 ---
 
-## 2. F-PROC-001.2: 文档状态阶段绑定
+## 2. F-PROC-003: Todo 编号唯一性保证 (v2.3)
 
 ### 2.1 评审结论
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
-| 设计合理性 | ⭐⭐⭐⭐⭐ | 状态机设计完整，流程清晰 |
-| 技术可行性 | ⭐⭐⭐⭐ | 基于现有状态管理扩展 |
-| 实现复杂度 | ⭐⭐⭐ | 中等复杂度，需状态机引擎 |
-| 向后兼容性 | ⭐⭐⭐⭐ | 不破坏现有文档结构 |
+| 设计合理性 | ⭐⭐⭐⭐⭐ | 彻底解决编号冲突问题 |
+| 技术可行性 | ⭐⭐⭐⭐ | 编号规则简单，逻辑清晰 |
+| 实现复杂度 | ⭐⭐ | 低复杂度，规则引擎 |
+| 向后兼容性 | ⭐⭐⭐ | 需要迁移脚本 |
 
-**结论**: ✅ 通过
+**结论**: ✅ 通过（需关注兼容性）
 
-### 2.2 状态机设计
+### 2.2 设计分析
 
+**问题场景**:
 ```
-DRAFT (草稿)
-  ↓ (Agent1: 发起评审)
-REVIEW_PENDING (待评审)
-  ↓ (Agent2: 完成评审 + 签署)
-REVIEWED (已评审)
-  ↓ (Agent1: 确认设计 + 签署)
-APPROVED (已批准)
-  ↓ (系统: 发布新版本)
-ARCHIVED (已归档)
+Agent1 创建 todo → TODO-001
+    ↓
+Agent2 创建 todo → 也想用 TODO-001
+    ↓
+冲突: 其中一个被覆盖或丢失
 ```
 
-**状态转换正确**:
-- ✅ DRAFT → REVIEW_PENDING（Agent1 发起评审）
-- ✅ REVIEW_PENDING → REVIEWED（Agent2 评审 + 签署）
-- ✅ REVIEWED → APPROVED（Agent1 确认 + 签署）
-- ✅ APPROVED → ARCHIVED（系统发布）
+**解决方案**: Agent 专属编号前缀
+```
+格式: {AgentID}-{序号}
 
-### 2.3 技术实现建议
-
-```python
-# 文档状态机
-class DocumentStateMachine:
-    """文档状态机引擎"""
-
-    STATES = ["DRAFT", "REVIEW_PENDING", "REVIEWED", "APPROVED", "ARCHIVED"]
-    TRANSITIONS = {
-        "DRAFT": ["REVIEW_PENDING"],
-        "REVIEW_PENDING": ["REVIEWED"],
-        "REVIEWED": ["APPROVED"],
-        "APPROVED": ["ARCHIVED"],
-        "ARCHIVED": [],
-    }
-
-    ROLE_PERMISSIONS = {
-        "DRAFT": {
-            "agent1": ["edit", "submit_review"],
-            "agent2": ["view"],
-        },
-        "REVIEW_PENDING": {
-            "agent1": ["view"],
-            "agent2": ["review", "signoff"],
-        },
-        "REVIEWED": {
-            "agent1": ["confirm", "signoff"],
-            "agent2": ["view"],
-        },
-        "APPROVED": {
-            "agent1": ["view"],
-            "agent2": ["view"],
-        },
-        "ARCHIVED": {
-            "agent1": ["view"],
-            "agent2": ["view"],
-        },
-    }
-
-    def can_transition(self, current_state: str, target_state: str, agent_id: str) -> tuple[bool, str]:
-        """检查状态转换是否合法"""
-        if target_state not in self.TRANSITIONS.get(current_state, []):
-            return False, f"无法转换: {current_state} → {target_state} 不是合法转换。"
-
-        if not self._has_permission(agent_id, current_state, target_state):
-            return False, f"权限拒绝: {agent_id} 无法执行 {current_state} → {target_state}。"
-
-        return True, "状态转换合法"
-
-    def _has_permission(self, agent_id: str, current_state: str, target_state: str) -> bool:
-        """检查权限"""
-        action_map = {
-            ("DRAFT", "REVIEW_PENDING"): "submit_review",
-            ("REVIEW_PENDING", "REVIEWED"): "signoff",
-            ("REVIEWED", "APPROVED"): "signoff",
-        }
-        action = action_map.get((current_state, target_state))
-        if action:
-            permissions = self.ROLE_PERMISSIONS.get(current_state, {}).get(agent_id, [])
-            return action in permissions
-        return True
+Agent1: 1-001, 1-002, 1-003, ...
+Agent2: 2-001, 2-002, 2-003, ...
 ```
 
-### 2.4 验收标准确认
+### 2.3 编号规则确认
+
+| 场景 | 行为 | 评审结论 |
+|------|------|----------|
+| 新建 todo | 自动分配当前 Agent 的下一个序号 | ✅ 合理 |
+| 废弃 todo | 编号作废，不重新使用 | ✅ 防止混淆 |
+| 跨 Agent 分配 | 使用被分配 Agent 的前缀 | ✅ 归属清晰 |
+
+### 2.4 兼容性设计确认
+
+| 组件 | 影响 | 处理方式 | 评审结论 |
+|------|------|----------|----------|
+| state/agent_adhoc_todos.yaml | 编号格式变更 | 迁移脚本自动更新 | ✅ 需要迁移脚本 |
+| `oc-collab todo done` | 命令参数变更 | 支持新旧两种格式 | ✅ 双格式支持 |
+| 文档引用 | 引用格式变更 | 渐进式迁移 | ✅ 合理策略 |
+
+### 2.5 验收标准确认
 
 | 标准 | 状态 | 说明 |
 |------|------|------|
-| DRAFT 文档无法发起评审 | ✅ | 状态检查 + 权限验证 |
-| 已评审文档无法被同一 Agent 再次评审 | ✅ | 状态 + Agent 检查 |
-| 归档文档无法修改 | ✅ | 状态检查 |
-| 状态变更有完整审计日志 | ✅ | 审计日志记录 |
+| Agent1 创建的 todo 编号格式为 `1-xxx` | ✅ | 前缀规则清晰 |
+| Agent2 创建的 todo 编号格式为 `2-xxx` | ✅ | 同上 |
+| 同一 Agent 内编号递增 | ✅ | 递增逻辑简单 |
+| 废弃的编号不重新使用 | ✅ | 防止混淆 |
+| `oc-collab todo list` 按 Agent 分组显示 | ✅ | 便于管理 |
 
-### 2.5 风险与缓解
+### 2.6 迁移策略建议
+
+```python
+# 迁移脚本伪代码
+def migrate_todo_format():
+    """迁移 TODO 编号格式"""
+
+    # 1. 读取现有 todos
+    todos = load_todos()
+
+    # 2. 根据创建者分配新编号
+    for todo in todos:
+        if todo.from.startswith("agent1"):
+            todo.id = f"1-{next_agent1序号()}"
+        elif todo.from.startswith("agent2"):
+            todo.id = f"2-{next_agent2序号()}"
+
+    # 3. 保存迁移后的 todos
+    save_todos(todos)
+
+    # 4. 更新文档引用
+    update_doc_references()
+```
+
+### 2.7 风险与缓解
 
 | 风险 | 可能性 | 影响 | 缓解措施 |
 |------|--------|------|----------|
-| 状态转换规则过于严格 | 低 | 低 | 提供强制状态转换命令 |
-| 状态检查影响性能 | 低 | 低 | 缓存状态，延迟检查 |
+| 迁移失败 | 低 | 高 | 提供回滚机制 |
+| 文档引用失效 | 中 | 中 | 渐进式迁移，逐步更新 |
+| 双格式过渡期混乱 | 中 | 中 | 明确过渡期策略 |
 
 ---
 
-## 3. F-PROC-001.3: 完整性门禁
+## 3. F-GIT-001: Git 同步强制机制 (v2.4)
 
 ### 3.1 评审结论
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
-| 设计合理性 | ⭐⭐⭐⭐ | 防止碎片化评审，聚焦整体 |
-| 技术可行性 | ⭐⭐⭐⭐ | 基于文档结构分析 |
-| 实现复杂度 | ⭐⭐ | 低复杂度，规则简单 |
-| 用户体验 | ⭐⭐⭐ | 避免遗漏，整体把控 |
+| 设计合理性 | ⭐⭐⭐⭐⭐ | 直击痛点，用户原话驱动 |
+| 技术可行性 | ⭐⭐⭐⭐ | 基于现有命令扩展 |
+| 实现复杂度 | ⭐⭐⭐ | 中等复杂度，多点集成 |
+| 用户体验 | ⭐⭐⭐⭐ | 自动 + 手动双保险 |
 
 **结论**: ✅ 通过
 
 ### 3.2 设计分析
 
-**触发场景**:
-```
-✓ Agent2 尝试只评审需求文档的某一章节
-✓ Agent2 尝试评审已经被提取出去的子模块
-```
+**用户原话**:
+> "我需要体制性的保障，而不是你的承诺。你的承诺在 compaction 或 session 重启之后将是一张废纸。"
 
-**解决目标**:
-- 需求文档必须整体评审通过
-- 不允许单独评审部分内容
-- 意见可以按章节记录，但评审结论针对整体
+**问题场景**:
+| 场景 | 当前行为 | 问题 |
+|------|----------|------|
+| 文件修改后 | git sync 依赖人工操作 | 容易遗忘 |
+| session 重启 | Agent 承诺不可延续 | 协作上下文丢失 |
+| 多人协作 | 各自为政 | 版本混乱 |
 
-### 3.3 技术实现建议
+**解决方案**: 自动触发 + 强制提醒
 
-```python
-# 完整性门禁检查器
-class CompletenessGateChecker:
-    """完整性门禁检查器"""
+### 3.3 触发点设计确认
 
-    def check_review完整性(self, document_path: str, review_scope: str) -> tuple[bool, str]:
-        """检查评审完整性"""
-        # 1. 检查是否是完整文档
-        if self._is_sub_document(document_path):
-            return False, "无法评审: 不允许评审子文档。"
+| 触发点 | 行为 | 评审结论 |
+|--------|------|----------|
+| `oc-collab phase-advance` | 自动 git add → commit → push | ✅ 高频操作，自动合理 |
+| `oc-collab todo done` | 自动 git add → commit | ✅ 低频操作，自动合理 |
+| `oc-collab signoff` | 自动 git add → commit → push | ✅ 关键节点，自动合理 |
 
-        # 2. 检查是否是完整章节
-        if review_scope.startswith("--section"):
-            return False, "无法评审: 不允许部分评审。"
+### 3.4 新增命令设计确认
 
-        # 3. 检查是否有未评审的章节
-        if self._has_unreviewed_sections(document_path):
-            return False, "无法评审: 存在未评审的章节。"
+```bash
+# 手动触发同步
+oc-collab git sync
 
-        return True, "评审完整性检查通过"
+# 同步并显示状态
+oc-collab git sync --status
 
-    def _is_sub_document(self, path: str) -> bool:
-        """检查是否是子文档"""
-        # 子文档命名规则: requirements_xxx_子模块.md
-        return bool(re.match(r"requirements_\w+_[a-z]+\.md$", Path(path).name))
-
-    def _has_unreviewed_sections(self, path: str) -> bool:
-        """检查是否有未评审的章节"""
-        # 读取文档，统计章节
-        # 检查是否有章节未标记为已评审
-        return False  # 简化实现
+# 强制同步（跳过确认）
+oc-collab git sync --force
 ```
 
-### 3.4 验收标准确认
+| 命令 | 用途 | 评审结论 |
+|------|------|----------|
+| `oc-collab git sync` | 手动触发同步 | ✅ 基础功能 |
+| `oc-collab git sync --status` | 查看同步状态 | ✅ 便于排查 |
+| `oc-collab git sync --force` | 强制同步 | ✅ 紧急情况 |
+
+### 3.5 未同步警告设计
+
+**用户界面示例**:
+```
+$ oc-collab todo done 1
+
+⚠️  警告: 您有未同步的修改。
+  - state/agent_adhoc_todos.yaml 已修改
+  - docs/01-requirements/requirements_v2.2.2_READY.md 已修改
+
+建议: 执行 oc-collab git sync --status 查看详情
+```
+
+**评审结论**: ✅ 警告友好，提供解决方案
+
+### 3.6 验收标准确认
 
 | 标准 | 状态 | 说明 |
 |------|------|------|
-| 无法只评审需求的某一章节 | ✅ | 作用域检查 |
-| 无法对提取出去的内容单独评审 | ✅ | 子文档检查 |
-| 评审必须针对完整文档 | ✅ | 完整性检查 |
-| 意见可以按章节记录，但评审结论针对整体 | ✅ | 灵活设计 |
+| `oc-collab phase-advance` 自动执行 git sync | ✅ | 核心场景 |
+| `oc-collab todo done` 自动执行 git add → commit | ✅ | 任务完成同步 |
+| `oc-collab git sync` 命令可用 | ✅ | 手动触发 |
+| 未同步修改时显示警告 | ✅ | 提醒用户 |
+| 支持查看同步状态 | ✅ | 便于排查 |
+| sync 失败时有明确错误提示 | ✅ | 错误处理 |
 
-### 3.5 风险与缓解
+### 3.7 工时预估确认
+
+| 功能 | 预估时间 | 复杂度 | 评审结论 |
+|------|----------|--------|----------|
+| 修改 phase-advance | 2h | 低 | ✅ 合理 |
+| 修改 todo done | 1h | 低 | ✅ 合理 |
+| 新增 git sync 命令 | 3h | 中 | ✅ 合理 |
+| 未同步警告机制 | 2h | 低 | ✅ 合理 |
+| 错误处理 | 1h | 低 | ✅ 合理 |
+
+**总计**: 9h ✅ 合理
+
+### 3.8 风险与缓解
 
 | 风险 | 可能性 | 影响 | 缓解措施 |
 |------|--------|------|----------|
-| 误判完整文档为不完整 | 低 | 低 | 改进文档解析逻辑 |
-| 大文档评审体验差 | 中 | 低 | 提供章节进度显示 |
+| git 操作失败 | 中 | 中 | 详细错误日志 |
+| 网络问题 push 失败 | 中 | 中 | 重试机制 |
+| 误操作覆盖 | 低 | 高 | 强制确认 |
+| 性能影响 | 低 | 低 | 异步执行 |
 
 ---
 
-## 4. F-PROC-001 总体评估
+## 4. 总体评估
 
-### 4.1 三位一体设计
-
-```
-F-PROC-001 协作规范强制执行
-├── 1.1 角色边界检查 - 谁不能做什么
-├── 1.2 文档状态绑定 - 什么状态不能做什么
-└── 1.3 完整性门禁 - 不能只做一部分
-```
-
-**设计亮点**:
-1. **三层防护**: 角色 → 状态 → 完整性
-2. **渐进式限制**: 从宽到严，逐步强制
-3. **错误友好**: 提供解决方案，不只是拒绝
-
-### 4.2 与现有系统集成
-
-```
-现有系统                    F-PROC-001 扩展
-├── Brain Engine          ├── RoleBoundaryChecker
-├── State Manager         ├── DocumentStateMachine
-├── Checklist Generator   └── CompletenessGateChecker
-└── Signoff Engine
-```
-
-### 4.3 开发顺序建议
-
-| 顺序 | 功能 | 理由 |
-|------|------|------|
-| 1 | F-PROC-001.1 角色边界检查 | 防止越权，是其他功能的基础 |
-| 2 | F-PROC-001.2 文档状态绑定 | 依赖状态管理，逻辑独立 |
-| 3 | F-PROC-001.3 完整性门禁 | 基于前两者，逻辑简单 |
-
-### 4.4 资源估算
-
-| 功能 | 预估开发时间 | 复杂度 | 风险 |
-|------|--------------|--------|------|
-| F-PROC-001.1 | 4h | 中 | 低 |
-| F-PROC-001.2 | 3h | 低 | 低 |
-| F-PROC-001.3 | 2h | 低 | 低 |
-| **合计** | **9h** | - | - |
-
----
-
-## 5. F-AUTO-001 部署自动化完整性评审
-
-### 5.1 评审确认
-
-**验收标准回顾**:
-
-| 标准 | 状态 | 说明 |
-|------|------|------|
-| deployment.yaml 配置 | ✅ | 格式清晰，覆盖主要场景 |
-| oc-collab deployment configure | ✅ | 交互友好，降低门槛 |
-| phase-advance 时自动发布 | ✅ | --deploy 选项控制 |
-| 发布前预览和确认 | ✅ | to_deployment 需要确认 |
-| 支持环境变量敏感配置 | ✅ | ${env:VAR} 格式 |
-| deployment.yaml 可选配置 | ✅ | COMP-001 |
-| 命令执行失败返回详细错误 | ✅ | 错误处理完善 |
-
-### 5.2 补充建议
-
-**F-AUTO-001.10 回滚机制**:
-
-v2.2.2 MVP 阶段不做自动回滚（Agent2 评审决定）。
-
-**建议**:
-- 在文档中明确标注 "MVP 阶段不包含"
-- 在 v2.3.0 作为增强功能实现
-- 用户可手动回滚
-
----
-
-## 6. 验收标准可验证性确认
-
-### 6.1 所有功能验收标准检查
-
-| 功能 | 验收项数量 | 可验证项 | 需澄清项 |
-|------|------------|----------|----------|
-| F-REVIEW-001 | 5 | 5 | 0 |
-| F-AUTO-001 | 7 | 7 | 0 |
-| F-AUTO-002 | 3 | 3 | 0 |
-| F-AUTO-003 | 4 | 4 | 0 |
-| F-AUTO-004 | 4 | 3 | 1 |
-| F-IDENTITY-001 | 5 | 5 | 0 |
-| F-PROC-001.1 | 4 | 4 | 0 |
-| F-PROC-001.2 | 4 | 4 | 0 |
-| F-PROC-001.3 | 4 | 4 | 0 |
-
-### 6.2 F-AUTO-004 需澄清项
-
-| 待澄清项 | 当前状态 | 建议 |
-|----------|----------|------|
-| 版本索引自动更新时机 | 待确认 | 建议：阶段推进时自动更新 |
-
----
-
-## 7. 评审总结
-
-### 7.1 评审结论
+### 4.1 v2.2/v2.3/v2.4 评审结论
 
 | 功能 | 结论 | 核心评价 |
 |------|------|----------|
-| F-PROC-001.1 角色边界 | ✅ 通过 | 直击痛点，边界清晰 |
-| F-PROC-001.2 状态绑定 | ✅ 通过 | 状态机完整，流程清晰 |
-| F-PROC-001.3 完整性门禁 | ✅ 通过 | 防止碎片，整体把控 |
-| F-AUTO-001 完整性 | ✅ 通过 | 配置完善，逻辑清晰 |
+| F-PROC-002 | ✅ 通过 | 问题定义清晰，解决方案直接 |
+| F-PROC-003 | ✅ 通过 | 彻底解决冲突，需关注兼容性 |
+| F-GIT-001 | ✅ 通过 | 直击痛点，设计完善 |
 
-### 7.2 v1.3 评审结论
+### 4.2 开发优先级建议
 
-**总体结论**: v1.3 新增的 F-PROC-001 三位一体协作规范设计合理，技术可行，同意进入开发阶段。
+| 优先级 | 功能 | 理由 |
+|--------|------|------|
+| 1 | F-PROC-003 | 编号唯一性是其他功能的基础 |
+| 2 | F-PROC-002 | 依赖 F-PROC-003 和 F-AUTO-002 |
+| 3 | F-GIT-001 | 用户痛点驱动，优先级高 |
 
-**核心价值**:
-1. **解决根本问题**: 从系统层面强制规范协作行为
-2. **渐进式限制**: 从角色 → 状态 → 完整性三层防护
-3. **用户体验**: 拒绝时有友好提示，提供解决方案
+### 4.3 总工时估算
 
-### 7.3 下一步行动
+| 功能 | 预估时间 | 累计 |
+|------|----------|------|
+| F-PROC-002 | 2h | 2h |
+| F-PROC-003 | 2h | 4h |
+| F-GIT-001 | 9h | 13h |
 
-| 行动项 | 执行人 | 前提 |
-|--------|--------|------|
-| 签署 requirements_v2.2.2_READY.md | Agent 2 | 评审完成 |
-| 创建 F-PROC-001.1 设计文档 | Agent 2 | 签署完成 |
-| 创建 F-PROC-001.2 设计文档 | Agent 2 | 签署完成 |
-| 创建 F-PROC-001.3 设计文档 | Agent 2 | 签署完成 |
-| 开始开发 F-PROC-001.1 | Agent 2 | 设计完成 |
+### 4.4 与 v2.2.1 整合
+
+**v2.2.2 总功能**:
+1. F-REVIEW-001 (v1.2)
+2. F-AUTO-001 (v1.2)
+3. F-AUTO-002 (v1.2)
+4. F-AUTO-003 (v1.2)
+5. F-AUTO-004 (v1.2)
+6. F-IDENTITY-001 (v1.2)
+7. F-PROC-001.1/001.2/001.3 (v1.3)
+8. **F-PROC-002 (v2.2)** ✅
+9. **F-PROC-003 (v2.3)** ✅
+10. **F-GIT-001 (v2.4)** ✅
 
 ---
 
-## 8. 签署
+## 5. 签署
 
 ### Agent 2 技术评审
 
 | 评审项 | 结论 |
 |--------|------|
-| F-PROC-001.1 角色边界设计 | ✅ 通过 |
-| F-PROC-001.2 状态机设计 | ✅ 通过 |
-| F-PROC-001.3 完整性门禁设计 | ✅ 通过 |
-| F-AUTO-001 部署自动化完整性 | ✅ 通过 |
+| F-PROC-002 任务感知机制 | ✅ 通过 |
+| F-PROC-003 Todo 编号唯一性 | ✅ 通过 |
+| F-GIT-001 Git 同步强制 | ✅ 通过 |
 | 所有功能验收标准可验证 | ✅ 通过 |
 
 | 角色 | 姓名 | 日期 | 确认 |
@@ -447,4 +355,6 @@ v2.2.2 MVP 阶段不做自动回滚（Agent2 评审决定）。
 
 ---
 
-*本文档为 requirements_v2.2.2_READY.md (v2.0) 的技术评审报告，专注于 v1.3 新增的 F-PROC-001 功能。*
+**文档版本**: v1
+**创建日期**: 2026-02-07
+**评审对象**: requirements_v2.2.2_READY.md (v2.4)
