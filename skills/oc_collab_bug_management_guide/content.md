@@ -325,6 +325,17 @@ fix(BUG-YYYYMMDD-XXX): 简明描述
 Closes #BUG-YYYYMMDD-XXX
 ```
 
+### 修复后必须更新TODO
+
+```bash
+# 1. 更新TODO状态为pending
+# 2. 在标题标注"已修复"
+# 3. 提交TODO变更
+git add state/agent_adhoc_todos.yaml
+git commit -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
+oc-collab sync-all -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
+```
+
 ### 修复检查清单
 
 ```bash
@@ -333,7 +344,16 @@ Closes #BUG-YYYYMMDD-XXX
 2. ✅ 代码审查通过
 3. ✅ 提交信息规范
 4. ✅ 更新Bug报告状态
+5. ✅ 更新TODO，告知Agent1已修复
 ```
+
+### ⚠️ TODO更新规范 ⭐
+
+| 规则 | 说明 | 示例 |
+|------|------|------|
+| 在TODO标题标注"已修复" | 让Agent1明确知道状态变化 | `修复 BUG-XXX（已修复）` |
+| 保持简洁 | 不需要添加冗长的验证步骤 | Agent1自然会去验证 |
+| 任务交接给Agent1 | TODO状态改为pending，等待验收 | `status: pending` |
 
 ---
 
@@ -646,8 +666,10 @@ git push --tags
 |------|------|------|
 | v1 | 2026-02-08 | 初始版本 |
 | v1.1 | 2026-02-08 | 补充验收确认环节（BUG-20260208-002教训） |
-| v1.2 | 2026-02-08 | 修复流程错误：验收必须在发布之前 |
-| v1.3 | 2026-02-08 | 发布引用部署Skill，不写死部署步骤 |
+| v1.2 | 2026-02-08 | 发布引用部署Skill，不写死部署步骤 |
+| v1.3 | 2026-02-08 | 修复流程错误：验收必须在发布之前 |
+| v1.4 | 2026-02-08 | 测试中发现基础设施Bug处理规则 |
+| v1.5 | 2026-02-08 | TODO更新规范：修复后标注"已修复" |
 
 ---
 
