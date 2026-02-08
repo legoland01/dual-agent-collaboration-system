@@ -307,4 +307,20 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-08T21:32:25.369997'
   updated_at: '2026-02-08T21:32:25.370003'
-total: 44
+- id: TODO-063
+  content: 修复 BUG-20260208-006（signoff.py _save_stage_data未保存到v2.2.x.testing）
+  status: pending
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-08T23:10:00'
+  bug_id: BUG-20260208-006
+  testing_cmd: oc-collab signoff test -m "验证签署"
+- id: TODO-064
+  content: Agent2 修复 BUG-20260208-007（todowrite命令无法可靠创建TODO）
+  status: pending
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-08T23:20:00'
+  bug_id: BUG-20260208-007
+  testing_cmd: oc-collab todowrite --content "验证todowrite" --priority high --agent 2
+total: 46
