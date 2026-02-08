@@ -50,7 +50,7 @@ class TodoRollbackError(TodoSyncError):
 class TodoSyncManager:
     """待办同步管理器"""
 
-    TODO_FILENAME = "state/todo.yaml"
+    TODO_FILENAME = "state/agent_adhoc_todos.yaml"
 
     def __init__(self, project_path: Optional[str] = None):
         self.project_path = Path(project_path) if project_path else Path.cwd()
@@ -87,7 +87,7 @@ class TodoSyncManager:
                     created_at=item.get("created_at"),
                     updated_at=item.get("updated_at"),
                 )
-                for item in data.get("todos", [])
+                for item in data.get("adhoc_todos", [])
             ]
 
             return TodoState(
@@ -111,21 +111,22 @@ class TodoSyncManager:
             TodoSaveError: 保存失败
         """
         try:
+            todos_list = [
+                {
+                    "id": todo.id,
+                    "content": todo.content,
+                    "status": todo.status,
+                    "priority": todo.priority,
+                    "agent_id": todo.agent_id,
+                    "created_at": todo.created_at,
+                    "updated_at": todo.updated_at,
+                }
+                for todo in state.todos
+            ]
+
             data = {
-                "todos": [
-                    {
-                        "id": todo.id,
-                        "content": todo.content,
-                        "status": todo.status,
-                        "priority": todo.priority,
-                        "agent_id": todo.agent_id,
-                        "created_at": todo.created_at,
-                        "updated_at": todo.updated_at,
-                    }
-                    for todo in state.todos
-                ],
-                "version": state.version,
-                "last_updated": datetime.now().isoformat(),
+                "adhoc_todos": todos_list,
+                "total": len(todos_list),
             }
 
             self.todo_file.parent.mkdir(parents=True, exist_ok=True)
