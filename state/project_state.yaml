@@ -50,6 +50,13 @@ v2.2.3:
     agent2_signoff_at: null
     status: in_review
   created_at: 2026-02-08 14:04
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: 2026-02-08 06:30:00
+    agent2_signoff: null
+    agent2_signoff_at: null
+    design_doc: docs/02-design/DETAIL-2026-02-v2.2.3_Agent_Experience_Optimization.md
+    status: approved
   development:
     completed_at: null
     started_at: null
@@ -58,7 +65,8 @@ v2.2.3:
   - 'F-CONTEXT-001: .a 文件机制'
   - 'F-TASK-001: 任务状态同步'
   - 'F-UI-001: 状态增强显示'
-  phase: requirements_review
+  phase: detailing
   status: in_progress
-  updated_at: 2026-02-08 14:04
+  updated_at: 2026-02-08 06:27:00
   version: 2.2.3
+  workload: 12h

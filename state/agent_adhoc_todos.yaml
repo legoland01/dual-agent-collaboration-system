@@ -69,10 +69,10 @@ adhoc_todos:
 - completed_at: null
   confirmed_at: null
   created_at: 2026-02-07 23:55:00
-  description: 任务：明确评审优先级规则。Critical Review 自动覆盖 Technical Review。规则写入协作指南。
+  description: '[推迟到 v2.2.4] 任务：明确评审优先级规则。Critical Review 自动覆盖 Technical Review。规则写入协作指南。'
   from: agent1
   id: TODO-037
-  phase: process_improvement
+  phase: v2.2.4
   priority: P1
   started_at: null
   status: pending
@@ -108,15 +108,15 @@ adhoc_todos:
   phase: design
   priority: P0
   started_at: null
-  status: completed
+  status: archived
   to: agent1
 - completed_at: null
   confirmed_at: null
   created_at: 2026-02-07 04:10:00
-  description: 任务：完成 v2.2.1 测试签署和阶段推进。
+  description: '[推迟到 v2.2.4] 任务：完成 v2.2.1 测试签署和阶段推进。'
   from: agent1
   id: TODO-021
-  phase: deployment_prep
+  phase: v2.2.4
   priority: P0
   started_at: null
   status: pending
@@ -130,7 +130,7 @@ adhoc_todos:
   phase: design
   priority: P0
   started_at: null
-  status: completed
+  status: archived
   to: agent1
 - completed_at: 2026-02-07 14:30:00
   confirmed_at: 2026-02-07 14:30:00
@@ -141,7 +141,7 @@ adhoc_todos:
   phase: requirements_review
   priority: P0
   started_at: null
-  status: completed
+  status: archived
   to: agent2
 - completed_at: 2026-02-07 04:00:00
   confirmed_at: null
@@ -296,7 +296,7 @@ adhoc_todos:
   description: 任务：评审 v2.2.3 需求文档。范围：F-CONTEXT-001(.a机制), F-TASK-001(任务同步), F-UI-001(状态显示)。状态：Agent1
     已确认，待 Agent2 技术评审。
   phase: requirements_review
-  status: completed
+  status: archived
   priority: P0
   created_at: 2026-02-08 14:04
   started_at: null
@@ -307,7 +307,7 @@ adhoc_todos:
   to: agent1
   description: 任务：Agent2 实质性评审 v2.2.3。结果：有条件通过，需 Agent1 确认修改建议。
   phase: design
-  status: completed
+  status: archived
   priority: P0
   created_at: 2026-02-08 14:13
   started_at: null
@@ -316,13 +316,12 @@ adhoc_todos:
 - id: TODO-043
   from: agent2
   to: agent1
-  description: 任务：确认 v2.2.3 修改建议。Agent2 评审：1) F-CONTEXT-001 改为自动检测；2) F-TASK-001 补充同步失败处理；3)
-    F-UI-001 补充错误处理。
+  description: 任务：确认 v2.2.3 修改建议。结果：已采纳，可开始详细设计。
   phase: requirements_review
-  status: pending
+  status: archived
   priority: P0
   created_at: 2026-02-08 14:34
   started_at: null
-  completed_at: null
+  completed_at: 2026-02-08 14:52
   confirmed_at: null
 total: 19
