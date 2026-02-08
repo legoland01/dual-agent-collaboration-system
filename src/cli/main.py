@@ -943,14 +943,24 @@ def design_command(action: str, target: str):
                 sys.exit(1)
             else:
                 click.echo(f"✅ {result.message}")
+                return
 
-        if agent_id == "agent2" or action == "view":
-            if action == "create":
-                click.echo(f"Agent2: 创建设计文档 {target}")
-            elif action == "edit":
-                click.echo(f"Agent2: 编辑设计文档 {target}")
-            elif action == "view":
-                click.echo(f"查看设计文档 {target}")
+        if agent_id == "agent2":
+            result = engine.check_role_boundary(agent_id, action, f"docs/02-design/{target}")
+            if result.result_type.value == "denied":
+                console.print(Panel(
+                    f"⛔ 权限拒绝\n{result.message}",
+                    title="角色边界检查",
+                    style="red"
+                ))
+                sys.exit(1)
+
+        if action == "create":
+            click.echo(f"[{agent_id}]: 创建设计文档 {target}")
+        elif action == "edit":
+            click.echo(f"[{agent_id}]: 编辑设计文档 {target}")
+        elif action == "view":
+            click.echo(f"[{agent_id}]: 查看设计文档 {target}")
 
     except Exception as e:
         click.echo(f"错误: {e}")
@@ -979,14 +989,24 @@ def requirements_command(action: str, target: str):
                 sys.exit(1)
             else:
                 click.echo(f"✅ {result.message}")
+                return
 
-        if agent_id == "agent1" or action == "view":
-            if action == "create":
-                click.echo(f"Agent1: 创建需求文档 {target}")
-            elif action == "edit":
-                click.echo(f"Agent1: 编辑需求文档 {target}")
-            elif action == "view":
-                click.echo(f"查看需求文档 {target}")
+        if agent_id == "agent1":
+            result = engine.check_role_boundary(agent_id, action, f"docs/01-requirements/{target}")
+            if result.result_type.value == "denied":
+                console.print(Panel(
+                    f"⛔ 权限拒绝\n{result.message}",
+                    title="角色边界检查",
+                    style="red"
+                ))
+                sys.exit(1)
+
+        if action == "create":
+            click.echo(f"[{agent_id}]: 创建需求文档 {target}")
+        elif action == "edit":
+            click.echo(f"[{agent_id}]: 编辑需求文档 {target}")
+        elif action == "view":
+            click.echo(f"[{agent_id}]: 查看需求文档 {target}")
 
     except Exception as e:
         click.echo(f"错误: {e}")
