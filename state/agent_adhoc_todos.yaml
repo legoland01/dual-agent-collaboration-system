@@ -32,12 +32,12 @@ adhoc_todos:
   - id: TODO-040
     from: agent1
     to: agent1
-    description: "任务：执行 v2.2.2 黑盒测试。前置条件：TODO-039 CLI 修复完成。用例：docs/03-test/blackbox_test_cases_v2.2.2.md。结果：docs/05-development/v2.2.2_blackbox_test_results.md"
+    description: "任务：执行 v2.2.2 黑盒测试。结果：docs/03-test/BLACKBOX_TEST_v2.2.2.md。通过：5/7。需补充：design create、requirements edit 命令用于角色边界测试。"
     phase: blackbox_testing
-    status: pending
+    status: in_progress
     priority: P0
     created_at: 2026-02-08T12:00:00
-    started_at: null
+    started_at: 2026-02-08T12:00:00
     completed_at: null
     confirmed_at: null
 
