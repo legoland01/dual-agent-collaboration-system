@@ -202,6 +202,26 @@ Types:
 | 需求变更 | 需求修改 | Agent 1 |
 | 设计变更 | 设计修改 | Agent 2 |
 
+### 评审反馈TODO体系 ⭐
+
+**原则**：TODO是短程"通知-完成"结构，保持最大灵活性
+
+```
+Agent2评审 → TODO设为complete（评审工作完成）
+              ↓
+        如需Agent1反馈
+              ↓
+    Agent2创建新TODO给Agent1
+```
+
+**示例**：
+1. Agent2评审需求文档，发现问题
+2. Agent2将评审TODO设为complete
+3. Agent2创建新TODO："Agent1修复评审意见"（agent_id: "1"）
+4. Agent1修复后，可创建TODO给Agent2确认
+
+**禁止**：Agent2将评审TODO设为complete后，自己再创建TODO给自己
+
 ### TODO 标准格式
 
 ```yaml
