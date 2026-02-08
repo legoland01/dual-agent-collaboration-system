@@ -34,13 +34,14 @@
 
 | 项目 | 负责人 | 状态 |
 |------|--------|------|
-| 创建设计文档 | Agent 2 | ⏳ 待开始 |
-| Git Commit命令评审 | Agent 2 | ⏳ 待评审 |
+| 创建设计文档 | Agent 2 | ✅ 已完成 |
+| 设计文档评审 | Agent 1 | ✅ 已完成 |
 
 ### 中优先级（推迟到v2.2.4）
 
 | 项目 | 说明 |
 |------|------|
+| Git Commit命令提案 | proposal 阶段，无需评审 |
 | 需求收集流程 | `PROPOSAL_Incoming_Requirements_Management.md` |
 
 ---
@@ -49,7 +50,7 @@
 
 ```
 需求: APPROVED ✅
-设计: 待创建 ⏳
+设计: APPROVED ✅
 开发: 待开始 ⏳
 测试: 待开始 ⏳
 ```
@@ -89,9 +90,9 @@
 
 ### 必须首先做的
 
-1. **v2.2.3设计阶段** - Agent 2需要创建设计文档
-2. **评审Git Commit提案** - `PROPOSAL_v2.2.3_Git_Commit_Command.md`
-3. **实施需求收集流程** - 推迟到v2.2.4
+1. **v2.2.3开发阶段** - Agent 2 可以开始实现设计文档
+2. **v2.2.3测试阶段** - Agent 1 准备测试用例
+3. **Git Commit命令提案** - 作为后续设计输入，暂不实施（推迟到v2.3.0）
 
 ### 评审Skill已就绪
 
@@ -123,7 +124,9 @@ skills/oc_collab_requirements_review_guide/content.md
 8fb129b feat: v2.2.3 需求评审通过（Agent 2 实质性评审）
 ```
 
-**待提交**：无
+**待提交**：
+- `docs/02-design/DETAIL-2026-02-v2.2.3_Agent_Experience_Optimization.md`（设计文档）
+- `docs/08-compaction/COMPACT-001_v2.2.3_MidCycle.md`（compaction更新）
 
 ---
 
@@ -140,9 +143,8 @@ skills/oc_collab_requirements_review_guide/content.md
 ### 从Compaction恢复
 
 1. 阅读本摘要
-2. 阅读 `docs/01-requirements/requirements_v2.2.3_READY.md`
-3. 加载评审Skill：`skills/oc_collab_requirements_review_guide/content.md`
-4. 继续设计阶段
+2. 阅读 `docs/02-design/DETAIL-2026-02-v2.2.3_Agent_Experience_Optimization.md`
+3. 开始开发阶段
 
 ### 快速恢复命令
 
@@ -150,15 +152,12 @@ skills/oc_collab_requirements_review_guide/content.md
 # 1. 克隆/拉取最新代码
 git pull
 
-# 2. 阅读需求文档
-cat docs/01-requirements/requirements_v2.2.3_READY.md
+# 2. 阅读设计文档
+cat docs/02-design/DETAIL-2026-02-v2.2.3_Agent_Experience_Optimization.md
 
-# 3. 加载评审指南
-cat skills/oc_collab_requirements_review_guide/content.md
-
-# 4. 开始设计
-#    - 参考模板: docs/02-design/DETAIL-2026-02-v2.2.2_collaboration_enforcement.md
-#    - 创建: docs/02-design/DETAIL-2026-02-v2.2.3_xxx.md
+# 3. 开始开发
+#    - 参考: docs/02-design/DETAIL-2026-02-v2.2.3_Agent_Experience_Optimization.md
+#    - 实现位置: src/core/context_manager.py, src/core/todo_sync_manager.py
 ```
 
 ---
@@ -168,6 +167,7 @@ cat skills/oc_collab_requirements_review_guide/content.md
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | v1 | 2026-02-08 | 初始Compaction摘要 |
+| v2 | 2026-02-08 | 设计评审通过，状态更新为 APPROVED |
 
 ---
 
