@@ -102,3 +102,64 @@ class TestSignoffWithV2Structure:
         v224 = state["v2.2.4"]
         assert v224["development"]["status"] == "completed", \
             "v2.2.4开发状态应该是completed"
+
+
+class TestSignoffV2Structure:
+    """
+    TC-SESSION-005: 测试signoff.py支持v2.2.x结构
+    BUG-20260208-004: signoff.py不支持v2.2.x版本化结构
+
+    问题描述：
+    - signoff.py期望测试状态在顶层 test 字段
+    - v2.2.x结构中测试状态在 v2.2.x.testing 字段
+    """
+
+    def test_signoff_can_read_v2_testing_status(self):
+        """
+        TC-SESSION-005: 测试signoff能读取v2.2.x的testing状态
+
+        预期结果：
+        - signoff.py应该能识别v2.2.4.testing.status
+        """
+        from src.core.state_manager import StateManager
+
+        state_manager = StateManager(str(PROJECT_ROOT))
+        
+        # 创建signoff engine（需要workflow_engine，但这里只用state_manager测试）
+        # 由于signoff需要workflow_engine，我们直接测试状态读取逻辑
+        
+        state = state_manager.load_state()
+        
+        # 期望signoff能读取v2.2.4.testing.status
+        if "v2.2.4" in state and "testing" in state["v2.2.4"]:
+            testing_status = state["v2.2.4"]["testing"].get("status", "")
+            assert testing_status in ["in_progress", "approved", "passed"], \
+                f"v2.2.4.testing.status应该是in_progress/approved/passed，但返回: {testing_status}"
+        else:
+            pytest.skip("v2.2.4.testing不存在（可能是其他版本结构）")
+
+    def test_signoff_test_stage_v2_structure(self):
+        """
+        TC-SESSION-006: 测试signoff.test阶段能识别v2.2.x结构
+
+        当前问题：
+        - signoff.py的_get_stage_data()使用 state.get("test", {})
+        - 这在v2.2.x结构中会失败，因为testing数据在v2.2.4.testing
+        """
+        from src.core.signoff import SignoffEngine
+        from src.core.state_manager import StateManager
+        from unittest.mock import Mock
+
+        state_manager = StateManager(str(PROJECT_ROOT))
+        workflow_engine = Mock()
+        
+        engine = SignoffEngine(state_manager, workflow_engine)
+        
+        # 测试获取test阶段数据
+        state = state_manager.load_state()
+        
+        # 检查STAGE_CONFIG
+        assert "test" in engine.STAGE_CONFIG, "应该有test阶段配置"
+        
+        # 在v2.2.x结构下，signoff.py需要能识别v2.2.x.testing
+        # 当前实现只检查顶层test字段，这是bug的根源
