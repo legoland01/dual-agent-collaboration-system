@@ -103,9 +103,10 @@ oc-collab phase-advance --no-sync
 #### 2.1 概要设计 (Agent 1 创建)
 
 1. Agent 1 基于需求文档创建概要设计
-2. Agent 2 评审概要设计
-3. Agent 1 修订并更新状态
-4. Agent 2 签署概要设计确认
+2. Agent 1 创建TODO要求Agent 2评审概要设计 ← 新增
+3. Agent 2 评审概要设计
+4. Agent 1 修订并更新状态
+5. Agent 2 签署概要设计确认
 
 #### 2.2 详细设计 (Agent 2 创建)
 
