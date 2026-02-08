@@ -18,6 +18,8 @@ from ..core.auto_retry import AutoRetry, AutoRetryConfig
 from ..core.auto_docs import AutoDocs, AutoDocsConfig
 from ..core.phase_advance import PhaseAdvanceEngine
 from ..core.session_manager import SessionManager
+from ..core.compliance_engine import ComplianceEngine
+from ..core.git_sync_integrator import GitSyncIntegrator
 from ..utils.lock import LockExistsError
 
 
@@ -816,11 +818,11 @@ def sync_command(retry: bool, max_retries: int, interval: int, no_backoff: bool)
     try:
         project_path = get_project_path()
         git_helper = GitHelper(project_path)
-        
+
         if git_helper.has_local_changes():
             click.echo("警告: 有未提交的本地修改，请先提交或暂存")
             sys.exit(1)
-        
+
         if retry:
             config = AutoRetryConfig(
                 max_retries=max_retries,
@@ -829,13 +831,13 @@ def sync_command(retry: bool, max_retries: int, interval: int, no_backoff: bool)
                 verbose=True
             )
             auto_retry = AutoRetry(project_path, config)
-            
+
             remotes = git_helper.get_all_remotes()
             if not remotes:
                 remotes = ["origin"]
-            
+
             result = auto_retry.pull_with_retry(remotes[0])
-            
+
             if result["success"]:
                 console.print(Panel(
                     f"✓ 同步成功\n重试次数: {result['attempts']}\n耗时: {result['duration']}秒",
@@ -854,7 +856,51 @@ def sync_command(retry: bool, max_retries: int, interval: int, no_backoff: bool)
                 click.echo("已同步远程变更")
             else:
                 click.echo("同步失败")
-                
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("git")
+@click.argument("action", type=click.Choice(["status", "sync-state", "warn"]), default="status")
+def git_command(action: str):
+    """Git 同步工具 (v2.2.2)"""
+    try:
+        project_path = get_project_path()
+        git_sync = GitSyncIntegrator(project_path)
+
+        if action == "status":
+            status = git_sync.get_sync_status()
+            if status["status"] == "synced":
+                click.echo("✅ Git 状态: 已同步")
+            else:
+                click.echo(f"⚠️ Git 状态: 未同步 ({status['unsynced_count']} 个文件)")
+                for f in status["files"].split(", "):
+                    click.echo(f"  - {f}")
+
+        elif action == "sync-state":
+            result = git_sync.sync_state()
+            if result.success:
+                console.print(Panel(
+                    f"✅ {result.message}",
+                    title="状态同步",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"⚠️ {result.message}",
+                    title="状态同步",
+                    style="yellow"
+                ))
+
+        elif action == "warn":
+            warning = git_sync.warn_unsynced()
+            if warning:
+                console.print(Panel(warning, title="未同步警告", style="yellow"))
+            else:
+                click.echo("✅ 无未同步修改")
+
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
@@ -1113,8 +1159,9 @@ def project_command(action: str, type: str, value: str, cases: int,
 @click.option("--phase", "-p", help="目标阶段")
 @click.option("--force", "-f", is_flag=True, help="强制推进")
 @click.option("--check", "-c", is_flag=True, help="仅检查条件")
-def advance_command(phase: str, force: bool, check: bool):
-    """推进到下一阶段。"""
+@click.option("--sync/--no-sync", "-s", default=True, help="推进后自动同步到 Git")
+def advance_command(phase: str, force: bool, check: bool, sync: bool):
+    """推进到下一阶段 (v2.2.2: 推进后自动同步 Git 状态)。"""
     try:
         project_path = get_project_path()
         phase_engine = PhaseAdvanceEngine(project_path)
@@ -1141,6 +1188,13 @@ def advance_command(phase: str, force: bool, check: bool):
                     title="阶段推进",
                     style="green"
                 ))
+                if sync:
+                    git_sync = GitSyncIntegrator(project_path)
+                    sync_result = git_sync.sync_state()
+                    if sync_result.success:
+                        click.echo(f"✅ Git 同步: {sync_result.message}")
+                    else:
+                        click.echo(f"⚠️ Git 同步跳过: {sync_result.message}")
             else:
                 console.print(Panel(
                     f"推进失败\n原因: {result.get('error', '未知')}",
@@ -1156,6 +1210,13 @@ def advance_command(phase: str, force: bool, check: bool):
                     title="自动推进",
                     style="green"
                 ))
+                if sync:
+                    git_sync = GitSyncIntegrator(project_path)
+                    sync_result = git_sync.sync_state()
+                    if sync_result.success:
+                        click.echo(f"✅ Git 同步: {sync_result.message}")
+                    else:
+                        click.echo(f"⚠️ Git 同步跳过: {sync_result.message}")
             else:
                 console.print(Panel(
                     f"{result['message']}\n\n使用 'oc-collab advance --check' 查看详情\n使用 'oc-collab advance --force --phase <阶段名>' 强制推进",
@@ -1208,42 +1269,120 @@ def workflow_command(check: bool, suggest: bool):
         sys.exit(1)
 
 
-@main.command("compliance")
-@click.option("--prd", "-p", help="检查 PRD 文件")
-@click.option("--rfc", "-r", help="检查 RFC 文件")
-@click.option("--detect", "-d", is_flag=True, help="检测冲突")
-def compliance_command(prd: str, rfc: str, detect: bool):
-    """检查变更合规性。"""
+@main.group("compliance")
+def compliance_group():
+    """合规检查命令组 (v2.2.2)"""
+    pass
+
+
+@compliance_group.command("check")
+@click.option("--role", is_flag=True, help="检查角色边界")
+@click.option("--doc", is_flag=True, help="检查文档状态")
+@click.option("--completeness", is_flag=True, help="检查评审完整性")
+@click.option("--all", "check_all", is_flag=True, help="执行所有检查")
+@click.option("--agent", "-a", type=click.Choice(["agent1", "agent2"]), help="指定 Agent ID")
+@click.option("--action", "-x", type=click.Choice(["create", "edit", "view", "signoff", "review", "submit_review", "confirm"]), help="操作类型")
+@click.option("--target", "-t", help="目标路径")
+def compliance_check_command(role: bool, doc: bool, completeness: bool, check_all: bool, agent: str, action: str, target: str):
+    """执行合规检查 (v2.2.2)"""
     try:
-        from ..core.change_compliance import ChangeComplianceChecker
-
         project_path = get_project_path()
-        checker = ChangeComplianceChecker(project_path)
+        state_manager = StateManager(project_path)
 
-        if prd:
-            result = checker.check_prd_compliance(prd)
-            if result.valid:
-                click.echo("✅ PRD 合规")
-            else:
-                for v in result.violations:
-                    click.echo(f"❌ {v}")
+        if not agent:
+            agent = state_manager.get_active_agent()
 
-        if rfc:
-            result = checker.check_rfc_compliance(rfc, prd)
-            if result.valid:
-                click.echo("✅ RFC 合规")
-            else:
-                for v in result.violations:
-                    click.echo(f"❌ {v}")
+        engine = ComplianceEngine(project_path)
 
-        if detect and prd and rfc:
-            conflicts = checker.detect_conflicts(prd, rfc)
-            if conflicts:
-                click.echo(f"⚠️ 发现 {len(conflicts)} 个冲突:")
-                for c in conflicts:
-                    click.echo(f"  - {c.type}: {c.description}")
+        if check_all or role:
+            if action and target:
+                result = engine.check_role_boundary(agent, action, target)
             else:
-                click.echo("✅ 未检测到冲突")
+                click.echo("⚠️ 检查角色边界需要 --action 和 --target 参数")
+                return
+            engine.save_result(result)
+            click.echo(f"[{result.check_type}] {result.message}")
+
+        if check_all or doc:
+            if action and target:
+                result = engine.check_doc_state(action, target, agent)
+            else:
+                click.echo("⚠️ 检查文档状态需要 --action 和 --target 参数")
+                return
+            engine.save_result(result)
+            click.echo(f"[{result.check_type}] {result.message}")
+
+        if check_all or completeness:
+            if target:
+                result = engine.check_completeness(target, agent)
+            else:
+                click.echo("⚠️ 检查完整性需要 --target 参数")
+                return
+            engine.save_result(result)
+            click.echo(f"[{result.check_type}] {result.message}")
+
+        if not (check_all or role or doc or completeness):
+            click.echo("请指定检查类型: --role, --doc, --completeness, 或 --all")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@compliance_group.command("status")
+def compliance_status_command():
+    """查看合规状态 (v2.2.2)"""
+    try:
+        project_path = get_project_path()
+        engine = ComplianceEngine(project_path)
+
+        results = engine.get_results(limit=10)
+
+        console.print("\n[bold]合规检查状态[/bold]")
+
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("时间")
+        table.add_column("类型")
+        table.add_column("结果")
+        table.add_column("Agent")
+        table.add_column("消息")
+
+        for r in results:
+            result_icon = "✅" if r.get("result_type") == "passed" else ("❌" if r.get("result_type") == "denied" else "⚠️")
+            table.add_row(
+                r.get("timestamp", "")[:19],
+                r.get("check_type", ""),
+                result_icon,
+                r.get("agent_id", ""),
+                r.get("message", "")[:50]
+            )
+
+        console.print(table)
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@compliance_group.command("results")
+@click.option("--type", "-t", type=click.Choice(["role_boundary", "doc_state", "completeness"]), help="筛选检查类型")
+@click.option("--limit", "-n", type=int, default=20, help="显示数量")
+def compliance_results_command(type: str, limit: int):
+    """查看合规检查结果 (v2.2.2)"""
+    try:
+        project_path = get_project_path()
+        engine = ComplianceEngine(project_path)
+
+        results = engine.get_results(limit=limit, check_type=type)
+
+        console.print(f"\n[bold]合规检查结果 (最近 {len(results)} 条)[/bold]")
+
+        for i, r in enumerate(results, 1):
+            result_icon = "✅" if r.get("result_type") == "passed" else ("❌" if r.get("result_type") == "denied" else "⚠️")
+            console.print(f"\n{i}. {result_icon} [{r.get('check_type')}] {r.get('agent_id')} - {r.get('action')}")
+            console.print(f"   目标: {r.get('target', 'N/A')}")
+            console.print(f"   消息: {r.get('message')}")
+            console.print(f"   时间: {r.get('timestamp', '')[:19]}")
 
     except Exception as e:
         click.echo(f"错误: {e}")

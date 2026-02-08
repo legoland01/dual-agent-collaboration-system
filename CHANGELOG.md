@@ -1,5 +1,53 @@
 # Changelog
 
+## v2.2.2 - v2.2.2 Released
+
+**Date**: 2026-02-08
+**Status**: ✅ **RELEASED** - Collaboration Enforcement
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| F-PROC-001 | Collaboration Enforcement | ✅ |
+| ├─ F-PROC-001.1 | Role Boundary Checker | ✅ |
+| ├─ F-PROC-001.2 | Document State Binder | ✅ |
+| └─ F-PROC-001.3 | Completeness Gate | ✅ |
+| F-GIT-001 | Git Sync Integration | ✅ |
+
+### Changes
+
+- **src/core/compliance_engine.py** - Unified compliance engine entry point
+- **src/core/role_boundary_checker.py** - Agent role boundary enforcement
+- **src/core/document_state_binder.py** - Document state machine
+- **src/core/completeness_gate.py** - Review completeness validation
+- **src/core/git_sync_integrator.py** - Git sync integration (integrates auto_git_sync.py)
+
+### CLI Changes
+
+- **`oc-collab compliance check`** - Execute compliance checks (role, doc, completeness)
+- **`oc-collab compliance status`** - View compliance status
+- **`oc-collab compliance results`** - View compliance check results
+- **`oc-collab advance --sync/--no-sync`** - Auto-sync Git after phase advance
+- **`oc-collab git status`** - View Git sync status
+- **`oc-collab git sync-state`** - Sync state files to Git
+- **`oc-collab git warn`** - Show unsynced changes warning
+
+### Tests
+
+- **tests/test_compliance_engine.py** - Compliance engine tests
+- **tests/test_role_boundary_checker.py** - Role boundary tests
+- **tests/test_document_state_binder.py** - Document state tests
+- **tests/test_completeness_gate.py** - Completeness gate tests
+- **tests/test_git_sync_integrator.py** - Git sync integration tests
+
+### Key Insights
+
+- **P9 Root Cause**: 认知趋同 (cognitive convergence) - Agents have independent LLM sessions but read the same documents, leading to thinking convergence
+- **Solution**: Reverse verification checklist - "How to prove this is wrong?" instead of "What problems exist?"
+
+---
+
 ## v2.2.1.post1 - v2.2.1 Patch Release
 
 **Date**: 2026-02-07
