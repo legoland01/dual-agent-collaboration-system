@@ -100,6 +100,7 @@ def init_command(project_name: str, type: str, force: bool, no_git: bool):
 def status_command():
     """查看当前协作状态。"""
     try:
+        import re
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         state = state_manager.load_state()
@@ -113,12 +114,32 @@ def status_command():
         metadata = state.get("metadata", {})
         project_info = state.get("project", {})
 
-        project_name = metadata.get("project_name") or project_info.get("name", "未配置")
+        project_name = metadata.get("project_name") or project_info.get("name")
+        if not project_name:
+            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+            if version_keys:
+                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                project_name = f"oc-collab {latest_version}"
+        if not project_name:
+            project_name = "oc-collab"
+
         project_type = metadata.get("project_type") or project_info.get("type", "未知")
 
         table.add_row("项目名称", project_name)
         table.add_row("项目类型", project_type)
+
         current_phase = project_info.get("phase") or state.get("phase", "未知")
+        if current_phase == "未知":
+            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+            if version_keys:
+                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                version_data = state.get(latest_version, {})
+                dev_status = version_data.get("development", {}).get("status", "")
+                if dev_status == "completed":
+                    current_phase = "testing"
+                elif dev_status == "in_progress":
+                    current_phase = "development"
+
         table.add_row("当前阶段", current_phase)
 
         active_agent = state_manager.get_active_agent()

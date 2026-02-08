@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional, List
+import re
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
@@ -75,16 +76,41 @@ class SessionManager:
     def get_project_info(self) -> dict:
         try:
             state = self.state_manager.load_state()
+
             metadata = state.get("metadata", {})
             project_info = state.get("project", {})
 
+            project_name = metadata.get("project_name") or project_info.get("name")
+
+            if not project_name:
+                version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+                if version_keys:
+                    latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                    project_name = f"oc-collab {latest_version}"
+
+            if not project_name:
+                project_name = "oc-collab"
+
+            phase = project_info.get("phase") or state.get("phase", "未知")
+
+            if phase == "未知":
+                version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+                if version_keys:
+                    latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                    version_data = state.get(latest_version, {})
+                    dev_status = version_data.get("development", {}).get("status", "")
+                    if dev_status == "completed":
+                        phase = "testing"
+                    elif dev_status == "in_progress":
+                        phase = "development"
+
             return {
-                "name": metadata.get("project_name") or project_info.get("name", "未配置"),
-                "phase": project_info.get("phase") or state.get("phase", "未知"),
+                "name": project_name,
+                "phase": phase,
                 "milestone": state.get("current_milestone", "待定义")
             }
-        except Exception:
-            return {"name": "未配置", "phase": "未知", "milestone": "待定义"}
+        except Exception as e:
+            return {"name": "oc-collab", "phase": "未知", "milestone": "待定义"}
 
     def get_agent_info(self, agent_id: str) -> dict:
         agent_config = AGENT_ROLES.get(agent_id, {
