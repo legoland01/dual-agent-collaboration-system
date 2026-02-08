@@ -193,10 +193,10 @@ class TestTodoWritePersistence:
         )
 
         try:
-            # 执行todowrite
+            # 执行todowrite（注意：优先级参数是high/medium/low，不是P0/P1/P2）
             result = subprocess.run(
                 ["python3", "-m", "src.cli.main", "todowrite",
-                 "--content", "测试TODO", "--priority", "P0", "--agent", "2"],
+                 "--content", "测试TODO", "--priority", "high", "--agent", "2"],
                 cwd=str(PROJECT_ROOT),
                 capture_output=True,
                 text=True
