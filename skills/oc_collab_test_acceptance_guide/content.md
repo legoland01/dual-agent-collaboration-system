@@ -132,12 +132,61 @@ python -m pytest tests/test_blackbox_*.py -v
 | 结果类型 | 处理方式 |
 |----------|----------|
 | ✅ 全部通过 | 签署验收，更新状态 |
-| ⚠️ 部分失败 | 记录问题，要求Agent2修复 |
+| ⚠️ 部分失败 | 记录问题，创建TODO分配给Agent2修复 |
 | ❌ 全部失败 | 检查环境，报告Bug |
 
 ---
 
+## ⚠️ 发现Bug后的处理流程
+
+**绝对禁止**: 发现Bug后标记验收完成
+
+**正确流程**:
+
+```
+发现Bug
+  ↓
+  1. 创建Bug报告文件 (docs/00-memos/BUG-YYYYMMDD-XXX_XXX.md)
+  ↓
+  2. 创建TODO任务分配给Agent2修复
+  ↓
+  oc-collab todowrite --content "修复 BUG-YYYYMMDD-XXX" --priority P0 --agent 2
+  ↓
+  3. 更新 project_state.yaml
+     - status: 保持 "in_progress"
+     - phase: 保持 "testing"
+     - bugs: 添加Bug列表
+  ↓
+  4. 提交变更
+  ↓
+  等待Agent2修复后，重新测试
+```
+
+**反面教训** (BUG-20260208-001):
+
+| 错误做法 | 正确做法 |
+|----------|----------|
+| 发现Bug后标记验收完成 | 保持 testing 状态 |
+| 只写Bug报告不分配任务 | 必须创建TODO分配给Agent2 |
+| Bug只在docs/记录 | 同时更新project_state.yaml |
+| 让Agent2自己找Bug | 主动分配任务 |
+
+---
+
 ## 验收签署
+
+### 签署前提
+
+**只有所有测试通过且无Bug时，才能签署验收**
+
+```
+验收条件:
+- ✅ 单元测试: 全部通过
+- ✅ E2E测试: 全部通过  
+- ✅ 黑盒测试: 全部通过
+- ✅ CLI功能: 全部实现
+- ❌ 无未修复的Bug
+```
 
 ### 签署内容模板
 
@@ -154,6 +203,23 @@ python -m pytest tests/test_blackbox_*.py -v
 - [P1]: xxx
 
 签署: Agent 1 @ 2026-02-08
+```
+
+### ⚠️ 有Bug时不签署
+
+```
+验收结果: ❌ 未完成
+
+测试执行:
+- 测试命令: python -m pytest tests/test_v2_2_3.py -v
+- 测试结果: XX passed, YY failed
+
+发现问题:
+- [P0]: CLI命令未完全实现 (BUG-20260208-001)
+
+后续处理:
+- TODO-052: Agent2 修复Bug
+- 待修复后重新测试
 ```
 
 ### 签署规范
@@ -174,6 +240,9 @@ python -m pytest tests/test_blackbox_*.py -v
 | 不核对版本号 | 确认测试文件与开发版本一致 |
 | 测试失败直接签署 | 必须记录问题，要求修复 |
 | Agent1做白盒测试 | 白盒测试由Agent2执行 |
+| 发现Bug后标记验收完成 | 创建TODO分配给Agent2，保持testing状态 |
+| 只写Bug报告不分配任务 | 必须创建TODO分配给Agent2 |
+| Bug只在docs/记录 | 同时更新project_state.yaml |
 
 ---
 
@@ -201,3 +270,4 @@ git commit -m "docs: v2.2.3 测试验收通过"
 |------|------|------|
 | v1 | 2026-02-08 | 初始版本 |
 | v2 | 2026-02-08 | 添加测试前检查清单，强调开发状态检查 |
+| v3 | 2026-02-08 | 添加Bug处理流程（BUG-20260208-001教训） |
