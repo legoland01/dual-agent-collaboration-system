@@ -1,0 +1,24 @@
+{
+  "name": "oc_collab_outline_design_guide",
+  "description": "OC-Collab 概要设计指南 - 功能视角，由Agent 1负责",
+  "version": "v1",
+  "author": "OC-Collab Team",
+  "trigger_keywords": [
+    "概要设计",
+    "outline design",
+    "功能模块",
+    "产品路线图"
+  ],
+  "parameters": {},
+  "examples": [
+    "创建概要设计",
+    "功能模块有哪些",
+    "本版本在路线图中的位置"
+  ],
+  "related_skills": [
+    "oc_collab_detailed_design_guide",
+    "oc_collab_requirements_guide",
+    "oc_collab_requirements_review_guide"
+  ],
+  "documentation_path": "skills/oc_collab_outline_design_guide/content.md"
+}

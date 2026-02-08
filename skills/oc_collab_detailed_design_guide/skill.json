@@ -1,0 +1,24 @@
+{
+  "name": "oc_collab_detailed_design_guide",
+  "description": "OC-Collab 详细设计指南 - 技术视角，由Agent 2负责",
+  "version": "v1",
+  "author": "OC-Collab Team",
+  "trigger_keywords": [
+    "详细设计",
+    "detailed design",
+    "技术实现",
+    "代码设计"
+  ],
+  "parameters": {},
+  "examples": [
+    "创建详细设计",
+    "类如何设计",
+    "技术模块映射"
+  ],
+  "related_skills": [
+    "oc_collab_outline_design_guide",
+    "oc_collab_requirements_guide",
+    "oc_collab_development_guide"
+  ],
+  "documentation_path": "skills/oc_collab_detailed_design_guide/content.md"
+}
