@@ -30,6 +30,11 @@ history:
   details: '签署test阶段: v2.2.4验收通过：45个测试全部通过（含BUG-20260208-003/004/006修复验证）'
   id: 024a55dc
   timestamp: '2026-02-08T21:34:36.843066'
+- id: deployment
+  timestamp: '2026-02-08T22:42:45.345471'
+  action: deployment
+  agent_id: agent2
+  details: v2.2.4部署完成：PyPI发布 + Git tag
 requirements:
   agent1_signoff: true
   agent2_signoff: true
@@ -131,3 +136,9 @@ v2.2.4:
     completed_at: '2026-02-08T22:29:49.721508'
   version: 2.2.4
   workload: 14h
+deployment:
+  status: completed
+  completed_at: '2026-02-08T22:42:45.345464'
+  version: 2.2.4
+  pypi: true
+  git_tag: v2.2.4
