@@ -1,0 +1,105 @@
+{
+  "id": "oc_collab_requirements_review_guide",
+  "name": "OC-Collab 需求评审指南",
+  "version": "v1",
+  "description": "需求评审规范 - 角色分工、实质性评审检查项、签署规范",
+  "author": "Agent 1",
+  "created_at": "2026-02-08",
+  "tags": ["requirements", "review", "guide", "v2.2.3"],
+  "version_info": {
+    "current": "v2.2.3"
+  },
+  "triggers": [
+    {
+      "condition": "before_reviewing_requirements",
+      "priority": "high",
+      "description": "评审需求前触发，提供评审清单"
+    },
+    {
+      "condition": "agent_signs_requirements",
+      "priority": "high",
+      "description": "签署需求前检查角色和内容"
+    },
+    {
+      "condition": "agent_asks_who_does_what",
+      "priority": "high",
+      "description": "询问职责分工时提供"
+    }
+  ],
+  "role_responsibility": {
+    "agent1": {
+      "role": "产品经理",
+      "must_do": ["创建需求文档", "编写黑盒测试", "验收签署"],
+      "must_not_do": ["创建设计文档", "实现代码", "签署\"评审通过\""]
+    },
+    "agent2": {
+      "role": "开发",
+      "must_do": ["评审需求", "创建设计文档", "实现代码", "白盒测试"],
+      "must_not_do": ["编写黑盒测试", "签署\"创建需求\""]
+    }
+  },
+  "substantive_review": {
+    "description": "实质性评审禁止只写\"✅ 通过\"，必须回答：",
+    "checklist": {
+      "feasibility": {
+        "name": "技术可行性",
+        "questions": [
+          "这个功能在当前架构下能实现吗？",
+          "有没有技术风险没识别出来？",
+          "实现复杂度是否被低估了？"
+        ]
+      },
+      "completeness": {
+        "name": "完整性",
+        "questions": [
+          "验收标准是否可测试？",
+          "异常流程是否覆盖了？",
+          "有没有遗漏的边界条件？"
+        ]
+      },
+      "implementability": {
+        "name": "可实施性",
+        "questions": [
+          "工时预估是否合理？",
+          "依赖关系是否正确？",
+          "需要额外依赖吗？"
+        ]
+      },
+      "reverse_thinking": {
+        "name": "逆向思考（必须）",
+        "questions": [
+          "如果我是用户，这个设计好用吗？",
+          "最大的风险点是什么？",
+          "有没有更好的实现方式？"
+        ]
+      }
+    }
+  },
+  "signing_rules": {
+    "agent1": {
+      "can_sign": ["创建需求", "发起评审"],
+      "cannot_sign": ["评审通过", "技术评审通过"]
+    },
+    "agent2": {
+      "can_sign": ["技术评审通过", "设计评审通过"],
+      "cannot_sign": ["创建需求"]
+    }
+  },
+  "wrong_examples": {
+    "title": "常见错误（禁止）",
+    "examples": [
+      {
+        "wrong": "Agent 1 签署\"评审通过\"",
+        "correct": "Agent 1 签署\"发起评审\"，Agent 2 签署\"技术评审通过\""
+      },
+      {
+        "wrong": "Agent 1 创建设计文档",
+        "correct": "Agent 2 创建设计文档"
+      },
+      {
+        "wrong": "评审只写\"✅ 通过\"",
+        "correct": "必须提供具体意见，包括逆向思考"
+      }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "id": "oc_collab_requirements_guide",
+  "name": "OC-Collab 需求编写指南",
+  "version": "v1",
+  "description": "需求文档编写规范 - 模板、检查清单、双签流程",
+  "author": "Agent 1",
+  "created_at": "2026-02-08",
+  "updated_at": "2026-02-08",
+  "tags": ["requirements", "template", "checklist", "v2.2.3"],
+  "version_info": {
+    "current": "v2.2.3",
+    "previous": "v2.2.2"
+  },
+  "triggers": [
+    {
+      "condition": "session_start",
+      "priority": "high",
+      "description": "新会话开始时提醒需求规范"
+    },
+    {
+      "condition": "before_requirements_review",
+      "priority": "high",
+      "description": "需求评审前自动触发规范检查"
+    },
+    {
+      "condition": "agent_asks_template",
+      "priority": "high",
+      "description": "Agent 询问需求模板时提供"
+    }
+  ],
+  "templates": {
+    "requirements_doc": {
+      "file": "docs/01-requirements/TEMPLATE_requirements.md",
+      "required_sections": [
+        "概述",
+        "功能需求",
+        "CLI 命令清单",
+        "工时预估",
+        "依赖关系",
+        "签署确认"
+      ],
+      "checklist": [
+        "✅ 概述完整（版本信息、核心原则）",
+        "✅ 每个功能有验收标准（使用 - [ ] 格式）",
+        "✅ 有 CLI 命令清单",
+        "✅ 工时预估 ≤ 12h（单版本）",
+        "✅ 依赖关系明确",
+        "✅ Agent 1 已签署",
+        "✅ Agent 2 已评审",
+        "✅ 文档状态为 APPROVED"
+      ]
+    },
+    "parker_features": {
+      "file": "docs/01-requirements/PARKED_vX.X.X_features.md",
+      "required_fields": [
+        "来源文档路径",
+        "推迟原因",
+        "原始验收标准",
+        "后续建议版本"
+      ]
+    }
+  },
+  "workflow": {
+    "step_1_create": {
+      "action": "创建需求文档",
+      "command": "cp docs/01-requirements/TEMPLATE_requirements.md docs/01-requirements/requirements_vX.X.X_DRAFT.md",
+      "description": "复制模板创建新需求文档"
+    },
+    "step_2_draft": {
+      "action": "填写 DRAFT",
+      "description": "填写所有必须字段，明确验收标准"
+    },
+    "step_3_review": {
+      "action": "Agent 2 评审",
+      "description": "Agent 2 评审并签署"
+    },
+    "step_4_approve": {
+      "action": "改为 APPROVED",
+      "description": "双签后状态改为 APPROVED"
+    },
+    "step_5_publish": {
+      "action": "发布前检查",
+      "command": "./scripts/check_requirements.sh docs/01-requirements/requirements_vX.X.X_READY.md",
+      "description": "运行检查脚本确认文档完整"
+    }
+  },
+  "signatures": {
+    "required": true,
+    "roles": ["Agent 1 (产品负责人)", "Agent 2 (开发负责人)"],
+    "order": ["Agent 1 first", "Agent 2 second"]
+  }
+}
