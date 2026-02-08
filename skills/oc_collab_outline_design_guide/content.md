@@ -260,9 +260,6 @@ oc-collab todowrite --content "Agent2评审vX.X.X概要设计并签署" --priori
 ### 2. 同步到Git
 
 ```bash
-# 优先确保Gitee配置正确（GitHub不稳定）
-oc-collab remote list
-
 # 提交概要设计文档
 git add docs/02-design/OUTLINE_DESIGN_vX.X.X.md
 git commit -m "feat: vX.X.X概要设计 - xxx"
@@ -271,8 +268,9 @@ git commit -m "feat: vX.X.X概要设计 - xxx"
 git add state/agent_adhoc_todos.yaml state/project_state.yaml
 git commit -m "sync: 更新todo状态 - Agent2评审概要设计"
 
-# 推送到Gitee优先
-git push gitee main 2>/dev/null || git push origin main
+# 推送到所有远程（GitHub + Gitee）
+git push --all
+git push --tags
 ```
 
 ### 3. 通知Agent2
