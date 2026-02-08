@@ -396,9 +396,19 @@ class StateManager:
         """获取活跃Agent（兼容旧接口）。"""
         try:
             state = self._read_state_file()
-            for agent_id, agent_data in state.get("agents", {}).items():
-                if agent_data.get("current", False):
-                    return agent_id
+            # 检查环境变量（测试环境优先）
+            import os
+            agent_env = os.environ.get("OC_COLLAB_AGENT")
+            if agent_env:
+                return agent_env
+            # 检查 agents 结构
+            if "agents" in state:
+                for agent_id, agent_data in state.get("agents", {}).items():
+                    if agent_data.get("current", False):
+                        return agent_id
+            # 回退到 current_agent 字段
+            if "current_agent" in state:
+                return state["current_agent"]
             return "unknown"
         except StateFileNotFoundError:
             return "unknown"
