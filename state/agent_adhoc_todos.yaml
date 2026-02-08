@@ -309,11 +309,12 @@ adhoc_todos:
   updated_at: '2026-02-08T21:32:25.370003'
 - id: TODO-063
   content: 修复 BUG-20260208-006（signoff.py _save_stage_data未保存到v2.2.x.testing）
-  status: pending
+  status: completed
   priority: P0
   agent_id: '2'
   created_at: '2026-02-08T23:10:00'
   updated_at: null
+  completed_at: '2026-02-08T21:55:38.476927'
 - id: TODO-064
   content: Agent2 修复 BUG-20260208-007（todowrite命令无法可靠创建TODO）
   status: pending

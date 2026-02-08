@@ -104,9 +104,20 @@ class SignoffEngine:
         return stage_data if isinstance(stage_data, dict) else {}
     
     def _save_stage_data(self, stage: str, state: dict, stage_data: dict):
-        """保存阶段数据（处理 design 列表的情况）。"""
+        """保存阶段数据（处理 design 列表和 v2.2.x 版本化结构）。"""
         config = self.STAGE_CONFIG.get(stage, {})
         status_field = config.get("status_field", stage)
+        
+        # test 阶段需要保存到 v2.2.x.testing
+        if stage == "test":
+            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+            if version_keys:
+                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                version_data = state.get(latest_version, {})
+                if "testing" in version_data:
+                    version_data["testing"] = stage_data
+                    self.state_manager.save_state(state)
+                    return
         
         # design 阶段是列表，需要找到并更新对应的设计文档
         if stage == "design" and isinstance(state.get(status_field), list):
