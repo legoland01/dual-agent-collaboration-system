@@ -277,8 +277,8 @@ Changelog = "https://gitee.com/zhang-xiuqin01/dual-agent-collaboration-system/-/
 git add pyproject.toml
 git commit -m "chore: 版本升级至 v{x}.{y}.{z}"
 
-# 2. 推送到远程
-git push origin main
+# 2. 推送到所有远程（GitHub + Gitee）
+git push --all && git push --tags
 ```
 
 ### 8.2 标签管理（可选）
@@ -472,7 +472,7 @@ curl -s https://pypi.org/pypi/opencode-collaboration/$VERSION/json | \
 echo "4. Git 提交..."
 git add pyproject.toml
 git commit -m "chore: 版本升级至 v$VERSION"
-git push
+git push --all && git push --tags
 
 echo "✅ 部署完成！"
 ```

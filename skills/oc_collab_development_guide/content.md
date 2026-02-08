@@ -275,7 +275,7 @@ yaml.dump(state, 'state/project_state.yaml')
 | 运行测试 | `python3 -m pytest tests/test_v2_2_x.py -v` |
 | 提交代码 | `git commit -m "feat: xxx"` |
 | 推送代码 | `oc-collab push --message "xxx"` |
-| 完整提交 | `git add . && git commit -m "feat: xxx" && git push` |
+| 完整提交 | `git add . && git commit -m "feat: xxx" && git push --all && git push --tags` |
 
 ---
 

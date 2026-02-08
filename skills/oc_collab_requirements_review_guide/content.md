@@ -111,9 +111,15 @@
 git add docs/
 git commit -m "feat: 创建/更新需求文档"
 
-# 2. 评审通过后，提交签署状态
+# 2. 推送到所有远程（GitHub + Gitee）
+git push --all && git push --tags
+
+# 3. 评审通过后，提交签署状态
 git add docs/
 git commit -m "docs: 更新需求签署状态"
+
+# 4. 推送签署状态
+git push --all && git push --tags
 ```
 
 **禁止**: 创建文档后不提交，积压多个提交
