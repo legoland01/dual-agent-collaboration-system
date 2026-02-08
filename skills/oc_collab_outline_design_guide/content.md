@@ -242,21 +242,36 @@ cp docs/02-design/TEMPLATE_outline_design.md docs/02-design/OUTLINE_DESIGN_vX.X.
 
 | 角色 | 姓名 | 日期 | 确认 |
 |------|------|------|------|
-| 开发负责人 | Agent 2 | YYYY-MM-DD | ⏳ |
+| 开发负责人 | Agent 2 | | ⏳ |
 
 ---
 
-## 与详细设计的关联
+## 后续动作 ⭐
 
-概要设计完成后，Agent 2 会基于此创建详细设计：
+概要设计完成后，必须执行以下动作：
 
-| 概要设计输出 | 详细设计输入 |
-|--------------|--------------|
-| 功能模块清单 | 技术模块映射 |
-| 功能关系 | 模块依赖关系 |
-| 用户故事 | 测试场景 |
-| 外部接口 | API 设计 |
-| 约束条件 | 技术选型依据 |
+### 1. 创建TODO
+
+```bash
+# 创建评审TODO
+oc-collab todowrite --content "Agent2评审vX.X.X概要设计并签署" --priority high
+```
+
+### 2. 同步到Git
+
+```bash
+# 提交概要设计文档
+git add docs/02-design/OUTLINE_DESIGN_vX.X.X.md
+git commit -m "feat: vX.X.X概要设计 - xxx"
+
+# 同步TODO状态
+git add state/agent_adhoc_todos.yaml state/project_state.yaml
+git commit -m "sync: 更新todo状态 - Agent2评审概要设计"
+```
+
+### 3. 通知Agent2
+
+在独立Session中通知Agent2进行评审。
 
 ---
 
@@ -265,3 +280,4 @@ cp docs/02-design/TEMPLATE_outline_design.md docs/02-design/OUTLINE_DESIGN_vX.X.
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | v1 | 2026-02-08 | 初始版本 |
+| v2 | 2026-02-08 | 新增"后续动作"章节，明确TODO和Git同步要求 |
