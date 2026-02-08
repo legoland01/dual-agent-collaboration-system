@@ -29,11 +29,14 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-08T12:17:27.050778'
+updated_at: '2026-02-08T13:06:55.115315'
 v2.2.2:
   acceptance:
     agent1_signoff: true
     agent1_signoff_at: 2026-02-08 11:30:00
+    agent2_signoff: true
+    agent2_signoff_at: 2026-02-08 13:33
+    status: APPROVED
   development:
     completed_at: 2026-02-08 11:18:00
     coverage: 86%
