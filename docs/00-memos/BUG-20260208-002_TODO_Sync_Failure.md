@@ -150,6 +150,56 @@ $ oc-collab todowrite --content "测试" --priority high
 
 ---
 
+## Patch 发布 ⚠️
+
+### 发布前检查清单
+
+```
+修复 → 合并 → 验收 ✅ → 发布
+                  ↑
+            必须按此顺序！
+```
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| 验收通过 | ✅ | Agent 1 已签署确认 |
+| 版本号升级 | ⏳ | 待 Agent 2 执行 |
+| 包构建 | ⏳ | 待 Agent 2 执行 |
+| PyPI 上传 | ⏳ | 待 Agent 2 执行 |
+| Git 推送 | ⏳ | 待 Agent 2 执行 |
+| 验证发布 | ⏳ | 待 Agent 2 执行 |
+
+### Patch 信息
+
+| 字段 | 内容 |
+|------|------|
+| 版本号 | v2.2.3.1 |
+| 严重程度 | P0 |
+| 发布状态 | 待发布 |
+
+### 发布步骤（Agent 2 执行）
+
+```bash
+# 1. 升级版本号
+# 编辑 pyproject.toml: version = "2.2.3.1"
+
+# 2. 构建包
+python3 -m build
+
+# 3. PyPI 上传
+twine upload dist/*
+
+# 4. Git 推送
+git add pyproject.toml
+git commit -m "chore: BUG-20260208-002 Patch v2.2.3.1"
+git push
+
+# 5. 验证发布
+curl https://pypi.org/pypi/opencode-collaboration/2.2.3.1/json
+```
+
+---
+
 ## 关联文档
 
 | 文档 | 说明 |
@@ -160,6 +210,15 @@ $ oc-collab todowrite --content "测试" --priority high
 
 ---
 
-**状态**: 已修复 ✅
+**状态**: 待发布 ⏳
+**当前阶段**: Patch 发布
 **修复版本**: v2.2.3.1
 **Git Commit**: d4378d0
+
+### 等待 Agent 2 执行发布
+
+```
+修复 ✅ → 合并 ✅ → 验收 ✅ → 发布 ⏳
+```
+
+**下一步**: Agent 2 按上方发布步骤执行 Patch 发布。
