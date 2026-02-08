@@ -7,16 +7,8 @@
 
 版本: v2.2.3
 创建日期: 2026-02-08
-状态: ⚠️ 待 CLI 命令实现后执行
+状态: ✅ CLI 命令已实现
 
-注意：
-- init 命令参数与设计不符（缺少 --name, --path, --agent）
-- .a 命令未实现
-- todowrite/todoedit 命令未实现
-- status 命令未集成待办摘要功能
-
-待修复问题：
-- BUG-20260208-001: CLI 命令未完全实现
 """
 
 import pytest
@@ -43,7 +35,6 @@ def run_oc_collab_command(args, cwd=None):
     return result
 
 
-@pytest.mark.skip(reason="CLI命令未实现 - BUG-20260208-001")
 class TestE2EContextManagement:
     """F-CONTEXT-001: .a 文件机制端到端测试"""
 
@@ -72,7 +63,6 @@ class TestE2EContextManagement:
         assert "TestProject" in result.stdout
 
 
-@pytest.mark.skip(reason="CLI命令未实现 - BUG-20260208-001")
 class TestE2ETodoSync:
     """F-TASK-001: 任务状态同步端到端测试"""
 
@@ -91,7 +81,11 @@ class TestE2ETodoSync:
         assert result.returncode == 0
 
     def test_todoedit_updates_status(self, temp_project):
-        """todoedit 更新待办 - 未实现"""
+        """todoedit 更新待办 - 需要先创建待办"""
+        run_oc_collab_command(
+            ["todowrite", "--content", "待更新任务"],
+            cwd=temp_project
+        )
         result = run_oc_collab_command(
             ["todoedit", "TODO-001", "--status", "completed"],
             cwd=temp_project
@@ -99,7 +93,6 @@ class TestE2ETodoSync:
         assert result.returncode == 0
 
 
-@pytest.mark.skip(reason="CLI命令未实现 - BUG-20260208-001")
 class TestE2EStatusDisplay:
     """F-UI-001: 状态增强显示端到端测试"""
 
@@ -110,24 +103,35 @@ class TestE2EStatusDisplay:
             yield Path(tmpdir)
 
     def test_status_shows_summary(self, temp_project):
-        """status 显示待办摘要 - 需要增强现有status命令"""
+        """status 显示待办摘要 - 需要 project_state.yaml"""
         config_file = temp_project / ".oc-collab.yaml"
         config_file.write_text(
             "project: TestProject\npath: /test\nagent: 1\nversion: 2.2.3\n"
+        )
+        state_file = temp_project / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True)
+        state_file.write_text(
+            "current_agent: agent1\nphase: development\nproject:\n  name: TestProject\n"
         )
         result = run_oc_collab_command(["status"], cwd=temp_project)
         assert result.returncode == 0
 
 
-@pytest.mark.skip(reason="CLI命令未实现 - BUG-20260208-001")
 class TestE2EIntegration:
     """集成端到端测试"""
 
+    @pytest.fixture
+    def temp_project(self):
+        """创建临时项目目录"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
     def test_full_workflow(self, temp_project):
         """完整工作流测试 - 需要所有CLI命令支持"""
-        config_file = temp_project / ".oc-collab.yaml"
-        config_file.write_text(
-            "project: FullTest\npath: /test\nagent: 1\nversion: 2.2.3\n"
+        state_file = temp_project / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True)
+        state_file.write_text(
+            "current_agent: agent1\nphase: development\nproject:\n  name: FullTest\n"
         )
 
         result1 = run_oc_collab_command([".a"], cwd=temp_project)

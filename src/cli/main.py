@@ -21,6 +21,12 @@ from ..core.session_manager import SessionManager
 from ..core.compliance_engine import ComplianceEngine
 from ..core.git_sync_integrator import GitSyncIntegrator
 from ..utils.lock import LockExistsError
+from .enhanced_commands import (
+    show_context_command,
+    todowrite_command,
+    todoedit_command,
+    status_command,
+)
 
 
 console = Console()
@@ -1494,6 +1500,12 @@ def compliance_results_command(type: str, limit: int):
     except Exception as e:
         click.echo(f"错误: {e}")
         sys.exit(1)
+
+
+main.add_command(show_context_command, ".a")
+main.add_command(todowrite_command, "todowrite")
+main.add_command(todoedit_command, "todoedit")
+main.add_command(status_command, "status")
 
 
 if __name__ == "__main__":
