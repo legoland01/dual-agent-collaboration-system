@@ -49,7 +49,10 @@ oc-collab advance -p design
 
 | 命令 | 说明 |
 |------|------|
-| `oc-collab status` | 查看项目状态 |
+| `oc-collab status` | 查看项目状态和待办摘要 (v2.2.3) |
+| `oc-collab .a` | 显示当前关联的项目信息 (v2.2.3) |
+| `oc-collab todowrite` | 创建待办任务 (v2.2.3) |
+| `oc-collab todoedit` | 编辑待办任务 (v2.2.3) |
 | `oc-collab todo` | 查看待办事项 |
 | `oc-collab advance -p <phase>` | 推进到指定阶段 |
 | `oc-collab signoff <stage>` | 签署确认 |
@@ -93,6 +96,17 @@ myproject/
 │   └── project_state.yaml # 项目状态
 └── src/                   # 源代码
 ```
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 功能 |
+|------|------|------|
+| v2.2.3 | 2026-02-08 | Agent体验优化：`.a`项目信息、任务同步、状态摘要 |
+| v2.2.2 | 2026-02-07 | 协作规范强制执行、Git同步集成 |
+| v2.2.1 | 2026-02-07 | 双代理认知免疫系统、动态Checklist |
+| v2.2.0 | 2026-02-06 | 初始版本 |
 
 ---
 
