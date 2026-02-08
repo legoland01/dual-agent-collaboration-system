@@ -308,12 +308,27 @@ rules:
         engine = BrainEngine()
         signoff = {
             "requirements": {
+                "pm_signoff": False,
+                "dev_signoff": False
+            }
+        }
+        action, rule = engine.get_action("agent1", "requirements_review", signoff=signoff)
+        assert action == ActionType.SIGNOFF_REQUIREMENTS
+        assert rule is not None
+        assert rule.id == "agent1-signoff-requirements"
+
+    def test_get_action_with_signoff_already_signed(self):
+        """测试获取动作（已签署后应等待）。"""
+        engine = BrainEngine()
+        signoff = {
+            "requirements": {
                 "pm_signoff": True,
                 "dev_signoff": True
             }
         }
         action, rule = engine.get_action("agent1", "requirements_review", signoff=signoff)
-        assert action == ActionType.SIGNOFF_REQUIREMENTS
+        assert action == ActionType.WAIT
+        assert rule is None
 
     def test_update_context(self):
         """测试更新上下文。"""
