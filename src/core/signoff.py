@@ -85,7 +85,12 @@ class SignoffEngine:
             if version_keys:
                 latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
                 version_data = state.get(latest_version, {})
-                stage_data = version_data.get(stage, {})
+                
+                # test 阶段在 v2.2.x 中可能使用 "testing" 字段名
+                if stage == "test":
+                    stage_data = version_data.get("testing", version_data.get("test", {}))
+                else:
+                    stage_data = version_data.get(stage, {})
 
         # design 阶段是列表，需要找到当前进行中的设计文档
         if stage == "design" and isinstance(stage_data, list):
