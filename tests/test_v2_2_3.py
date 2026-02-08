@@ -35,10 +35,19 @@ class TestContextManager:
     def context_manager(self, temp_project):
         return ContextManager(temp_project)
 
-    def test_find_config_file_not_found(self, context_manager):
-        """TC-CONTEXT-001: 未找到配置文件时返回 None"""
-        result = context_manager.find_config_file()
-        assert result is None
+    def test_find_config_file_from_subdir(self, temp_project):
+        """TC-CONTEXT-001: 从子目录向上查找配置文件"""
+        manager = ContextManager()
+
+        subdir = Path(temp_project) / "subdir" / "nested"
+        subdir.mkdir(parents=True)
+
+        config_path = Path(temp_project) / ".oc-collab.yaml"
+        with open(config_path, 'w') as f:
+            f.write(f"project: Test\npath: {temp_project}\nagent: 1\n")
+
+        result = manager.find_config_file(subdir)
+        assert result == config_path
 
     def test_save_and_load_context(self, temp_project):
         """TC-CONTEXT-002: 保存和加载上下文"""
@@ -254,3 +263,209 @@ class TestTodoItem:
         assert todo.status == "completed"
         assert todo.priority == "high"
         assert todo.agent_id == 1
+
+
+class TestContextManagerEdgeCases:
+    """ContextManager 边界条件测试"""
+
+    @pytest.fixture
+    def temp_project(self):
+        """创建临时项目目录"""
+        temp_dir = tempfile.mkdtemp()
+        yield temp_dir
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+    def test_find_config_file_git_boundary(self, temp_project):
+        """TC-CONTEXT-001: 遇到 git root 停止查找"""
+        manager = ContextManager()
+
+        project_dir = Path(temp_project) / "project"
+        project_dir.mkdir()
+
+        git_dir = project_dir / ".git"
+        git_dir.mkdir()
+
+        subdir = project_dir / "subdir"
+        subdir.mkdir()
+
+        result = manager.find_config_file(subdir)
+        assert result is None
+
+    def test_find_config_file_pyproject_boundary(self, temp_project):
+        """遇到 pyproject.toml 停止查找"""
+        manager = ContextManager()
+
+        project_dir = Path(temp_project) / "project"
+        project_dir.mkdir()
+
+        pyproject = project_dir / "pyproject.toml"
+        pyproject.touch()
+
+        subdir = project_dir / "subdir"
+        subdir.mkdir()
+
+        result = manager.find_config_file(subdir)
+        assert result is None
+
+    def test_load_context_yaml_parse_error(self, temp_project):
+        """TC-CONTEXT-002: YAML 解析错误"""
+        manager = ContextManager(temp_project)
+        config_path = Path(temp_project) / ".oc-collab.yaml"
+
+        with open(config_path, 'w') as f:
+            f.write("project: Test\n  invalid yaml: \n")
+
+        with pytest.raises(ContextParseError):
+            manager.load_context(config_path)
+
+    def test_load_context_empty_file(self, temp_project):
+        """空配置文件测试"""
+        manager = ContextManager(temp_project)
+        config_path = Path(temp_project) / ".oc-collab.yaml"
+
+        config_path.touch()
+
+        with pytest.raises(InvalidContextError):
+            manager.load_context(config_path)
+
+    def test_load_context_missing_project_field(self, temp_project):
+        """缺少 project 字段"""
+        manager = ContextManager(temp_project)
+        config_path = Path(temp_project) / ".oc-collab.yaml"
+
+        with open(config_path, 'w') as f:
+            f.write("path: /test\nagent: 1\n")
+
+        with pytest.raises(InvalidContextError):
+            manager.load_context(config_path)
+
+    def test_load_context_missing_path_field(self, temp_project):
+        """缺少 path 字段"""
+        manager = ContextManager(temp_project)
+        config_path = Path(temp_project) / ".oc-collab.yaml"
+
+        with open(config_path, 'w') as f:
+            f.write("project: Test\nagent: 1\n")
+
+        with pytest.raises(InvalidContextError):
+            manager.load_context(config_path)
+
+
+class TestTodoSyncManagerEdgeCases:
+    """TodoSyncManager 边界条件测试"""
+
+    @pytest.fixture
+    def temp_project(self):
+        """创建临时项目目录"""
+        temp_dir = tempfile.mkdtemp()
+        yield temp_dir
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+    @pytest.fixture
+    def sync_manager(self, temp_project):
+        return TodoSyncManager(temp_project)
+
+    def test_add_todo_multiple(self, sync_manager):
+        """添加多个待办"""
+        todo1 = sync_manager.add_todo("任务1", agent_id=1, priority="high")
+        todo2 = sync_manager.add_todo("任务2", agent_id=1, priority="medium")
+        todo3 = sync_manager.add_todo("任务3", agent_id=2, priority="low")
+
+        assert todo1.id == "TODO-001"
+        assert todo2.id == "TODO-002"
+        assert todo3.id == "TODO-003"
+
+        state = sync_manager.load_todos()
+        assert len(state.todos) == 3
+
+    def test_update_nonexistent_todo(self, sync_manager):
+        """更新不存在的待办"""
+        result = sync_manager.update_todo("TODO-999", status="completed")
+        assert result is None
+
+    def test_delete_nonexistent_todo(self, sync_manager):
+        """删除不存在的待办"""
+        result = sync_manager.delete_todo("TODO-999")
+        assert result is False
+
+    def test_rollback_creates_backup(self, sync_manager):
+        """回滚时创建备份"""
+        sync_manager.add_todo("测试任务", agent_id=1)
+
+        sync_manager.create_backup()
+
+        backup_file = sync_manager.todo_file.with_suffix(".bak")
+        assert backup_file.exists()
+
+    def test_load_todos_empty_file(self, temp_project):
+        """加载空的 todo.yaml"""
+        manager = TodoSyncManager(temp_project)
+
+        todo_file = Path(temp_project) / "state" / "todo.yaml"
+        todo_file.parent.mkdir()
+        todo_file.touch()
+
+        state = manager.load_todos()
+        assert len(state.todos) == 0
+
+    def test_get_todos_by_agent_and_status(self, sync_manager):
+        """按 Agent 和状态过滤"""
+        todo1 = sync_manager.add_todo("Agent1进行中", agent_id=1)
+        todo2 = sync_manager.add_todo("Agent1已完成", agent_id=1)
+        sync_manager.update_todo(todo2.id, status="completed")
+        todo3 = sync_manager.add_todo("Agent2待办", agent_id=2)
+
+        agent1_pending = sync_manager.get_todos_by_agent(agent_id=1, status="pending")
+        assert len(agent1_pending) == 1
+        assert agent1_pending[0].content == "Agent1进行中"
+
+
+class TestTodoState:
+    """TodoState 数据类测试"""
+
+    def test_default_values(self):
+        """默认字段值测试"""
+        state = TodoState()
+        assert len(state.todos) == 0
+        assert state.version == "1.0"
+        assert state.last_updated is not None
+
+    def test_with_todos(self):
+        """带待办的 TodoState"""
+        todos = [
+            TodoItem(id="TODO-001", content="任务1"),
+            TodoItem(id="TODO-002", content="任务2"),
+        ]
+        state = TodoState(todos=todos, version="2.0")
+
+        assert len(state.todos) == 2
+        assert state.version == "2.0"
+
+
+class TestErrorMessages:
+    """错误消息测试"""
+
+    def test_context_not_found_error_message(self):
+        """ContextNotFoundError 消息测试"""
+        error = ContextNotFoundError("未找到配置文件")
+        assert "未找到配置文件" in str(error)
+
+    def test_context_parse_error_message(self):
+        """ContextParseError 消息测试"""
+        error = ContextParseError("YAML 解析失败")
+        assert "YAML 解析失败" in str(error)
+
+    def test_invalid_context_error_message(self):
+        """InvalidContextError 消息测试"""
+        error = InvalidContextError("缺少必要字段")
+        assert "缺少必要字段" in str(error)
+
+    def test_todo_load_error_message(self):
+        """TodoLoadError 消息测试"""
+        error = TodoLoadError("文件读取失败")
+        assert "文件读取失败" in str(error)
+
+    def test_todo_save_error_message(self):
+        """TodoSaveError 消息测试"""
+        error = TodoSaveError("文件写入失败")
+        assert "文件写入失败" in str(error)
