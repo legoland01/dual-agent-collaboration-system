@@ -1,6 +1,6 @@
 # oc-collab 开发阶段指南
 
-**版本**: v1.0.0  
+**版本**: v1.1.0  
 **适用阶段**: development  
 **Agent**: Agent 2 (开发)
 
@@ -12,7 +12,7 @@
 
 ### 阶段入口条件
 - [x] 需求文档已签署 (PM + Dev)
-- [x] 设计文档已签署 (PM + Dev)
+- [x] 详细设计文档已签署 (Agent 1)
 - [x] `project_state.yaml` 中 `phase: development`
 
 ### 阶段出口条件
@@ -31,9 +31,10 @@
 |------|------|----------|
 | 1 | 确认当前版本 | `oc-collab status` |
 | 2 | 确认设计已签署 | `oc-collab signoffs --list` |
-| 3 | 查看设计文档 | `cat docs/02-design/DETAIL-*.md` |
-| 4 | 更新待办 | `oc-collab todowrite --content "实现M1功能" --priority high` |
-| 5 | 创建开发分支 (可选) | `git checkout -b feature/v2.2.x` |
+| 3 | 查看详细设计文档 | `cat docs/02-design/DETAIL-*.md` |
+| 4 | 确认概要设计参考 | `cat docs/02-design/OUTLINE-*.md` |
+| 5 | 更新待办 | `oc-collab todowrite --content "实现M1功能" --priority high` |
+| 6 | 创建开发分支 (可选) | `git checkout -b feature/v2.2.x` |
 
 ### 2.2 模块实现
 
@@ -237,9 +238,11 @@ yaml.dump(state, 'state/project_state.yaml')
 ## 6. 常见问题
 
 ### Q1: 设计与实现不符怎么办？
-1. 记录差异到设计文档注释
-2. 通知 Agent 1 确认
-3. 如需修改，重新发起设计评审
+1. 以详细设计文档为准进行实现
+2. 如有疑问，参考概要设计理解功能意图
+3. 记录差异到代码注释
+4. 通知 Agent 1 确认
+5. 如需修改详细设计，重新发起设计评审
 
 ### Q2: 发现设计遗漏怎么办？
 1. 评估影响范围
@@ -306,5 +309,11 @@ yaml.dump(state, 'state/project_state.yaml')
 
 ---
 
-**维护者**: Agent 2  
-**更新日期**: 2026-02-08
+## 版本历史
+
+| 版本 | 日期 | 变更 |
+|------|------|------|
+| v1.0.0 | 2026-02-08 | 初始版本 |
+| v1.1.0 | 2026-02-08 | 强调开发基于详细设计，增加概要设计参考 |
+
+**维护者**: Agent 2

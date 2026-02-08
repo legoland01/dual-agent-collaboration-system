@@ -3,14 +3,15 @@
 ## Agent 角色定义
 
 ### Agent 1: 产品经理 + 测试 + 部署
-- 负责编写需求说明和系统设计
-- 负责编写黑盒测试用例
+- 负责编写需求说明和概要设计
 - 负责评审详细设计
+- 负责编写黑盒测试用例
 - 负责执行黑盒测试
 - 负责部署和发布
 
 ### Agent 2: 开发
-- 负责评审需求和设计
+- 负责创建概要设计的详细设计
+- 负责评审概要设计
 - 负责开发实现
 - 负责编写白盒测试
 - 负责签署确认
@@ -24,14 +25,16 @@
 #### 角色边界检查
 
 **Agent1 权限**：
-- ✅ 可以创建/修改：docs/01-requirements/, docs/03-test/, docs/04-deployment/
-- ❌ 不能操作：docs/02-design/ (设计文档)
+- ✅ 可以创建/修改：docs/01-requirements/, docs/02-design/OUTLINE_*.md, docs/03-test/, docs/04-deployment/
+- ❌ 不能操作：docs/02-design/DETAIL_*.md (详细设计文档)
 - ❌ 不能操作：src/ (代码文件)
 - ❌ 不能签署自己创建的文档
 
 **Agent2 权限**：
-- ✅ 可以创建/修改：docs/02-design/, src/, tests/
+- ✅ 可以创建/修改：docs/02-design/DETAIL_*.md, src/, tests/
+- ✅ 可以评审：docs/01-requirements/, docs/02-design/OUTLINE_*.md
 - ❌ 不能修改 docs/01-requirements/ (评审除外)
+- ❌ 不能创建概要设计文档
 - ❌ 不能签署自己创建的文档
 
 #### 文档状态阶段绑定
@@ -94,11 +97,22 @@ oc-collab phase-advance --no-sync
 7. Agent1 打标签：requirements-v*approved
 
 ### 阶段2: 设计评审
-1. Agent1 创建详细设计文档
-2. Agent2 Review，写评审意见
-3. 循环直到达成一致
-4. Agent2 签署设计确认
-5. Agent1 打标签：design-v*approved
+
+设计阶段分为两个子阶段：概要设计和详细设计
+
+#### 2.1 概要设计 (Agent 1 创建)
+
+1. Agent 1 基于需求文档创建概要设计
+2. Agent 2 评审概要设计
+3. Agent 1 修订并更新状态
+4. Agent 2 签署概要设计确认
+
+#### 2.2 详细设计 (Agent 2 创建)
+
+1. Agent 2 基于概要设计创建详细设计
+2. Agent 1 评审详细设计
+3. Agent 2 修订并更新状态
+4. Agent 1 签署详细设计确认
 
 ### 阶段3: 开发与测试
 1. Agent1 编写黑盒测试用例
@@ -136,10 +150,11 @@ Types:
 - test: 测试
 
 ### 标签规范
-- requirements-v1-approved - 需求确认
-- design-v1-approved - 设计确认
-- test-v1-passed - 测试通过
-- release-v1.0.0 - 正式发布
+- requirements-v*approved - 需求确认
+- outline-design-v*approved - 概要设计确认
+- design-v*approved - 详细设计确认
+- test-v*passed - 测试通过
+- release-v*.*.* - 正式发布
 
 ---
 
@@ -150,7 +165,8 @@ Types:
 | 需求 | 需求文档 | requirements_v{版本}.md |
 | 需求 | 评审意见 | requirements_review_v{版本}.md |
 | 需求 | 签署确认 | requirements_signoff.md |
-| 设计 | 详细设计 | detailed_design_v{版本}.md |
+| 设计 | 概要设计 | OUTLINE_DESIGN_v{版本}.md |
+| 设计 | 详细设计 | DETAIL_v{版本}.md |
 | 设计 | 评审意见 | design_review_v{版本}.md |
 | 设计 | 签署确认 | design_signoff.md |
 | 测试 | 黑盒用例 | blackbox_test_cases.md |
@@ -270,18 +286,20 @@ oc-collab todo
 ## 关键提醒
 
 ### Agent 1 的职责
-- 创建需求和设计文档
+- 创建需求文档和概要设计
+- 评审详细设计
 - 编写黑盒测试用例
 - 执行黑盒测试
 - 部署和发布
 - 打标签
 
 ### Agent 2 的职责
-- 评审需求和设计
+- 评审需求和概要设计
+- 创建详细设计
 - 开发实现
 - 编写白盒测试
 - 签署确认
-- 不准创建需求文档
+- 不准创建概要设计文档
 - 不准修改验收标准
 - 不准签署需求文档
 
@@ -319,54 +337,5 @@ oc-collab todo
 | v2.2.2 | 2026-02-07 | 协作规范强制执行 + Git同步集成 |
 | v2.2.3 | 2026-02-08 | Agent体验优化 |
 | v2.2.4 | 2026-02-08 | 新增TODO任务管理规范 |
----
-
-## Bug 处理流程 ⭐
-
-**Bug处理参考**: [oc_collab_bug_management_guide](../../skills/oc_collab_bug_management_guide/content.md)
-
-### Bug处理流程
-
-```
-发现 → 报告 → 分配 → 调查 → 修复 → 合并 → 发布
-```
-
-### Bug处理检查清单
-
-| 步骤 | 操作 | 必须？ |
-|------|------|--------|
-| 1 | 创建Bug报告 | ✅ |
-| 2 | 分配TODO任务 | ✅ |
-| 3 | 调查根因 | ✅ |
-| 4 | 修复代码 | ✅ |
-| 5 | 更新Bug报告 | ✅ |
-| 6 | 合并修复 | ✅ |
-| 7 | 经验总结 | 建议 |
-
-### Bug严重程度
-
-| 等级 | 定义 | 响应时间 |
-|------|------|----------|
-| **P0** | 阻塞协作流程 | 立即修复 |
-| **P1** | 影响功能使用 | 本次会话 |
-| **P2** | 轻微问题 | 下个版本 |
-| **P3** | 建议改进 | 可推迟 |
-
-### 常见Bug
-
-| Bug ID | 问题 | 严重程度 | 状态 |
-|--------|------|----------|------|
-| BUG-20260208-002 | TODO任务不同步 | P0 | 待修复 |
-
----
-
-## 当你困惑时
-
-1. 检查当前阶段
-2. 确认自己的角色职责
-3. 查看待办任务
-4. 查看Bug报告
-5. 按照工作流程执行
-
-
 | v2.2.5 | 2026-02-08 | 新增Bug管理流程规范 + Bug管理Skill |
+| v2.2.6 | 2026-02-08 | 设计流程分离：概要设计(Agent1) + 详细设计(Agent2) |
