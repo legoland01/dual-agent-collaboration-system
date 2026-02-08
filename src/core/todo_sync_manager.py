@@ -128,6 +128,8 @@ class TodoSyncManager:
                 "last_updated": datetime.now().isoformat(),
             }
 
+            self.todo_file.parent.mkdir(parents=True, exist_ok=True)
+
             if self.todo_file.exists():
                 self._backup_file = self.todo_file.with_suffix(".bak")
                 shutil.copy2(self.todo_file, self._backup_file)
