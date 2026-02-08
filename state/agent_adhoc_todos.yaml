@@ -1,308 +1,297 @@
 adhoc_todos:
-- agent_id: null
+- id: TODO-033
   content: null
-  created_at: 2026-02-07 21:35:00
-  id: TODO-033
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 21:35:00
   updated_at: null
-- agent_id: null
+- id: TODO-040
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-08 12:00:00
-  id: TODO-040
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-034
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 22:00:00
-  id: TODO-034
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-038
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-08 00:05:00
-  id: TODO-038
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-036
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 23:55:00
-  id: TODO-036
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-033
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 21:35:00
-  id: TODO-033
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-037
   content: null
+  status: pending
+  priority: P1
+  agent_id: null
   created_at: 2026-02-07 23:55:00
-  id: TODO-037
-  priority: P1
-  status: pending
   updated_at: null
-- agent_id: null
+- id: TODO-032
   content: null
+  status: completed
+  priority: P1
+  agent_id: null
   created_at: 2026-02-07 21:00:00
-  id: TODO-032
-  priority: P1
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-031
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 17:00:00
-  id: TODO-031
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-030
   content: null
+  status: archived
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 15:10:00
-  id: TODO-030
-  priority: P0
-  status: archived
   updated_at: null
-- agent_id: '1'
+- id: TODO-021
   content: v2.2.1 测试签署和阶段推进
+  status: completed
+  priority: P0
+  agent_id: '1'
   created_at: 2026-02-07 04:10:00
-  id: TODO-021
-  priority: P0
-  status: completed
   updated_at: '2026-02-08T19:52:00'
-- agent_id: null
+- id: TODO-027
   content: null
+  status: archived
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 14:35:00
-  id: TODO-027
-  priority: P0
-  status: archived
   updated_at: null
-- agent_id: null
+- id: TODO-025
   content: null
+  status: archived
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 04:20:00
-  id: TODO-025
-  priority: P0
-  status: archived
   updated_at: null
-- agent_id: null
+- id: TODO-020
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 03:15:00
-  id: TODO-020
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-014
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 02:08:00
-  id: TODO-014
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-013
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 02:07:00
-  id: TODO-013
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-012
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 02:06:00
-  id: TODO-012
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-011
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 02:05:00
-  id: TODO-011
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-010
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 02:00:00
-  id: TODO-010
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-008
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 01:00:00
-  id: TODO-008
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-007
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 00:30:00
-  id: TODO-007
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-006
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-07 00:10:00
-  id: TODO-006
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-004
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-06 23:40:00
-  id: TODO-004
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-005
   content: null
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: 2026-02-06 23:50:00
-  id: TODO-005
-  priority: P0
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-003
   content: null
+  status: completed
+  priority: P1
+  agent_id: null
   created_at: 2026-02-06 23:00:00
-  id: TODO-003
-  priority: P1
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-002
   content: null
+  status: completed
+  priority: P1
+  agent_id: null
   created_at: 2026-02-06 12:00:00
-  id: TODO-002
-  priority: P1
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-001
   content: null
+  status: completed
+  priority: P1
+  agent_id: null
   created_at: 2026-02-05 22:50:00
-  id: TODO-001
-  priority: P1
-  status: completed
   updated_at: null
-- agent_id: null
+- id: TODO-041
   content: null
+  status: archived
+  priority: P0
+  agent_id: null
   created_at: 2026-02-08 14:04
-  id: TODO-041
-  priority: P0
-  status: archived
   updated_at: null
-- agent_id: null
+- id: TODO-042
   content: null
+  status: archived
+  priority: P0
+  agent_id: null
   created_at: 2026-02-08 14:13
-  id: TODO-042
-  priority: P0
-  status: archived
   updated_at: null
-- agent_id: null
+- id: TODO-043
   content: null
-  created_at: 2026-02-08 14:34
-  id: TODO-043
-  priority: P0
   status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 14:34
   updated_at: null
-- agent_id: '2'
+- id: TODO-046
   content: 确认v2.2.4需求文档评审意见修复完成
+  status: completed
+  priority: high
+  agent_id: '2'
   created_at: '2026-02-08T19:30:00'
-  id: TODO-046
-  priority: high
-  status: completed
   updated_at: '2026-02-08T19:23:55.872863'
-- agent_id: '2'
-  completed_at: '2026-02-08T19:31:27.586751'
+- id: TODO-047
   content: 评审v2.2.4概要设计并签署
-  created_at: '2026-02-08T19:45:00'
-  id: TODO-047
+  status: completed
   priority: high
-  status: completed
+  agent_id: '2'
+  created_at: '2026-02-08T19:45:00'
   updated_at: null
-- completed_at: '2026-02-08T19:55:00.000000'
-  confirmed_at: null
+- id: TODO-048
   content: 确认v2.2.4概要设计评审意见并推进到详细设计阶段
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-08T19:32:11.714082'
-  from: agent2
-  id: TODO-048
-  phase: design
-  priority: P0
-  started_at: null
-  status: completed
-  to: agent1
-- completed_at: '2026-02-08T19:40:47.350887'
-  confirmed_at: null
+  updated_at: null
+- id: TODO-049
   content: 创建v2.2.4详细设计（基于OUTLINE_DESIGN_v2.2.4）
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-08T20:00:00.000000'
-  from: agent1
-  id: TODO-049
-  phase: design
-  priority: P0
-  started_at: null
-  status: completed
-  to: agent2
-- completed_at: '2026-02-08T20:05:00.000000'
-  confirmed_at: null
+  updated_at: null
+- id: TODO-050
   content: 评审v2.2.4详细设计（DETAIL-2026-02-v2.2.4_Enforcement_System.md）
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-08T19:42:01.019387'
-  from: agent2
-  id: TODO-050
-  phase: design
-  priority: P0
-  started_at: null
-  status: completed
-  to: agent1
-- completed_at: '2026-02-08T20:08:21.975370'
-  confirmed_at: null
+  updated_at: null
+- id: TODO-051
   content: 开发v2.2.4 P0功能（SkillEnforcer, SignoffEnforcer, RequirementsChecker, PhaseAdvance）
+  status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-08T20:10:00.000000'
-  from: agent1
-  id: TODO-051
-  phase: development
-  priority: P0
-  started_at: '2026-02-08T19:46:16.728588'
-  status: completed
-  to: agent2
-- acceptance_criteria:
-  - 39个测试全部通过
-  - '签署 development.status: completed'
+  updated_at: null
+- id: TODO-052
   content: 测试验收v2.2.4 P0功能（BUG-20260208-003已修复）
+  status: pending
+  priority: P0
+  agent_id: null
   created_at: '2026-02-08T20:17:04.083882'
-  from: agent2
-  id: TODO-052
-  phase: testing
-  priority: P0
-  status: pending
-  testing_cmd: python3 -m pytest tests/test_skill_enforcer.py tests/test_signoff_enforcer.py
-    tests/test_requirements_checker.py tests/test_enforcement_system_e2e.py tests/test_session_manager_v2.py
-    -v
-  to: agent1
   updated_at: '2026-02-08T20:57:49.117566'
-- agent_id: '2'
+- id: TODO-056
   content: 修复 BUG-20260208-004（signoff.py不支持v2.2.x结构）
-  created_at: '2026-02-08T22:00:00'
-  id: TODO-056
-  priority: P0
-  phase: bugfix
   status: completed
-  bug_id: BUG-20260208-004
-  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestSignoffV2Structure
-    -v
-  started_at: '2026-02-08T22:05:00'
-  completed_at: '2026-02-08T21:19:41.136599'
-- agent_id: '2'
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-08T22:00:00'
+  updated_at: null
+- id: TODO-057
   content: 修复 BUG-20260208-005（todowrite未正确写入TODO到文件）
-  created_at: '2026-02-08T22:20:00'
-  id: TODO-057
+  status: completed
   priority: P1
-  phase: bugfix
+  agent_id: '2'
+  created_at: '2026-02-08T22:20:00'
+  updated_at: null
+  completed_at: '2026-02-08T21:23:01.784974'
+- id: TODO-058
+  content: 测试TODO persistence
   status: pending
-  bug_id: BUG-20260208-005
-  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestTodoWritePersistence
-    -v
-total: 38
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-08T21:21:30.905954'
+  updated_at: '2026-02-08T21:21:30.905961'
+- id: TODO-059
+  content: 测试失败TODO
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-08T21:21:54.324794'
+  updated_at: '2026-02-08T21:21:54.324800'
+- id: TODO-060
+  content: 测试CLI todowrite
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-08T21:22:43.260580'
+  updated_at: '2026-02-08T21:22:43.260586'
+total: 42
