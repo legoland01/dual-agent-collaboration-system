@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opencode-collaboration"
-version = "2.2.3"
+version = "2.2.4"
 description = "双Agent协作框架 - 产品经理与开发的分离式协作工具"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -31,6 +31,12 @@ dependencies = [
     "rich>=12.0",
     "inquirer>=2.0"
 ]
+
+[project.urls]
+Homepage = "https://gitee.com/zhang-xiuqin01/dual-agent-collaboration-system"
+Repository = "https://gitee.com/zhang-xiuqin01/dual-agent-collaboration-system"
+Issues = "https://gitee.com/zhang-xiuqin01/dual-agent-collaboration-system/issues"
+Changelog = "https://gitee.com/zhang-xiuqin01/dual-agent-collaboration-system/-/raw/main/docs/00-changelog/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
