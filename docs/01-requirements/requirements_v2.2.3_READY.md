@@ -1,10 +1,10 @@
 # 需求规格说明书：oc-collab v2.2.3
 
-**版本**: v4
+**版本**: v5
 **创建日期**: 2026-02-07
 **作者**: Agent 1 (产品经理)
 **版本号**: 2.2.3
-**状态**: IN_REVIEW (需重新评审) ⏴
+**状态**: APPROVED ✅
 
 ---
 
@@ -35,7 +35,7 @@
 
 **.a 文件格式**:
 ```yaml
-# .oc-collab.a
+# .oc-collab.yaml
 project: MyProject
 path: /path/to/MyProject
 agent: 1  # 或 2
@@ -45,14 +45,15 @@ agent: 1  # 或 2
 
 | 命令 | 说明 |
 |------|------|
-| `oc-collab init` | 检测 .oc-collab.a 存在则跳过，否则创建 |
-| `oc-collab .a` | 显示当前 .a 文件内容 |
+| `oc-collab init` | 自动检测项目根目录 `.oc-collab.yaml`，存在则跳过初始化 |
+| `oc-collab .a` | 显示当前关联的项目信息 |
 
 **验收标准**:
-- [ ] `oc-collab init` 检测到 `.oc-collab.a` 存在则跳过初始化
-- [ ] `oc-collab init` 未检测到 `.oc-collab.a` 则引导用户创建
-- [ ] `.oc-collab.a` 文件格式包含: project, path, agent
-- [ ] `oc-collab .a` 命令显示当前关联的项目信息
+- [ ] `oc-collab init` 自动检测项目根目录 `.oc-collab.yaml`
+- [ ] `.oc-collab.yaml` 存在则跳过初始化，显示项目信息
+- [ ] `.oc-collab.yaml` 不存在则引导用户创建
+- [ ] 支持跨目录场景（从子目录运行可找到根目录）
+- [ ] `.oc-collab.yaml` 文件损坏时给出友好错误提示
 
 **工时**: 5h
 
@@ -73,7 +74,8 @@ agent: 1  # 或 2
 - [ ] todowrite 操作后自动同步到 state/todo.yaml
 - [ ] todoedit 操作后自动同步到 state/todo.yaml
 - [ ] 同步时有明确提示 "✓ 已同步"
-- [ ] 同步失败时有错误提示
+- [ ] 同步失败时回滚 todo 操作
+- [ ] 同步失败时有错误提示，显示原因和解决方法
 
 **工时**: 2h
 
@@ -118,6 +120,7 @@ agent: 1  # 或 2
 - [ ] 根据当前 Agent 角色过滤任务
 - [ ] 显示任务优先级
 - [ ] 待办为空时显示 "暂无待办任务"
+- [ ] .oc-collab.yaml 文件损坏或不存在时显示友好错误提示
 
 **工时**: 2h
 
@@ -129,10 +132,10 @@ agent: 1  # 或 2
 
 | 命令 | 功能 | 工时 |
 |------|------|------|
-| `oc-collab .a` | 显示当前 .a 文件内容 | 1h |
-| `oc-collab init` | 增强：支持 .a 文件检测 | 4h |
-| `oc-collab todowrite` | 增强：自动同步 | 1h |
-| `oc-collab todoedit` | 增强：自动同步 | 1h |
+| `oc-collab .a` | 显示当前 .oc-collab.yaml 内容 | 1h |
+| `oc-collab init` | 增强：自动检测 .oc-collab.yaml | 4h |
+| `oc-collab todowrite` | 增强：自动同步 + 回滚 | 1h |
+| `oc-collab todoedit` | 增强：自动同步 + 回滚 | 1h |
 | `oc-collab status` | 增强：显示待办摘要 | 2h |
 
 ### 3.2 变更说明
@@ -208,25 +211,20 @@ agent: 1  # 或 2
 |------|------|------|------|
 | 开发负责人 | Agent 2 | 2026-02-08 | ✅ (技术评审通过) |
 
-**评审意见**:
-- 范围合理性: ✅ 通过
-- 技术可行性: ✅ 通过
-- 工时准确性: ✅ 通过
+**实质性评审意见（已采纳）**:
+- ✅ F-CONTEXT-001: 改为自动检测项目根目录 `.oc-collab.yaml`
+- ✅ F-TASK-001: 补充"同步失败时回滚 todo 操作"
+- ✅ F-UI-001: 补充错误处理
 
-### 退回说明
+### Agent 1 确认
 
-| 日期 | 操作人 | 原因 |
-|------|--------|------|
-| 2026-02-08 | Agent 1 | **未加载评审指南 skill，评审不实质性**，需重新评审 |
-
-**退回理由**:
-- Agent 2 评审时未加载 `oc_collab_requirements_review_guide` skill
-- 评审输出只写"✅ 通过"，未回答实质性检查项
-- 违反实质性评审要求
+| 角色 | 姓名 | 日期 | 确认 |
+|------|------|------|------|
+| 产品负责人 | Agent 1 | 2026-02-08 | ✅ (确认修改，已采纳评审意见) |
 
 ---
 
-**文档版本**: v4
+**文档版本**: v5
 **创建日期**: 2026-02-07
 **修订日期**: 2026-02-08
-**状态**: IN_REVIEW (需重新评审) ⏴
+**状态**: APPROVED ✅
