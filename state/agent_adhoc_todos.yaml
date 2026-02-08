@@ -252,9 +252,20 @@ adhoc_todos:
   to: agent1
   phase: design
   priority: P0
-  status: pending
+  status: completed
   created_at: '2026-02-08T19:42:01.019387'
+  started_at: null
+  completed_at: '2026-02-08T20:05:00.000000'
+  confirmed_at: null
+- id: TODO-051
+  content: 开发v2.2.4 P0功能（SkillEnforcer, SignoffEnforcer, RequirementsChecker, PhaseAdvance）
+  from: agent1
+  to: agent2
+  phase: development
+  priority: P0
+  status: pending
+  created_at: '2026-02-08T20:10:00.000000'
   started_at: null
   completed_at: null
   confirmed_at: null
-total: 35
+total: 36
