@@ -2,9 +2,12 @@
 
 **Bug ID**: BUG-20260208-002
 **严重程度**: P0 - 阻塞
-**状态**: 待修复
+**状态**: 已修复 ✅
 **发现人**: Agent 1
 **发现日期**: 2026-02-08
+**修复人**: Agent 2
+**修复日期**: 2026-02-08
+**修复版本**: v2.2.3.1
 
 ---
 
@@ -43,101 +46,47 @@ $ cat state/agent_adhoc_todos.yaml
 
 ## 问题分析
 
-### 现象分类
+### 根因分析
 
-| 创建方式 | 是否同步到 agent_adhoc_todos.yaml |
-|----------|--------------------------------|
-| `oc-collab todowrite` | ❓ 待调查 |
-| `todowrite` 工具 | ❓ 待调查 |
-| 手动编辑 | ✅ 同步 |
+| 问题 | 原因 | 层级 |
+|------|------|------|
+| todowrite 写入错误文件 | `TodoSyncManager.TODO_FILENAME = "state/todo.yaml"` | 代码 |
+| 目标文件应该是 | `state/agent_adhoc_todos.yaml` | 流程 |
 
 ### 相关文件
 
-| 文件 | 用途 | 同步状态 |
-|------|------|----------|
-| `state/agent_adhoc_todos.yaml` | 任务追踪（应该同步） | ❌ 未同步 |
-| `state/todo.yaml` | 待办管理（v2.2.3新功能） | ✅ 正常 |
-| `src/cli/enhanced_commands.py` | todowrite命令实现 | ❓ 待调查 |
-| `tools/todowrite.py` | todowrite工具 | ❓ 待调查 |
-
-### 关键线索
-
-1. **两个TODO文件并存**：`todo.yaml` vs `agent_adhoc_todos.yaml`
-2. **工具可能写错文件**：todowrite工具可能写入了`todo.yaml`而非`agent_adhoc_todos.yaml`
-3. **CLI命令和工具不一致**：可能使用不同的存储位置
+| 文件 | 用途 | 状态 |
+|------|------|------|
+| `state/agent_adhoc_todos.yaml` | 任务追踪（Agent共享） | ✅ 已修复 |
+| `src/core/todo_sync_manager.py` | 待办同步管理 | ✅ 已修复 |
 
 ---
 
-## Agent2 调查方向
+## 修复方案
 
-### 1. todowrite工具调用链
+### 已实施：方案B - 修复 todowrite 命令
 
-```bash
-# 检查工具实现
-cat tools/todowrite.py
-# 是否正确写入 state/agent_adhoc_todos.yaml ？
+```
+修复内容：
+1. TodoSyncManager.TODO_FILENAME = "state/agent_adhoc_todos.yaml"
+2. 格式改为 adhoc_todos/total 格式（兼容 agent_adhoc_todos.yaml）
 ```
 
-### 2. CLI命令实现
+### 修复前
 
 ```bash
-# 检查CLI命令
-cat src/cli/enhanced_commands.py | grep -A20 "def todowrite"
-# 写入哪个文件？
+$ todowrite --content "测试" --priority high
+✅ 待办已创建: [TODO-001] 测试
+✓ 已同步到 state/todo.yaml  # ❌ 错误文件！
 ```
 
-### 3. 文件关系
+### 修复后
 
 ```bash
-# 检查两个文件的内容
-cat state/todo.yaml
-cat state/agent_adhoc_todos.yaml
-# 是否应该合并？还是二选一？
+$ oc-collab todowrite --content "测试" --priority high
+✅ 待办已创建: [TODO-001] 测试
+✓ 已同步到 state/agent_adhoc_todos.yaml  # ✅ 正确文件！
 ```
-
-### 4. 同步机制
-
-```bash
-# 检查是否有自动同步逻辑
-grep -r "sync" src/cli/enhanced_commands.py
-# 检查 todo.yaml 和 agent_adhoc_todos.yaml 的同步逻辑
-```
-
----
-
-## 预期行为
-
-```bash
-# Agent1 创建TODO
-$ todowrite --content "评审需求分析报告" --priority P0 --agent 2
-✅ 待办已创建: [TODO-060] 评审需求分析报告
-
-# Agent2 检查
-$ cat state/agent_adhoc_todos.yaml
-# 应该看到 TODO-060
-```
-
----
-
-## 临时解决方案（手动）
-
-```bash
-# 1. Agent1 手动创建TODO
-# 编辑 state/agent_adhoc_todos.yaml
-
-# 2. 或者使用 CLI 命令（如果可用）
-oc-collab todowrite --content "评审需求分析报告" --priority P0 --agent 2
-```
-
----
-
-## 根本解决方案（待Agent2调查）
-
-| 方案 | 说明 |
-|------|------|
-| **方案A** | 统一TODO存储位置，合并两个文件 |
-| **方案B** | 修复todowrite工具，正确写入agent_adhoc_todos.yaml |
-| **方案C** | 删除冗余，保留一个TODO文件 |
 
 ---
 
@@ -145,10 +94,27 @@ oc-collab todowrite --content "评审需求分析报告" --priority P0 --agent 2
 
 | 日期 | 事件 |
 |------|------|
-| 2026-02-08 | Agent1 发现问题，创建Bug报告 |
-| 2026-02-08 | Agent2 待调查 |
-| - | Agent2 待修复 |
-| - | Agent1 待验证 |
+| 2026-02-08 | Agent 1 发现问题，创建 Bug 报告 |
+| 2026-02-08 | Agent 2 调查并修复 |
+| 2026-02-08 | 合并到主分支 (commit: d4378d0) |
+| 2026-02-08 | ✅ Bug 已关闭 |
+
+---
+
+## 经验总结
+
+### 教训
+
+| 教训 | 说明 |
+|------|------|
+| 新功能应复用现有机制 | v2.2.3 的 `TodoSyncManager` 创建了新文件而非复用 `agent_adhoc_todos.yaml` |
+| 统一存储位置 | 两个 TODO 文件造成混乱，应统一使用 `agent_adhoc_todos.yaml` |
+
+### 防止措施
+
+| 措施 | 说明 |
+|------|------|
+| Skill 已更新 | `oc_collab_development_guide` 添加 TODO 管理规范 |
 
 ---
 
@@ -156,12 +122,12 @@ oc-collab todowrite --content "评审需求分析报告" --priority P0 --agent 2
 
 | 文档 | 说明 |
 |------|------|
-| `skills/oc_collab_collaboration_guide/` | TODO任务管理规范 |
-| `src/cli/enhanced_commands.py` | todowrite命令 |
-| `tools/todowrite.py` | todowrite工具 |
+| `skills/oc_collab_bug_management_guide/` | Bug 管理流程 |
+| `skills/oc_collab_development_guide/` | 开发规范（已更新） |
+| `src/core/todo_sync_manager.py` | 已修复 |
 
 ---
 
-**创建人**: Agent 1
-**日期**: 2026-02-08
-**状态**: 待修复
+**状态**: 已修复 ✅
+**修复版本**: v2.2.3.1
+**Git Commit**: d4378d0
