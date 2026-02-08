@@ -268,4 +268,20 @@ adhoc_todos:
   started_at: '2026-02-08T19:46:16.728588'
   completed_at: '2026-02-08T20:08:21.975370'
   confirmed_at: null
+- id: TODO-052
+  content: 测试验收v2.2.4 P0功能（SkillEnforcer, SignoffEnforcer, RequirementsChecker）
+  from: agent1
+  to: agent2
+  phase: testing
+  priority: P0
+  status: pending
+  created_at: '2026-02-08T20:17:04.083882'
+  testing_cmd: python3 -m pytest tests/test_skill_enforcer.py tests/test_signoff_enforcer.py
+    tests/test_requirements_checker.py tests/test_enforcement_system_e2e.py -v
+  acceptance_criteria:
+  - 34个单元测试全部通过
+  - 5个E2E测试全部通过
+  - CLI命令 oc-collab skill check 正常执行
+  - CLI命令 oc-collab check requirements 正常执行
+  - '签署 development.status: completed'
 total: 36
