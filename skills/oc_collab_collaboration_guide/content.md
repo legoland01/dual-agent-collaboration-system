@@ -1,20 +1,32 @@
 # OC-Collab 协作指南 (v2.2.2)
 
-## Agent 角色定义
+---
 
-### Agent 1: 产品经理 + 测试 + 部署
-- 负责编写需求说明和概要设计
-- 负责评审详细设计
-- 负责编写黑盒测试用例
-- 负责执行黑盒测试
-- 负责部署和发布
+## 📚 快速索引 ⭐
 
-### Agent 2: 开发
-- 负责创建概要设计的详细设计
-- 负责评审概要设计
-- 负责开发实现
-- 负责编写白盒测试
-- 负责签署确认
+**遇到问题时，先看这个表格：**
+
+| 问题类型 | 看哪个Skill | 关键章节 |
+|----------|-------------|----------|
+| 需求怎么写？ | `oc_collab_requirements_guide` | 需求分析、需求文档 |
+| 需求怎么评审？ | `oc_collab_requirements_guide` | 评审部分 |
+| 设计怎么写？ | `oc_collab_outline_design_guide` | 概要设计 |
+| 详细设计怎么写？ | `oc_collab_detailed_design_guide` | 详细设计 |
+| 怎么开发？ | `oc_collab_development_guide` | 开发流程 |
+| 怎么测试？ | `oc_collab_test_acceptance_guide` | 测试验收 |
+| 怎么部署？ | `oc_collab_deployment_guide` | 部署流程 |
+| 怎么报Bug？ | `oc_collab_bug_management_guide` | Bug管理 |
+| 角色权限？ | `oc_collab_collaboration_guide` | Agent角色定义 |
+| 协作流程？ | `oc_collab_collaboration_guide` | 协作流程 |
+
+### 常见问题快速定位
+
+| 问题 | 答案 |
+|------|------|
+| Proposal要评审吗？ | ❌ 不需要，看需求指南 |
+| Skill要评审吗？ | ❌ 不需要 |
+| 需求文档要评审吗？ | ✅ 需要，看需求指南 |
+| 跳过文档了怎么办？ | 看协作指南的"遇到问题"章节 |
 
 ---
 
@@ -482,6 +494,61 @@ oc-collab todo
 | 创建Bug报告 | ✅ | ✅ |
 | 修复Bug | ❌ | ✅ |
 | 签署Bug修复验收 | ✅ | ❌ |
+
+---
+
+## 💡 遇到问题时
+
+### 1. 先查快速索引
+
+**问自己**：这个问题属于什么类型？
+
+| 问题类型 | 看哪个Skill |
+|----------|-------------|
+| 需求怎么写/评审 | `oc_collab_requirements_guide` |
+| 设计怎么写 | `oc_collab_outline_design_guide` / `detailed_design_guide` |
+| 开发怎么开发 | `oc_collab_development_guide` |
+| 测试怎么测 | `oc_collab_test_acceptance_guide` |
+| 部署怎么做 | `oc_collab_deployment_guide` |
+| Bug怎么报 | `oc_collab_bug_management_guide` |
+| 角色权限 | `oc_collab_collaboration_guide` |
+
+### 2. 找不到正确的Skill？
+
+**问自己**：
+1. 我看了正确的Skill吗？
+   - ✅ 仔细阅读了 `oc_collab_requirements_guide`
+   - ❌ 只看了部分或跳过了
+
+2. 搜索关键词对吗？
+   - ✅ "proposal" → `requirements_guide`
+   - ❌ "proposal评审" → 应该先看requirements_guide，不是review_guide
+
+3. 有没有惯性思维？
+   - ✅ 先看主文档，再看子文档
+   - ❌ 看到"评审"就去找review_guide
+
+### 3. 常见错误
+
+| 错误 | 正确做法 |
+|------|----------|
+| 跳过主文档直接找子文档 | 先看主文档（requirements_guide），再看review |
+| 惯性脑补规范内容 | 仔细阅读规范原文 |
+| 找不到就跳过 | 问用户或创建Memo记录问题 |
+
+### 4. 解决流程
+
+```
+遇到问题
+   ↓
+查快速索引，找到正确的Skill
+   ↓
+仔细阅读规范原文
+   ↓
+按规范执行
+   ↓
+还有问题？ → 创建Memo记录 → Compaction时讨论
+```
 
 ---
 
