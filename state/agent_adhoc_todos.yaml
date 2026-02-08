@@ -289,7 +289,20 @@ adhoc_todos:
   id: TODO-056
   priority: P0
   phase: bugfix
-  status: pending
+  status: completed
   bug_id: BUG-20260208-004
-  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestSignoffV2Structure -v
-total: 37
+  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestSignoffV2Structure
+    -v
+  started_at: '2026-02-08T22:05:00'
+  completed_at: '2026-02-08T21:19:41.136599'
+- agent_id: '2'
+  content: 修复 BUG-20260208-005（todowrite未正确写入TODO到文件）
+  created_at: '2026-02-08T22:20:00'
+  id: TODO-057
+  priority: P1
+  phase: bugfix
+  status: pending
+  bug_id: BUG-20260208-005
+  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestTodoWritePersistence
+    -v
+total: 38

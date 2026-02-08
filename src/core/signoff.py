@@ -1,6 +1,7 @@
 """签署引擎模块。"""
 from typing import Tuple, Optional
 from dataclasses import dataclass
+import re
 
 
 class SignoffError(Exception):
@@ -71,22 +72,30 @@ class SignoffEngine:
         self.workflow_engine = workflow_engine
     
     def _get_stage_data(self, stage: str, state: dict) -> dict:
-        """获取阶段数据（处理 design 列表的情况）。"""
+        """获取阶段数据（处理 design 列表和 v2.2.x 版本化结构）。"""
         config = self.STAGE_CONFIG.get(stage, {})
         status_field = config.get("status_field", stage)
+
+        # 首先检查顶层字段（兼容旧结构）
         stage_data = state.get(status_field, {})
-        
+
+        # 如果顶层没有数据，检查 v2.2.x 版本结构
+        if not stage_data or not isinstance(stage_data, dict):
+            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+            if version_keys:
+                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+                version_data = state.get(latest_version, {})
+                stage_data = version_data.get(stage, {})
+
         # design 阶段是列表，需要找到当前进行中的设计文档
         if stage == "design" and isinstance(stage_data, list):
-            # 查找状态为 in_progress 或 completed 的设计文档
             for doc in stage_data:
                 if isinstance(doc, dict) and doc.get("status") in ["in_progress", "completed", "approved"]:
                     return doc
-            # 如果没有找到，返回第一个
             if stage_data and isinstance(stage_data[0], dict):
                 return stage_data[0]
             return {}
-        
+
         return stage_data if isinstance(stage_data, dict) else {}
     
     def _save_stage_data(self, stage: str, state: dict, stage_data: dict):
