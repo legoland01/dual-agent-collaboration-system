@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Callable
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 import yaml
@@ -300,7 +300,7 @@ class TodoSyncManager:
             return True
         return False
 
-    def sync_with_rollback(self, operation: callable) -> bool:
+    def sync_with_rollback(self, operation: Callable) -> bool:
         """
         带回滚的同步操作
 
