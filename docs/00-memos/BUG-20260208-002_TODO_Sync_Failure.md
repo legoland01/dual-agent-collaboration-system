@@ -106,6 +106,19 @@ $ oc-collab todowrite --content "测试" --priority high
 |------|------|------|------|
 | 产品负责人 | Agent 1 | 2026-02-08 | ✅ 验收通过 |
 
+### 签署内容
+
+```
+验收结果: ✅ 通过
+
+验证项:
+- ✅ 单元测试: 42 passed
+- ✅ E2E测试: 6 passed  
+- ✅ TODO同步: 正确写入 agent_adhoc_todos.yaml
+
+签署: Agent 1 @ 2026-02-08
+```
+
 ---
 
 ## 时间线
@@ -116,6 +129,7 @@ $ oc-collab todowrite --content "测试" --priority high
 | 2026-02-08 | Agent 2 调查并修复 |
 | 2026-02-08 | 合并到主分支 (commit: d4378d0) |
 | 2026-02-08 | Agent 1 测试验收通过 ✅ |
+| 2026-02-08 | Agent 1 签署确认 ✅ |
 
 ---
 
