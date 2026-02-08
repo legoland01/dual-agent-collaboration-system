@@ -163,3 +163,70 @@ class TestSignoffV2Structure:
         
         # 在v2.2.x结构下，signoff.py需要能识别v2.2.x.testing
         # 当前实现只检查顶层test字段，这是bug的根源
+
+
+class TestTodoWritePersistence:
+    """
+    TC-SESSION-007: 测试todowrite正确写入文件
+    BUG-20260208-005: todowrite未正确写入TODO到文件
+
+    问题描述：
+    - todowrite返回成功但state/agent_adhoc_todos.yaml未更新
+    - git status显示文件未被修改
+    """
+
+    def test_todowrite写入文件(self):
+        """
+        TC-SESSION-007: 验证todowrite正确写入TODO到文件
+
+        预期结果：
+        - todowrite执行后，文件包含新TODO
+        """
+        import subprocess
+        import yaml
+
+        # 备份原文件
+        result = subprocess.run(
+            ["cp", "state/agent_adhoc_todos.yaml", "/tmp/backup.yaml"],
+            cwd=str(PROJECT_ROOT),
+            capture_output=True
+        )
+
+        try:
+            # 执行todowrite
+            result = subprocess.run(
+                ["python3", "-m", "src.cli.main", "todowrite",
+                 "--content", "测试TODO", "--priority", "P0", "--agent", "2"],
+                cwd=str(PROJECT_ROOT),
+                capture_output=True,
+                text=True
+            )
+
+            # 验证命令成功
+            assert result.returncode == 0, f"todowrite失败: {result.stderr}"
+
+            # 验证文件被修改
+            result2 = subprocess.run(
+                ["git", "status", "--porcelain", "state/agent_adhoc_todos.yaml"],
+                cwd=str(PROJECT_ROOT),
+                capture_output=True,
+                text=True
+            )
+            assert "M" in result2.stdout or "A" in result2.stdout, \
+                "todowrite执行后文件未被修改"
+
+            # 验证TODO存在
+            with open("state/agent_adhoc_todos.yaml") as f:
+                data = yaml.safe_load(f)
+            
+            todo_ids = [t['id'] for t in data['adhoc_todos']]
+            assert any("测试TODO" in str(t) for t in data['adhoc_todos']), \
+                "新TODO不存在于文件中"
+
+        finally:
+            # 恢复备份
+            subprocess.run(
+                ["cp", "/tmp/backup.yaml", "state/agent_adhoc_todos.yaml"],
+                cwd=str(PROJECT_ROOT),
+                capture_output=True
+            )
