@@ -112,14 +112,14 @@ git add docs/
 git commit -m "feat: 创建/更新需求文档"
 
 # 2. 推送到所有远程（GitHub + Gitee）
-git push --all && git push --tags
+oc-collab sync-all -m "feat: 创建/更新需求文档"
 
 # 3. 评审通过后，提交签署状态
 git add docs/
 git commit -m "docs: 更新需求签署状态"
 
 # 4. 推送签署状态
-git push --all && git push --tags
+oc-collab sync-all -m "docs: 更新需求签署状态"
 ```
 
 **禁止**: 创建文档后不提交，积压多个提交

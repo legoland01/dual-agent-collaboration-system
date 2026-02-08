@@ -254,12 +254,12 @@ python -m pytest tests/test_blackbox_*.py -v
 # 1. 提交测试用例更新
 git add tests/
 git commit -m "test: 更新 v2.2.3 测试用例"
-git push --all && git push --tags
+oc-collab sync-all -m "test: 更新 v2.2.3 测试用例"
 
 # 2. 验收通过后，提交验收报告
 git add docs/03-test/
 git commit -m "docs: v2.2.3 测试验收通过"
-git push --all && git push --tags
+oc-collab sync-all -m "docs: v2.2.3 测试验收通过"
 ```
 
 **禁止**: 测试完成后不提交，积压多个提交

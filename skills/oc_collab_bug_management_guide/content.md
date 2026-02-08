@@ -605,18 +605,18 @@ v2.2.X.Y
 # 创建Bug报告
 git add docs/00-memos/BUG-YYYYMMDD-XXX.md
 git commit -m "docs: 创建 BUG-YYYYMMDD-XXX (简明描述)"
-git push --all && git push --tags
+oc-collab sync-all -m "docs: 创建 BUG-YYYYMMDD-XXX (简明描述)"
 
 # 修复Bug
 git add src/ tests/
 git commit -m "fix: 修复 BUG-YYYYMMDD-XXX (简明描述)"
-git push --all && git push --tags
+oc-collab sync-all -m "fix: 修复 BUG-YYYYMMDD-XXX (简明描述)"
 
 # 合并修复
 git checkout main
 git merge fix/BUG-YYYYMMDD-XXX
 git commit -m "merge: 合并 BUG-YYYYMMDD-XXX 修复"
-git push --all && git push --tags
+oc-collab sync-all -m "merge: 合并 BUG-YYYYMMDD-XXX 修复"
 
 # 发布Patch
 git tag vX.X.X-Y

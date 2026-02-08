@@ -264,13 +264,8 @@ oc-collab todowrite --content "Agent2评审vX.X.X概要设计并签署" --priori
 git add docs/02-design/OUTLINE_DESIGN_vX.X.X.md
 git commit -m "feat: vX.X.X概要设计 - xxx"
 
-# 同步TODO状态
-git add state/agent_adhoc_todos.yaml state/project_state.yaml
-git commit -m "sync: 更新todo状态 - Agent2评审概要设计"
-
-# 推送到所有远程（GitHub + Gitee）
-git push --all
-git push --tags
+# 同步TODO状态并推送到所有远程
+oc-collab sync-all -m "sync: 更新todo状态 - Agent2评审概要设计"
 ```
 
 ### 3. 通知Agent2

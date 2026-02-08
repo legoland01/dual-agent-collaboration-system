@@ -278,7 +278,7 @@ git add pyproject.toml
 git commit -m "chore: 版本升级至 v{x}.{y}.{z}"
 
 # 2. 推送到所有远程（GitHub + Gitee）
-git push --all && git push --tags
+oc-collab sync-all -m "chore: 版本升级至 v{x}.{y}.{z}"
 ```
 
 ### 8.2 标签管理（可选）
@@ -472,7 +472,7 @@ curl -s https://pypi.org/pypi/opencode-collaboration/$VERSION/json | \
 echo "4. Git 提交..."
 git add pyproject.toml
 git commit -m "chore: 版本升级至 v$VERSION"
-git push --all && git push --tags
+oc-collab sync-all -m "chore: 版本升级至 v$VERSION"
 
 echo "✅ 部署完成！"
 ```

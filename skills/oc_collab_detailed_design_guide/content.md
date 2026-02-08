@@ -368,13 +368,8 @@ oc-collab todowrite --content "实现vX.X.X功能：FR-XXX-001" --priority high
 git add docs/02-design/DETAIL_vX.X.X.md
 git commit -m "feat: vX.X.X详细设计 - xxx"
 
-# 同步TODO状态
-git add state/agent_adhoc_todos.yaml state/project_state.yaml
-git commit -m "sync: 更新todo状态 - 进入开发阶段"
-
-# 推送到所有远程（GitHub + Gitee）
-git push --all
-git push --tags
+# 同步TODO状态并推送到所有远程
+oc-collab sync-all -m "sync: 更新todo状态 - 进入开发阶段"
 ```
 
 ### 3. 开始开发
