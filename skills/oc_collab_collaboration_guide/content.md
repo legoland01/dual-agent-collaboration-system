@@ -322,6 +322,44 @@ todos:
 | 提前创建下阶段的TODO | 只有明确需要时才创建 |
 | 代他人创建TODO | 由需要的人自己创建 |
 | 为了"可能有需要"自创TODO | 实际需要时再创建 |
+| 手动编辑文件后不git add/commit | 编辑后立即提交 |
+
+### ⚠️ BUG-20260208-007教训：手动编辑文件的问题
+
+**场景**：Agent1直接编辑 `state/agent_adhoc_todos.yaml`，Agent2看不到更改
+
+**问题**：
+- Agent1编辑文件后忘记git add/commit
+- Agent2拉取远程后看不到新TODO
+- 误以为是todowrite工具的bug
+
+**教训**：
+```
+不是todowrite的bug，而是操作问题！
+
+手动编辑 state/agent_adhoc_todos.yaml 后，必须：
+1. git add state/agent_adhoc_todos.yaml
+2. git commit -m "chore: 添加TODO-XXX"
+3. git push（或等待其他人push）
+
+验证方法：
+git status  # 检查文件是否已标记
+git log --oneline  # 检查提交是否成功
+```
+
+**正确做法**：
+| 方式 | 步骤 | 验证 |
+|------|------|------|
+| 使用todowrite | `oc-collab todowrite --content "任务" --agent 2` | 检查文件是否已修改 |
+| 手动编辑 | 1.编辑文件 2.git add 3.git commit | `git status && git log` |
+
+**调查方法**：遇到TODO问题先运行测试
+```bash
+# 验证todowrite是否正常
+python3 -m pytest tests/test_todowrite_persistence.py -v
+```
+
+---
 
 ### TODO 追踪检查
 
@@ -399,8 +437,8 @@ oc-collab todo
 | v2.2.5 | 2026-02-08 | 新增Bug管理流程规范 + Bug管理Skill |
 | v2.2.6 | 2026-02-08 | 设计流程分离：概要设计(Agent1) + 详细设计(Agent2) |
 | v2.2.7 | 2026-02-08 | 新增评审反馈TODO体系 |
-
----
+| v2.2.8 | 2026-02-08 | 新增TODO创建黄金法则 |
+| v2.2.9 | 2026-02-08 | 新增手动编辑文件规范 + BUG-20260208-007教训 |
 
 ## 📚 教训总结（v2.2.8新增）
 
