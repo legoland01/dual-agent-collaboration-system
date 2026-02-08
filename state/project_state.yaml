@@ -14,6 +14,17 @@ development:
     M5: completed
   phase: completed
   started_at: 2026-02-07 02:00:00
+history:
+- id: 46d262eb
+  timestamp: '2026-02-08T21:35:56.245796'
+  action: signoff
+  agent_id: agent1
+  details: '签署test阶段: v2.2.4验收通过（第二次尝试）：signoff.py修复save逻辑'
+- action: signoff
+  agent_id: agent1
+  details: '签署test阶段: v2.2.4验收通过：45个测试全部通过（含BUG-20260208-003/004/006修复验证）'
+  id: 024a55dc
+  timestamp: '2026-02-08T21:34:36.843066'
 requirements:
   agent1_signoff: true
   agent2_signoff: true
@@ -29,7 +40,7 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-08T20:04:41.924757'
+updated_at: '2026-02-08T21:35:56.245802'
 v2.2.2:
   acceptance:
     agent1_signoff: true
