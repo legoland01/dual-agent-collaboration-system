@@ -100,7 +100,7 @@ adhoc_todos:
   started_at: null
   status: completed
   to: agent2
-- completed_at: null
+- completed_at: 2026-02-08 14:04
   confirmed_at: null
   created_at: 2026-02-07 15:10:00
   description: 任务：进入 v2.2.2 设计阶段。
@@ -109,7 +109,7 @@ adhoc_todos:
   phase: design
   priority: P0
   started_at: null
-  status: pending
+  status: completed
   to: agent1
 - completed_at: null
   confirmed_at: null
@@ -291,4 +291,16 @@ adhoc_todos:
   started_at: null
   status: completed
   to: agent1
+- id: TODO-041
+  from: agent1
+  to: agent2
+  description: 任务：评审 v2.2.3 需求文档。范围：F-CONTEXT-001(.a机制), F-TASK-001(任务同步), F-UI-001(状态显示)。状态：Agent1
+    已确认，待 Agent2 技术评审。
+  phase: requirements_review
+  status: pending
+  priority: P0
+  created_at: 2026-02-08 14:04
+  started_at: null
+  completed_at: null
+  confirmed_at: null
 total: 19
