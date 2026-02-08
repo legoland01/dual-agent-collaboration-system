@@ -270,8 +270,8 @@ adhoc_todos:
   confirmed_at: null
 - id: TODO-052
   content: 测试验收v2.2.4 P0功能（SkillEnforcer, SignoffEnforcer, RequirementsChecker）
-  from: agent1
-  to: agent2
+  from: agent2
+  to: agent1
   phase: testing
   priority: P0
   status: pending
