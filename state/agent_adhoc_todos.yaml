@@ -345,10 +345,11 @@ adhoc_todos:
   updated_at: '2026-02-08T21:51:29.696605'
 - id: TODO-BUG-008
   content: Agent2 修复 BUG-20260208-008（角色边界检查在工具层未生效）
-  status: pending
+  status: completed
   priority: P0
   agent_id: '2'
   created_at: '2026-02-08T23:50:00'
   bug_id: BUG-20260208-008
   testing_cmd: oc-collab compliance check --role --action edit --target "src/"
+  completed_at: '2026-02-08T22:15:50.989209'
 total: 50
