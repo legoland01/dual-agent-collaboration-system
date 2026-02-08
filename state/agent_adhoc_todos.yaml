@@ -15,6 +15,32 @@ adhoc_todos:
     completed_at: 2026-02-08T00:00:00
     confirmed_at: null
 
+  # v2.2.2 CLI Implementation (待完成)
+  - id: TODO-039
+    from: agent1
+    to: agent2
+    description: "任务：补全 v2.2.2 CLI 命令。需实现：1) oc-collab compliance --type [role|state|completeness]；2) oc-collab git sync/status/sync-state/warn；3) oc-collab advance --sync。详见测试报告：docs/05-development/v2.2.2_test_status_report.md"
+    phase: cli_implementation
+    status: completed
+    priority: P0
+    created_at: 2026-02-08T12:00:00
+    started_at: null
+    completed_at: 2026-02-08T12:30:00
+    confirmed_at: null
+
+  # v2.2.2 Blackbox Testing (执行中)
+  - id: TODO-040
+    from: agent1
+    to: agent1
+    description: "任务：执行 v2.2.2 黑盒测试。前置条件：TODO-039 CLI 补全完成。用例：docs/03-test/blackbox_test_cases_v2.2.2.md"
+    phase: blackbox_testing
+    status: in_progress
+    priority: P0
+    created_at: 2026-02-08T12:00:00
+    started_at: null
+    completed_at: null
+    confirmed_at: null
+
   # v2.2.3 Requirements (暂停)
   - id: TODO-034
     from: agent2
@@ -28,18 +54,18 @@ adhoc_todos:
     completed_at: null
     confirmed_at: null
 
-  # v2.2.2 Development Phase
+  # v2.2.2 Development Phase (已完成验收)
   - id: TODO-038
     from: agent1
     to: agent2
-    description: "任务：开发 v2.2.2。M1: ComplianceEngine; M2: RoleBoundaryChecker; M3: DocumentStateBinder; M4: GitSyncIntegrator; M5: 测试与签署。"
+    description: "任务：开发 v2.2.2。M1: ComplianceEngine; M2: RoleBoundaryChecker; M3: DocumentStateBinder; M4: GitSyncIntegrator; M5: 测试与签署。验收通过：Agent1 ✅ 2026-02-08 (覆盖率 86%, 62 tests passed)"
     phase: development
-    status: pending
+    status: completed
     priority: P0
     created_at: 2026-02-08T00:05:00
     started_at: null
-    completed_at: null
-    confirmed_at: null
+    completed_at: 2026-02-08T11:18:00
+    confirmed_at: 2026-02-08T11:30:00
   - id: TODO-036
     from: agent1
     to: agent1
