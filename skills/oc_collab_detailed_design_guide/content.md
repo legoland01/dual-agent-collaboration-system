@@ -350,8 +350,38 @@ xxx:
 
 ---
 
+## 后续动作 ⭐
+
+详细设计完成后，必须执行以下动作：
+
+### 1. 创建TODO
+
+```bash
+# 创建开发TODO
+oc-collab todowrite --content "实现vX.X.X功能：FR-XXX-001" --priority high
+```
+
+### 2. 同步到Git
+
+```bash
+# 提交详细设计文档
+git add docs/02-design/DETAIL_vX.X.X.md
+git commit -m "feat: vX.X.X详细设计 - xxx"
+
+# 同步TODO状态
+git add state/agent_adhoc_todos.yaml state/project_state.yaml
+git commit -m "sync: 更新todo状态 - 进入开发阶段"
+```
+
+### 3. 开始开发
+
+详细设计签署后，直接进入开发阶段，无需额外通知。
+
+---
+
 ## 版本历史
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | v1 | 2026-02-08 | 初始版本 |
+| v2 | 2026-02-08 | 新增"后续动作"章节，明确TODO和Git同步要求 |
