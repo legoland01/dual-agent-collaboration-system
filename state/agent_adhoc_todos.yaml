@@ -1,4 +1,240 @@
 adhoc_todos:
+- id: TODO-033
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 21:35:00
+  updated_at: null
+- id: TODO-040
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 12:00:00
+  updated_at: null
+- id: TODO-034
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 22:00:00
+  updated_at: null
+- id: TODO-038
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 00:05:00
+  updated_at: null
+- id: TODO-036
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 23:55:00
+  updated_at: null
+- id: TODO-033
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 21:35:00
+  updated_at: null
+- id: TODO-037
+  content: null
+  status: pending
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-07 23:55:00
+  updated_at: null
+- id: TODO-032
+  content: null
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-07 21:00:00
+  updated_at: null
+- id: TODO-031
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 17:00:00
+  updated_at: null
+- id: TODO-030
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 15:10:00
+  updated_at: null
+- id: TODO-021
+  content: v2.2.1 测试签署和阶段推进
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: 2026-02-07 04:10:00
+  updated_at: '2026-02-08T19:52:00'
+- id: TODO-027
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 14:35:00
+  updated_at: null
+- id: TODO-025
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 04:20:00
+  updated_at: null
+- id: TODO-020
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 03:15:00
+  updated_at: null
+- id: TODO-014
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:08:00
+  updated_at: null
+- id: TODO-013
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:07:00
+  updated_at: null
+- id: TODO-012
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:06:00
+  updated_at: null
+- id: TODO-011
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:05:00
+  updated_at: null
+- id: TODO-010
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:00:00
+  updated_at: null
+- id: TODO-008
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 01:00:00
+  updated_at: null
+- id: TODO-007
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 00:30:00
+  updated_at: null
+- id: TODO-006
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 00:10:00
+  updated_at: null
+- id: TODO-004
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-06 23:40:00
+  updated_at: null
+- id: TODO-005
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-06 23:50:00
+  updated_at: null
+- id: TODO-003
+  content: null
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-06 23:00:00
+  updated_at: null
+- id: TODO-002
+  content: null
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-06 12:00:00
+  updated_at: null
+- id: TODO-001
+  content: null
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-05 22:50:00
+  updated_at: null
+- id: TODO-041
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 14:04
+  updated_at: null
+- id: TODO-042
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 14:13
+  updated_at: null
+- id: TODO-043
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 14:34
+  updated_at: null
+- id: TODO-046
+  content: 确认v2.2.4需求文档评审意见修复完成
+  status: completed
+  priority: high
+  agent_id: '2'
+  created_at: '2026-02-08T19:30:00'
+  updated_at: '2026-02-08T19:23:55.872863'
+- id: TODO-047
+  content: 评审v2.2.4概要设计并签署
+  status: completed
+  priority: high
+  agent_id: '2'
+  created_at: '2026-02-08T19:45:00'
+  updated_at: null
+  completed_at: '2026-02-08T19:31:27.586751'
+- id: TODO-048
+  content: 确认v2.2.4概要设计评审意见并推进到详细设计阶段
+  from: agent2
+  to: agent1
+  phase: design
+  priority: P0
+  status: completed
+  created_at: '2026-02-08T19:32:11.714082'
+  started_at: null
+  completed_at: '2026-02-08T19:55:00.000000'
+  confirmed_at: null
 - id: TODO-049
   content: 创建v2.2.4详细设计（基于OUTLINE_DESIGN_v2.2.4）
   from: agent1
