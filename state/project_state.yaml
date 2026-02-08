@@ -1,8 +1,10 @@
+current_agent: agent1
 design:
   agent1_signoff: true
   agent2_signoff: true
   status: APPROVED
 development:
+  completed_at: 2026-02-07 04:00:00
   current_milestone: M1-M5
   modules:
     M1: completed
@@ -12,20 +14,10 @@ development:
     M5: completed
   phase: completed
   started_at: 2026-02-07 02:00:00
-  completed_at: 2026-02-07 04:00:00
 requirements:
   agent1_signoff: true
   agent2_signoff: true
   status: APPROVED
-v2.2.2:
-  development:
-    status: completed
-    completed_at: 2026-02-08T11:18:00
-    coverage: 86%
-    tests: 62 passed
-  acceptance:
-    agent1_signoff: true
-    agent1_signoff_at: 2026-02-08T11:30:00
 session_start:
   enabled: true
   show_pending: true
@@ -37,4 +29,13 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-08T11:30:00.000000'
+updated_at: '2026-02-08T12:17:27.050778'
+v2.2.2:
+  acceptance:
+    agent1_signoff: true
+    agent1_signoff_at: 2026-02-08 11:30:00
+  development:
+    completed_at: 2026-02-08 11:18:00
+    coverage: 86%
+    status: completed
+    tests: 62 passed

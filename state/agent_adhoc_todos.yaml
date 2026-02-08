@@ -13,12 +13,11 @@ adhoc_todos:
 - completed_at: null
   confirmed_at: null
   created_at: 2026-02-08 12:00:00
-  description: 任务：修复 v2.2.2 CLI 命令语法问题。详见测试报告 docs/05-development/v2.2.2_blackbox_test_results.md：1)
-    oc-collab git sync 参数语法；2) oc-collab git sync-state/warn 参数语法；3) 补充 design/create、requirements/edit
-    命令用于角色边界测试。
+  description: 任务：修复角色边界检查机制。现状：design create、requirements edit 命令执行成功但未拒绝越权操作。详见
+    docs/03-test/BLACKBOX_TEST_v2.2.2.md (v4)
   from: agent1
   id: TODO-039
-  phase: cli_fix
+  phase: role_boundary_fix
   priority: P0
   started_at: null
   status: pending
