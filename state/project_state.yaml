@@ -126,7 +126,8 @@ v2.2.4:
   testing:
     agent1_signoff: true
     agent2_signoff: true
-    status: in_progress
+    status: completed
     tests_passed: 39
+    completed_at: '2026-02-08T22:29:49.721508'
   version: 2.2.4
   workload: 14h
