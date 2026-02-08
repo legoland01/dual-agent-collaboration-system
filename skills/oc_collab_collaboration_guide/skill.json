@@ -1,23 +1,142 @@
 {
   "id": "oc_collab_collaboration_guide",
   "name": "OC-Collab 协作指南",
-  "version": "1.0",
-  "description": "双Agent协作流程指南 - Agent角色、工作流程、Git规范、文件命名",
+  "version": "1.1",
+  "description": "双Agent协作流程指南 - Agent角色，工作流程、Git规范、文件命名、协作规范强制执行",
   "author": "Agent 1",
   "created_at": "2026-02-07",
-  "tags": ["collaboration", "workflow", "guide"],
+  "updated_at": "2026-02-08",
+  "tags": ["collaboration", "workflow", "guide", "v2.2.2"],
+  "version_info": {
+    "current": "v2.2.2",
+    "previous": "v2.2.1"
+  },
   "triggers": [
     {
       "condition": "session_start",
-      "priority": "high"
+      "priority": "high",
+      "description": "新会话开始时自动加载协作规则"
     },
     {
       "condition": "agent_confused",
-      "priority": "high"
+      "priority": "high",
+      "description": "Agent 困惑时提供指导"
     },
     {
       "condition": "role_boundary_check",
-      "priority": "medium"
+      "priority": "medium",
+      "description": "检查 Agent 角色权限边界"
+    },
+    {
+      "condition": "document_state_check",
+      "priority": "medium",
+      "description": "检查文档状态是否允许当前操作"
+    },
+    {
+      "condition": "compliance_check",
+      "priority": "medium",
+      "description": "执行协作规范合规检查"
+    },
+    {
+      "condition": "git_sync",
+      "priority": "medium",
+      "description": "Git 同步相关操作"
     }
-  ]
+  ],
+  "commands": {
+    "compliance": {
+      "description": "合规检查命令",
+      "options": [
+        {
+          "name": "check",
+          "args": "[role|state|completeness]",
+          "description": "执行指定类型合规检查"
+        },
+        {
+          "name": "status",
+          "description": "显示合规状态"
+        },
+        {
+          "name": "results",
+          "description": "显示合规检查结果"
+        }
+      ]
+    },
+    "git": {
+      "description": "Git 同步命令",
+      "options": [
+        {
+          "name": "sync",
+          "description": "执行 Git 同步"
+        },
+        {
+          "name": "status",
+          "description": "显示同步状态"
+        },
+        {
+          "name": "sync-state",
+          "description": "同步状态文件"
+        },
+        {
+          "name": "warn",
+          "description": "显示未同步警告"
+        }
+      ]
+    },
+    "advance": {
+      "description": "阶段推进命令",
+      "options": [
+        {
+          "name": "--sync/--no-sync",
+          "description": "推进时自动同步 Git"
+        }
+      ]
+    }
+  },
+  "permissions": {
+    "agent1": {
+      "can_create": ["docs/01-requirements/", "docs/03-test/", "docs/04-deployment/"],
+      "cannot_create": ["docs/02-design/", "src/"],
+      "cannot_modify": ["src/"],
+      "special_rules": [
+        "不能签署自己创建的文档",
+        "不能操作代码文件"
+      ]
+    },
+    "agent2": {
+      "can_create": ["docs/02-design/", "src/", "tests/"],
+      "cannot_modify": ["docs/01-requirements/"],
+      "special_rules": [
+        "不能修改需求文档（评审除外）",
+        "不能签署自己创建的文档"
+      ]
+    }
+  },
+  "document_states": {
+    "DRAFT": {
+      "actions": ["edit", "submit_review"],
+      "agent1": ["edit", "submit_review"],
+      "agent2": ["view"]
+    },
+    "REVIEW_PENDING": {
+      "actions": ["review", "signoff"],
+      "agent1": ["view"],
+      "agent2": ["review", "signoff"]
+    },
+    "REVIEWED": {
+      "actions": ["confirm", "signoff"],
+      "agent1": ["confirm", "signoff"],
+      "agent2": ["view"]
+    },
+    "APPROVED": {
+      "actions": ["view"],
+      "agent1": ["view"],
+      "agent2": ["view"]
+    },
+    "ARCHIVED": {
+      "actions": ["view"],
+      "agent1": ["view"],
+      "agent2": ["view"]
+    }
+  }
 }

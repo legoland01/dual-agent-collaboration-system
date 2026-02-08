@@ -22,6 +22,8 @@
 - **src/core/document_state_binder.py** - Document state machine
 - **src/core/completeness_gate.py** - Review completeness validation
 - **src/core/git_sync_integrator.py** - Git sync integration (integrates auto_git_sync.py)
+- **skills/oc_collab_collaboration_guide/skill.json** - Updated with new commands and triggers (v1.1)
+- **skills/oc_collab_collaboration_guide/content.md** - Added v2.2.2 feature documentation
 
 ### CLI Changes
 
@@ -40,6 +42,7 @@
 - **tests/test_document_state_binder.py** - Document state tests
 - **tests/test_completeness_gate.py** - Completeness gate tests
 - **tests/test_git_sync_integrator.py** - Git sync integration tests
+- **docs/03-test/blackbox_test_cases_v2.2.2.md** - Blackbox test cases
 
 ### Key Insights
 
@@ -768,4 +771,4 @@ oc-collab status
 
 **Full Changelog**: [View Git History](https://github.com/opencode/dual-agent-collaboration/commits/main)
 
-**Next Version**: v2.2.1.post2 (planned)
+**Next Version**: v2.2.3 (planned - Agent Context Recovery & Smart Init)

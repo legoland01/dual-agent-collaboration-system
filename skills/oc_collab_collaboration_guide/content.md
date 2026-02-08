@@ -1,4 +1,4 @@
-# OC-Collab 协作指南
+# OC-Collab 协作指南 (v2.2.2)
 
 ## Agent 角色定义
 
@@ -14,6 +14,71 @@
 - 负责开发实现
 - 负责编写白盒测试
 - 负责签署确认
+
+---
+
+## v2.2.2 新功能：协作规范强制执行
+
+### F-PROC-001: 协作流程规范强制执行
+
+#### 角色边界检查
+
+**Agent1 权限**：
+- ✅ 可以创建/修改：docs/01-requirements/, docs/03-test/, docs/04-deployment/
+- ❌ 不能操作：docs/02-design/ (设计文档)
+- ❌ 不能操作：src/ (代码文件)
+- ❌ 不能签署自己创建的文档
+
+**Agent2 权限**：
+- ✅ 可以创建/修改：docs/02-design/, src/, tests/
+- ❌ 不能修改 docs/01-requirements/ (评审除外)
+- ❌ 不能签署自己创建的文档
+
+#### 文档状态阶段绑定
+
+| 状态 | Agent1 动作 | Agent2 动作 |
+|------|-------------|-------------|
+| DRAFT | 编辑、提交评审 | 仅查看 |
+| REVIEW_PENDING | 仅查看 | 评审、签署 |
+| REVIEWED | 确认、签署 | 仅查看 |
+| APPROVED | 仅查看 | 仅查看 |
+| ARCHIVED | 仅查看 | 仅查看 |
+
+#### 完整性门禁
+
+- 不允许部分评审（只评审文档的某一章节）
+- 不允许评审子文档（从主文档提取的模块）
+- 必须评审完整文档
+
+### F-GIT-001: Git 同步集成
+
+#### 新增命令
+
+```bash
+# 合规检查
+oc-collab compliance check [role|state|completeness]
+oc-collab compliance status
+oc-collab compliance results
+
+# Git 同步
+oc-collab git sync
+oc-collab git status
+oc-collab git sync-state
+oc-collab git warn
+
+# 阶段推进（自动同步）
+oc-collab phase-advance --sync
+oc-collab phase-advance --no-sync
+```
+
+#### 自动同步行为
+
+| 操作 | 自动同步 |
+|------|---------|
+| `oc-collab phase-advance` | ✅ 自动 git add → commit → push |
+| `oc-collab todo done` | ✅ 自动 git add → commit |
+
+---
 
 ---
 
