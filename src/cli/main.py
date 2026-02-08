@@ -863,7 +863,7 @@ def sync_command(retry: bool, max_retries: int, interval: int, no_backoff: bool)
 
 
 @main.command("git")
-@click.argument("action", type=click.Choice(["status", "sync-state", "warn"]), default="status")
+@click.argument("action", type=click.Choice(["status", "sync", "sync-state", "warn"]), default="status")
 def git_command(action: str):
     """Git 同步工具 (v2.2.2)"""
     try:
@@ -878,6 +878,21 @@ def git_command(action: str):
                 click.echo(f"⚠️ Git 状态: 未同步 ({status['unsynced_count']} 个文件)")
                 for f in status["files"].split(", "):
                     click.echo(f"  - {f}")
+
+        elif action == "sync":
+            result = git_sync.sync_all()
+            if result.success:
+                console.print(Panel(
+                    f"✅ {result.message}",
+                    title="Git 同步",
+                    style="green"
+                ))
+            else:
+                console.print(Panel(
+                    f"⚠️ {result.message}",
+                    title="Git 同步",
+                    style="yellow"
+                ))
 
         elif action == "sync-state":
             result = git_sync.sync_state()
@@ -900,6 +915,78 @@ def git_command(action: str):
                 console.print(Panel(warning, title="未同步警告", style="yellow"))
             else:
                 click.echo("✅ 无未同步修改")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("design")
+@click.argument("action", type=click.Choice(["create", "edit", "view"]), default="view")
+@click.argument("target", default="")
+def design_command(action: str, target: str):
+    """设计文档管理。Agent2 专用，Agent1 无权限操作。"""
+    try:
+        project_path = get_project_path()
+        state_manager = StateManager(project_path)
+        agent_id = state_manager.get_active_agent()
+        engine = ComplianceEngine(project_path)
+
+        if agent_id == "agent1":
+            result = engine.check_role_boundary(agent_id, action, f"docs/02-design/{target}")
+            if result.result_type.value == "denied":
+                console.print(Panel(
+                    f"⛔ 权限拒绝\n{result.message}",
+                    title="角色边界检查",
+                    style="red"
+                ))
+                sys.exit(1)
+            else:
+                click.echo(f"✅ {result.message}")
+
+        if agent_id == "agent2" or action == "view":
+            if action == "create":
+                click.echo(f"Agent2: 创建设计文档 {target}")
+            elif action == "edit":
+                click.echo(f"Agent2: 编辑设计文档 {target}")
+            elif action == "view":
+                click.echo(f"查看设计文档 {target}")
+
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@main.command("requirements")
+@click.argument("action", type=click.Choice(["create", "edit", "view"]), default="view")
+@click.argument("target", default="")
+def requirements_command(action: str, target: str):
+    """需求文档管理。Agent1 专用，Agent2 无权限操作。"""
+    try:
+        project_path = get_project_path()
+        state_manager = StateManager(project_path)
+        agent_id = state_manager.get_active_agent()
+        engine = ComplianceEngine(project_path)
+
+        if agent_id == "agent2":
+            result = engine.check_role_boundary(agent_id, action, f"docs/01-requirements/{target}")
+            if result.result_type.value == "denied":
+                console.print(Panel(
+                    f"⛔ 权限拒绝\n{result.message}",
+                    title="角色边界检查",
+                    style="red"
+                ))
+                sys.exit(1)
+            else:
+                click.echo(f"✅ {result.message}")
+
+        if agent_id == "agent1" or action == "view":
+            if action == "create":
+                click.echo(f"Agent1: 创建需求文档 {target}")
+            elif action == "edit":
+                click.echo(f"Agent1: 编辑需求文档 {target}")
+            elif action == "view":
+                click.echo(f"查看需求文档 {target}")
 
     except Exception as e:
         click.echo(f"错误: {e}")
