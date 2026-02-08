@@ -269,20 +269,34 @@ adhoc_todos:
   status: completed
   to: agent2
 - acceptance_criteria:
-  - 34个单元测试全部通过
-  - 5个E2E测试全部通过
-  - CLI命令 oc-collab skill check 正常执行
-  - CLI命令 oc-collab check requirements 正常执行
+  - 'v2.2.4 P0: 34个单元测试全部通过'
+  - 'v2.2.4 P0: 5个E2E测试全部通过'
+  - 'BUG修复: 4个session_manager_v2测试全部通过'
+  - oc-collab status 显示"oc-collab v2.2.4"而非"未配置"
   - '签署 development.status: completed'
-  content: 测试验收v2.2.4 P0功能（SkillEnforcer, SignoffEnforcer, RequirementsChecker）
+  content: 测试验收v2.2.4 P0功能 + 验证BUG-20260208-003修复
   created_at: '2026-02-08T20:17:04.083882'
   from: agent2
   id: TODO-052
   phase: testing
   priority: P0
   status: pending
-  testing_cmd: python3 -m pytest tests/test_skill_enforcer.py tests/test_signoff_enforcer.py
+  testing_cmd: '# 1. v2.2.4 P0功能测试
+
+    python3 -m pytest tests/test_skill_enforcer.py tests/test_signoff_enforcer.py
     tests/test_requirements_checker.py tests/test_enforcement_system_e2e.py -v
+
+
+    # 2. BUG-20260208-003 修复验证
+
+    python3 -m pytest tests/test_session_manager_v2.py -v
+
+
+    # 3. 验证 oc-collab status 正常
+
+    oc-collab status'
   to: agent1
   updated_at: '2026-02-08T20:57:49.117566'
+  bugs_fixed:
+  - 'BUG-20260208-003: SessionManager识别v2.2.x项目结构'
 total: 36
