@@ -131,10 +131,12 @@ class TestSignoffV2Structure:
         state = state_manager.load_state()
         
         # 期望signoff能读取v2.2.4.testing.status
+        # 注意：签署后status可能是"in_progress"或"completed"
         if "v2.2.4" in state and "testing" in state["v2.2.4"]:
             testing_status = state["v2.2.4"]["testing"].get("status", "")
-            assert testing_status in ["in_progress", "approved", "passed"], \
-                f"v2.2.4.testing.status应该是in_progress/approved/passed，但返回: {testing_status}"
+            # 签署后应该是in_progress或completed
+            assert testing_status in ["in_progress", "completed"], \
+                f"v2.2.4.testing.status应该是in_progress或completed，但返回: {testing_status}"
         else:
             pytest.skip("v2.2.4.testing不存在（可能是其他版本结构）")
 
