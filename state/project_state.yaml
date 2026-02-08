@@ -45,15 +45,15 @@ v2.2.2:
 v2.2.3:
   acceptance:
     agent1_signoff: true
-    agent1_signoff_at: "2026-02-08 16:15:00"
-    agent2_signoff: null
-    agent2_signoff_at: null
-    status: approved
+    agent1_signoff_at: '2026-02-08 16:15:00'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-08 16:06:32'
+    status: APPROVED
     bugs:
-      - id: "BUG-20260208-001"
-        description: "CLI 命令未完全实现"
-        severity: "P0"
-        status: "closed"
+    - id: BUG-20260208-001
+      description: CLI 命令未完全实现
+      severity: P0
+      status: closed
   created_at: 2026-02-08 14:04
   design:
     agent1_signoff: true
@@ -73,6 +73,13 @@ v2.2.3:
   - 'F-TASK-001: 任务状态同步'
   - 'F-UI-001: 状态增强显示'
   phase: completed
-  status: completed
+  status: APPROVED
   version: 2.2.3
   workload: 12h
+  testing:
+    status: completed
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-08 16:06:32'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-08 16:06:32'
+    tests_passed: 42
