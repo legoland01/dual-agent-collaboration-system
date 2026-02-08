@@ -294,4 +294,13 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-08T21:22:43.260580'
   updated_at: '2026-02-08T21:22:43.260586'
-total: 42
+- agent_id: '2'
+  content: 修复 BUG-20260208-006（signoff.py字段名'test'不匹配v2.2.4的'testing'）
+  created_at: '2026-02-08T22:30:00'
+  id: TODO-058
+  priority: P0
+  phase: bugfix
+  status: pending
+  bug_id: BUG-20260208-006
+  testing_cmd: python3 -m src.cli.main signoff test -m "修复验证"
+total: 43
