@@ -283,4 +283,13 @@ adhoc_todos:
     -v
   to: agent1
   updated_at: '2026-02-08T20:57:49.117566'
-total: 36
+- agent_id: '2'
+  content: 修复 BUG-20260208-004（signoff.py不支持v2.2.x结构）
+  created_at: '2026-02-08T22:00:00'
+  id: TODO-056
+  priority: P0
+  phase: bugfix
+  status: pending
+  bug_id: BUG-20260208-004
+  testing_cmd: python3 -m pytest tests/test_session_manager_v2.py::TestSignoffV2Structure -v
+total: 37
