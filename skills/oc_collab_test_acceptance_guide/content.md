@@ -159,8 +159,20 @@ python -m pytest tests/test_blackbox_*.py -v
   ↓
   4. 提交变更
   ↓
-  等待Agent2修复后，重新测试
+  ⏳ 等待Agent2修复并提交
+  ↓
+  5. Agent1看到修复后，自主创建验收TODO
+  ↓
+  6. 重新测试 → 通过 → 签署验收
 ```
+
+### ⚠️ TODO创建规则
+
+| 规则 | 说明 |
+|------|------|
+| 只创建"修复Bug"的TODO | ✅ 分配给Agent2 |
+| 不要提前创建"重新测试"的TODO | ❌ 等待Agent2修复后再创建 |
+| 不要代Agent1创建TODO | ❌ Agent1看到修复后自主创建 |
 
 **反面教训** (BUG-20260208-001):
 
