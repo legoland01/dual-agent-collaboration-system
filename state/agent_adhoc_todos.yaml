@@ -70,12 +70,12 @@ adhoc_todos:
   created_at: 2026-02-07 15:10:00
   updated_at: null
 - id: TODO-021
-  content: null
-  status: pending
+  content: v2.2.1 测试签署和阶段推进
+  status: completed
   priority: P0
-  agent_id: null
+  agent_id: '1'
   created_at: 2026-02-07 04:10:00
-  updated_at: null
+  updated_at: '2026-02-08T19:52:00'
 - id: TODO-027
   content: null
   status: archived
@@ -218,9 +218,21 @@ adhoc_todos:
   updated_at: '2026-02-08T19:23:55.872863'
 - id: TODO-047
   content: 评审v2.2.4概要设计并签署
-  status: pending
+  status: completed
   priority: high
   agent_id: '2'
   created_at: '2026-02-08T19:45:00'
   updated_at: null
-total: 32
+  completed_at: '2026-02-08T19:31:27.586751'
+- id: TODO-048
+  content: 确认v2.2.4概要设计评审意见并推进到详细设计阶段
+  from: agent2
+  to: agent1
+  phase: design
+  priority: P0
+  status: pending
+  created_at: '2026-02-08T19:32:11.714082'
+  started_at: null
+  completed_at: null
+  confirmed_at: null
+total: 33
