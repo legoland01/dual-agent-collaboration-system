@@ -1,1 +1,9 @@
-compliance_results: []
+compliance_results:
+- action: edit
+  agent_id: agent1
+  check_type: role_boundary
+  details: {}
+  message: ✅ 角色边界检查通过
+  result_type: passed
+  target: docs/01-requirements/requirements_v2.2.5.md
+  timestamp: '2026-02-09T11:56:59.340381'
