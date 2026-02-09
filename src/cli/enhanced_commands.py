@@ -65,26 +65,30 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
     """
     from ..core.auto_checker import AutoChecker, ValidationError
 
+    # v2.2.6: 参数验证
+    checker = AutoChecker()
+    
+    if auto_check:
+        result = checker.check_all(content, agent, priority)
+        
+        if result["warnings"]:
+            for warning in result["warnings"]:
+                click.echo(f"⚠️  {warning}")
+        
+        if not result["valid"]:
+            for error in result["errors"]:
+                click.echo(f"❌ {error}")
+            raise click.ClickException("参数验证失败")
+    
+    # 检查是否有内容可创建
+    if not content and not todos:
+        raise click.ClickException("请提供 --content 或导入 TODO 文件")
+
     sync_manager = TodoSyncManager()
 
     def _do_todowrite():
         if content:
             agent_id = int(agent) if agent else None
-
-            # v2.2.6: 自动检查
-            if auto_check:
-                checker = AutoChecker()
-                result = checker.check_all(content, agent, priority)
-
-                if result["warnings"]:
-                    for warning in result["warnings"]:
-                        click.echo(f"⚠️  {warning}")
-
-                if not result["valid"]:
-                    for error in result["errors"]:
-                        click.echo(f"❌ {error}")
-                    raise click.ClickException("参数验证失败")
-
             todo = sync_manager.add_todo(content, agent_id=agent_id, priority=priority)
             click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
             click.echo(f"   优先级: {todo.priority}")
