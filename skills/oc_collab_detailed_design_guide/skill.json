@@ -1,24 +1,33 @@
 {
-  "name": "oc_collab_detailed_design_guide",
-  "description": "OC-Collab 详细设计指南 - 技术视角，由Agent 2负责",
+  "id": "oc_collab_detailed_design_guide",
+  "name": "OC-Collab 详细设计指南",
   "version": "v1",
-  "author": "OC-Collab Team",
-  "trigger_keywords": [
-    "详细设计",
-    "detailed design",
-    "技术实现",
-    "代码设计"
+  "description": "OC-Collab 详细设计指南，技术视角，由 Agent 2 负责",
+  "author": "Agent 2",
+  "created_at": "2026-02-08",
+  "updated_at": "2026-02-09",
+  "tags": ["detailed_design", "guide", "implementation"],
+  "applicable_phase": "detailed_design",
+  "applicable_role": "Agent 2",
+  "triggers": [
+    {
+      "condition": "进入详细设计阶段，需要创建技术实现方案",
+      "priority": "high",
+      "description": "当概要设计评审通过后，详细设计阶段入口时触发"
+    },
+    {
+      "condition": "需要创建模块的详细设计",
+      "priority": "medium",
+      "description": "根据概要设计创建具体模块的技术设计时触发"
+    }
   ],
-  "parameters": {},
-  "examples": [
-    "创建详细设计",
-    "类如何设计",
-    "技术模块映射"
-  ],
+  "outputs": {
+    "documents": ["docs/02-design/DETAIL-*.md"],
+    "artifacts": []
+  },
   "related_skills": [
     "oc_collab_outline_design_guide",
     "oc_collab_requirements_guide",
     "oc_collab_development_guide"
-  ],
-  "documentation_path": "skills/oc_collab_detailed_design_guide/content.md"
+  ]
 }

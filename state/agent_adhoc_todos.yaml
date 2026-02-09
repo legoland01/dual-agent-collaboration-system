@@ -1391,7 +1391,22 @@ adhoc_todos:
   priority: high
   agent_id: 2
   created_at: '2026-02-09T23:27:46.123027'
-  completed_at: '2026-02-09T23:35:00'
-  note: '技术评审通过（有条件）：需补充责任人分工和Phase4切片粒度标准'
-total: 199
-total: 199
+  updated_at: null
+- id: TODO-214
+  content: '执行Phase1: 标准化3个Skill的skill.json（oc_collab_development_guide, oc_collab_detailed_design_guide,
+    oc_collab_deployment_guide）'
+  status: completed
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T23:33:49.348975'
+  completed_at: '2026-02-09T23:40:00'
+  note: '已创建/更新3个skill.json，遵循标准化结构'
+- id: TODO-215
+  content: '执行Phase1: 标准化4个Skill的skill.json（oc_collab_bug_management_guide, oc_collab_test_acceptance_guide,
+    oc_collab_requirements_guide, oc_collab_requirements_review_guide, oc_collab_outline_design_guide）'
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:33:50.655379'
+  updated_at: '2026-02-09T23:33:50.655384'
+total: 201

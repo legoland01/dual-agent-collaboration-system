@@ -1,0 +1,33 @@
+{
+  "id": "oc_collab_development_guide",
+  "name": "OC-Collab 开发指南",
+  "version": "v1.1.0",
+  "description": "OC-Collab 开发阶段指南，技术视角，由 Agent 2 负责",
+  "author": "Agent 2",
+  "created_at": "2026-02-09",
+  "updated_at": "2026-02-09",
+  "tags": ["development", "guide", "implementation"],
+  "applicable_phase": "development",
+  "applicable_role": "Agent 2",
+  "triggers": [
+    {
+      "condition": "进入开发阶段，需要实现代码功能",
+      "priority": "high",
+      "description": "当需求和设计评审通过后，进入开发阶段时触发"
+    },
+    {
+      "condition": "需要创建新功能模块",
+      "priority": "medium",
+      "description": "根据详细设计实现功能模块时触发"
+    }
+  ],
+  "outputs": {
+    "documents": ["src/**/*.py", "tests/**/*.py"],
+    "artifacts": ["project_state.yaml"]
+  },
+  "related_skills": [
+    "oc_collab_detailed_design_guide",
+    "oc_collab_requirements_guide",
+    "oc_collab_test_acceptance_guide"
+  ]
+}

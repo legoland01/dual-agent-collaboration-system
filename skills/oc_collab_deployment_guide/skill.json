@@ -1,0 +1,32 @@
+{
+  "id": "oc_collab_deployment_guide",
+  "name": "OC-Collab 部署指南",
+  "version": "v1.1.0",
+  "description": "OC-Collab 部署阶段指南，将验收通过的软件包发布到目标平台",
+  "author": "Agent 2",
+  "created_at": "2026-02-09",
+  "updated_at": "2026-02-09",
+  "tags": ["deployment", "guide", "release"],
+  "applicable_phase": "deployment",
+  "applicable_role": "Agent 2",
+  "triggers": [
+    {
+      "condition": "测试验收完成，需要部署发布",
+      "priority": "high",
+      "description": "当测试验收通过后，部署阶段入口时触发"
+    },
+    {
+      "condition": "版本发布",
+      "priority": "high",
+      "description": "需要发布新版本到 PyPI 或远程仓库时触发"
+    }
+  ],
+  "outputs": {
+    "documents": ["dist/**/*.whl", "dist/**/*.tar.gz"],
+    "artifacts": ["project_state.yaml", "pyproject.toml"]
+  },
+  "related_skills": [
+    "oc_collab_test_acceptance_guide",
+    "oc_collab_development_guide"
+  ]
+}
