@@ -204,16 +204,23 @@ v2.2.6:
     started_at: '2026-02-09T20:15:00'
     status: completed
   testing:
-    phase: in_progress
+    phase: completed
+    completed_at: '2026-02-09T21:30:00'
     started_at: '2026-02-09T20:35:00'
-    status: in_progress
+    status: completed
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-09T21:30:00'
     bugs:
     - description: "CLI命令未完整实现（todowrite --auto-check, skill search/slice/enforce）"
       id: BUG-20260209-003
       severity: P0
-      status: open
+      status: closed
     unit_tests_passed: 52
     coverage: ">80%"
+    acceptance_report: docs/03-test/user_scenario_acceptance_v2.2.6.md
+  deployment:
+    phase: pending
+    status: pending
   features:
   - "F-AI-001: todowrite\u53C2\u6570\u81EA\u52A8\u68C0\u67E5"
   - "F-AI-002: TODO\u4E0A\u4E0B\u6587\u643A\u5E26"
