@@ -1520,5 +1520,92 @@ main.add_command(todoedit_command, "todoedit")
 main.add_command(status_command, "status")
 
 
+@click.group(name="owner")
+def owner_group():
+    """文件Owner管理命令组 (v2.2.5)"""
+    pass
+
+
+@owner_group.command("status")
+@click.option("--agent", "-a", type=click.Choice(["agent1", "agent2"]), help="筛选特定Agent的文件")
+def owner_status_command(agent: str):
+    """查看文件Owner状态 (v2.2.5)"""
+    try:
+        project_path = get_project_path()
+        owner_manager = FileOwnerManager(project_path)
+        state_manager = StateManager(project_path)
+        
+        status = owner_manager.get_owner_status()
+        
+        console.print("\n[bold]文件Owner状态 (v2.2.5)[/bold]")
+        
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Agent")
+        table.add_column("文件数")
+        table.add_column("文件列表")
+        
+        for agent_id, files in status.get("agent_files", {}).items():
+            if agent and agent != agent_id:
+                continue
+            file_count = len(files)
+            file_list = "\n".join(files[:10])
+            if len(files) > 10:
+                file_list += f"\n... 还有 {len(files) - 10} 个文件"
+            table.add_row(agent_id, str(file_count), file_list)
+        
+        console.print(table)
+        
+        # 显示当前Agent
+        active_agent = state_manager.get_active_agent()
+        console.print(f"\n当前Agent: {active_agent}")
+        
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+@owner_group.command("check")
+@click.option("--target", "-t", required=True, help="目标文件路径")
+@click.option("--agent", "-a", type=click.Choice(["agent1", "agent2"]), help="指定Agent ID")
+def owner_check_command(target: str, agent: str):
+    """检查文件Owner权限 (v2.2.5)"""
+    try:
+        project_path = get_project_path()
+        owner_manager = FileOwnerManager(project_path)
+        state_manager = StateManager(project_path)
+        
+        if not agent:
+            agent = state_manager.get_active_agent()
+        
+        owner = owner_manager.get_file_owner(target)
+        
+        console.print(f"\n[bold]文件Owner检查 (v2.2.5)[/bold]")
+        
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("项目")
+        table.add_column("值")
+        
+        table.add_row("目标文件", target)
+        table.add_row("当前Agent", agent)
+        table.add_row("文件Owner", owner or "无记录")
+        
+        if owner:
+            can_modify, reason = owner_manager.can_modify(target, agent)
+            table.add_row("能否修改", "✅ 可以" if can_modify else "⛔ 不能")
+            if not can_modify:
+                table.add_row("拒绝原因", reason)
+        else:
+            table.add_row("能否修改", "✅ 可以（无Owner记录，兼容旧文件）")
+        
+        console.print(table)
+        
+    except Exception as e:
+        click.echo(f"错误: {e}")
+        sys.exit(1)
+
+
+main.add_command(owner_group, "owner")
+
+
 if __name__ == "__main__":
     main()

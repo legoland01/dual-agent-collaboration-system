@@ -1,15 +1,15 @@
 {
   "id": "oc_collab_collaboration_guide",
   "name": "OC-Collab 协作指南",
-  "version": "1.1",
+  "version": "1.2",
   "description": "双Agent协作流程指南 - Agent角色，工作流程、Git规范、文件命名、协作规范强制执行",
   "author": "Agent 1",
   "created_at": "2026-02-07",
-  "updated_at": "2026-02-08",
-  "tags": ["collaboration", "workflow", "guide", "v2.2.2"],
+  "updated_at": "2026-02-09",
+  "tags": ["collaboration", "workflow", "guide", "v2.2.5"],
   "version_info": {
-    "current": "v2.2.2",
-    "previous": "v2.2.1"
+    "current": "v2.2.5",
+    "previous": "v2.2.4"
   },
   "triggers": [
     {

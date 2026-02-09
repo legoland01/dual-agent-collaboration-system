@@ -95,6 +95,58 @@ oc-collab phase-advance --no-sync
 
 ---
 
+## 评审优先级规则 (v2.2.5 新增)
+
+### 评审类型定义
+
+| 类型 | 说明 | 角色 |
+|------|------|------|
+| **Technical Review** | 技术可行性评估 | Agent 2 |
+| **Critical Review** | 批判性质疑 | Agent 1 或 Agent 2 |
+
+### 优先级规则
+
+```
+Critical Review > Technical Review
+```
+
+### 评审流程
+
+```
+文档提交评审
+    │
+    ├── Agent 2 执行 Technical Review
+    │           │
+    │           └── 输出：技术可行性评估
+    │                       │
+    ├── Agent 1 执行 Critical Review（可选）
+    │           │
+    │           └── 输出：批判性结论
+    │                       │
+    └── 最终决策
+            │
+            └── Critical Review 结论覆盖 Technical Review
+                        │
+                        └── 一个最终评审结论
+```
+
+### 并存处理
+
+当两个评审并存时：
+- Critical Review 结论为准
+- Technical Review 结论作为参考
+- 不允许两个结论矛盾时无裁决
+
+### 签署规范
+
+| 评审类型 | Agent 1 | Agent 2 |
+|----------|---------|---------|
+| Technical Review | - | "技术评审通过" / "技术评审通过（有条件）" |
+| Critical Review | "批判性评审通过（有条件）" / "批判性评审通过" | "批判性评审通过（有条件）" / "批判性评审通过" |
+| **最终结论** | **Critical Review 结论为准** | **Critical Review 结论为准** |
+
+---
+
 ---
 
 ## 工作流程
@@ -514,6 +566,7 @@ oc-collab todo
 | v2.2.10 | 2026-02-08 | 明确Proposal/Skill不需要评审；新增版本结束后需求分析环节 |
 | v2.2.11 | 2026-02-08 | 新增环境更新规则（pip install -e.），修复BUG-20260208-009教训 |
 | v2.2.12 | 2026-02-08 | 新增"需求文档+概要设计一起评审"规则 |
+| v2.2.13 | 2026-02-09 | 新增"评审优先级规则"（Critical Review > Technical Review） |
 
 ---
 
