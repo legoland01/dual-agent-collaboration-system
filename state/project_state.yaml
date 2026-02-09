@@ -178,3 +178,9 @@ v2.2.5:
     started_at: '2026-02-09T14:30:00'
     status: APPROVED
     tests_passed: 5
+  deployment:
+    status: completed
+    started_at: '2026-02-09T15:00:00'
+    completed_at: '2026-02-09T15:05:00'
+    pypi_version: '2.2.5'
+    pypi_url: 'https://pypi.org/project/opencode-collaboration/2.2.5/'
