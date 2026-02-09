@@ -1177,9 +1177,221 @@ adhoc_todos:
   updated_at: '2026-02-09T23:15:38.483678'
 - id: TODO-183
   content: 修复BUG-20260209-001规范类问题：1）在oc_collab_requirements_guide中增加TODO创建检查规则；2）禁止替其他Agent分解任务；3）禁止创建大量重复TODO
-  status: pending
+  status: completed
   priority: medium
   agent_id: 1
   created_at: '2026-02-09T23:17:55.742117'
-  updated_at: '2026-02-09T23:17:55.742122'
-total: 169
+  updated_at: '2026-02-09T23:19:49.150637'
+- id: TODO-184
+  content: BB-AI-005测试 27724deb
+  status: completed
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:44.953694'
+  updated_at: '2026-02-09T23:27:51.267849'
+- id: TODO-185
+  content: BB-AI-006测试 7be00f95
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:45.210727'
+  updated_at: '2026-02-09T23:25:45.210733'
+- id: TODO-186
+  content: BB-AI-007测试 e9b1934e
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:45.473641'
+  updated_at: '2026-02-09T23:25:45.473647'
+- id: TODO-187
+  content: BB-AI-008测试 18abcbde
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:45.732508'
+  updated_at: '2026-02-09T23:25:45.732512'
+- id: TODO-188
+  content: BB-AI-010重复测试 c6327bac
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:45.992445'
+  updated_at: '2026-02-09T23:25:45.992454'
+- id: TODO-189
+  content: BB-AI-010重复测试 c6327bac
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:46.253921'
+  updated_at: '2026-02-09T23:25:46.253927'
+- id: TODO-190
+  content: BB-AI-011优先级测试 4d181376
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:46.521797'
+  updated_at: '2026-02-09T23:25:46.521802'
+- id: TODO-191
+  content: BB-AI-011优先级测试 a013f751
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:46.787274'
+  updated_at: '2026-02-09T23:25:46.787285'
+- id: TODO-192
+  content: BB-AI-011优先级测试 d28cef22
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:47.066046'
+  updated_at: '2026-02-09T23:25:47.066054'
+- id: TODO-193
+  content: BB-AI-011优先级测试 fe2ea085
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:47.334114'
+  updated_at: '2026-02-09T23:25:47.334126'
+- id: TODO-194
+  content: BB-AI-011优先级测试 e98a5a70
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:47.600598'
+  updated_at: '2026-02-09T23:25:47.600604'
+- id: TODO-195
+  content: BB-AI-011优先级测试 a37f1b99
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:47.867566'
+  updated_at: '2026-02-09T23:25:47.867573'
+- id: TODO-196
+  content: BB-AI-011第6个 e72fa55e
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:25:48.137736'
+  updated_at: '2026-02-09T23:25:48.137745'
+- id: TODO-197
+  content: BB-SKILL-009测试 9a643372
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:25:48.969780'
+  updated_at: '2026-02-09T23:25:48.969786'
+- id: TODO-198
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-09T23:26:48.284660'
+  updated_at: '2026-02-09T23:26:48.284665'
+- id: TODO-199
+  content: BB-AI-005测试 7a05c72d
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:48.646160'
+  updated_at: '2026-02-09T23:26:48.646167'
+- id: TODO-200
+  content: BB-AI-006测试 527b5bed
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:48.913490'
+  updated_at: '2026-02-09T23:26:48.913499'
+- id: TODO-201
+  content: BB-AI-007测试 f32851e8
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:49.187701'
+  updated_at: '2026-02-09T23:26:49.187721'
+- id: TODO-202
+  content: BB-AI-008测试 faaa2629
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:49.468151'
+  updated_at: '2026-02-09T23:26:49.468166'
+- id: TODO-203
+  content: BB-AI-010重复测试 a1d5277b
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:49.742409'
+  updated_at: '2026-02-09T23:26:49.742415'
+- id: TODO-204
+  content: BB-AI-010重复测试 a1d5277b
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:50.017117'
+  updated_at: '2026-02-09T23:26:50.017123'
+- id: TODO-205
+  content: BB-AI-011优先级测试 75454cde
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:50.300335'
+  updated_at: '2026-02-09T23:26:50.300341'
+- id: TODO-206
+  content: BB-AI-011优先级测试 219d1556
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:50.580539'
+  updated_at: '2026-02-09T23:26:50.580545'
+- id: TODO-207
+  content: BB-AI-011优先级测试 e0d2722f
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:50.861266'
+  updated_at: '2026-02-09T23:26:50.861272'
+- id: TODO-208
+  content: BB-AI-011优先级测试 db5ed214
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:51.145113'
+  updated_at: '2026-02-09T23:26:51.145119'
+- id: TODO-209
+  content: BB-AI-011优先级测试 c3e568cb
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:51.425257'
+  updated_at: '2026-02-09T23:26:51.425262'
+- id: TODO-210
+  content: BB-AI-011优先级测试 69be9baf
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:51.707061'
+  updated_at: '2026-02-09T23:26:51.707066'
+- id: TODO-211
+  content: BB-AI-011第6个 8f00a028
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:26:51.991259'
+  updated_at: '2026-02-09T23:26:51.991266'
+- id: TODO-212
+  content: BB-SKILL-009测试 b9a1b874
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:26:52.818654'
+  updated_at: '2026-02-09T23:26:52.818659'
+- id: TODO-213
+  content: 评审Skill SOP重组需求分析报告
+  status: completed
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T23:27:46.123027'
+  completed_at: '2026-02-09T23:35:00'
+  note: '技术评审通过（有条件）：需补充责任人分工和Phase4切片粒度标准'
+total: 199
+total: 199
