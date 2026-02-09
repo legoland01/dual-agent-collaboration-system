@@ -402,23 +402,27 @@ TODO-067:
     - docs/00-memos/BUG-20260208-009_oc_collab_CLI_无法执行.md'
 TODO-068:
   id: TODO-068
-  content: 评审 v2.2.5 需求文档
+  content: 评审 v2.2.5 需求文档 + 概要设计
   status: pending
   priority: P0
   agent_id: agent2
   created_by: agent1
-  created_at: '2026-02-08T23:00:00'
+  created_at: '2026-02-08T23:30:00'
   description: '评审重点：
 
     1. 功能范围是否合理
 
-    2. 验收标准是否可测试
+    2. 功能架构是否清晰
 
-    3. 工时预估是否准确
+    3. 验收标准是否可测试
+
+    4. 工时预估是否准确
 
 
     参考文档：
 
-    - docs/01-requirements/requirements_v2.2.5.md
+    - docs/01-requirements/requirements_v2.2.5.md（需求文档）
 
-    - docs/01-requirements/ANALYSIS_v2.2.5_Requirements_Analysis.md'
+    - docs/02-design/OUTLINE_v2.2.5.md（概要设计）
+
+    - docs/01-requirements/ANALYSIS_v2.2.5_Requirements_Analysis.md（分析报告）'
