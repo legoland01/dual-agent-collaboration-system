@@ -337,11 +337,13 @@ adhoc_todos:
   updated_at: null
 - id: TODO-067
   content: 修复 BUG-20260208-009 oc-collab CLI无法执行
-  status: pending
+  status: completed
   priority: P1
   agent_id: agent2
   created_at: '2026-02-08T22:10:00'
-  updated_at: null
+  updated_at: '2026-02-09T14:30:00'
+  completed_at: '2026-02-09T14:30:00'
+  note: BUG已修复。CLI命令正常工作，无需pip install -e .
 - id: TODO-068
   content: 评审 v2.2.5 需求文档 + 概要设计
   status: completed
