@@ -44,6 +44,8 @@
 - [ ] Agent1创建的文件，Agent2不能修改
 - [ ] Agent2签署后，Owner转移给Agent2
 - [ ] Agent2能修改签署后的文件
+- [ ] **非Owner修改时**：拒绝并提示
+- [ ] **CLI测试**：`oc-collab compliance check --role --action edit --target <文件>`
 
 ---
 
