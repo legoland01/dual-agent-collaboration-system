@@ -817,8 +817,7 @@ adhoc_todos:
   priority: high
   agent_id: 2
   created_at: '2026-02-09T21:18:25.241102'
-  completed_at: '2026-02-09T23:58:00'
-  note: '已完成：版本号更新，CHANGELOG更新，待PyPI发布和Git tag'
+  updated_at: null
 - id: TODO-135
   content: 测试todowrite持久化
   status: pending
@@ -1451,6 +1450,12 @@ adhoc_todos:
   priority: medium
   agent_id: 2
   created_at: '2026-02-09T23:54:55.010048'
-  completed_at: '2026-02-09T23:55:00'
-  note: 'Phase4已被v2.2.6 F-SKILL自动实现，skill slice支持动态切片，无需手动预切片'
-total: 207
+  updated_at: null
+- id: TODO-222
+  content: 执行Skill体系全面测试：1）skill.json完整性测试；2）skill命令功能测试；3）SOP四要素测试；4）覆盖率评估（目标>=95%）
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-10T00:01:59.883987'
+  updated_at: '2026-02-10T00:01:59.883994'
+total: 208

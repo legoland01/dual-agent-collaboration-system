@@ -138,5 +138,9 @@
       "agent1": ["view"],
       "agent2": ["view"]
     }
+  },
+  "outputs": {
+    "documents": ["docs/"],
+    "artifacts": ["state/project_state.yaml", "state/agent_adhoc_todos.yaml"]
   }
 }

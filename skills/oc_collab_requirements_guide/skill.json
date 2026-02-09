@@ -88,5 +88,9 @@
     "required": true,
     "roles": ["Agent 1 (产品负责人)", "Agent 2 (开发负责人)"],
     "order": ["Agent 1 first", "Agent 2 second"]
+  },
+  "outputs": {
+    "documents": ["docs/01-requirements/"],
+    "artifacts": ["docs/01-requirements/TEMPLATE_requirements.md"]
   }
 }

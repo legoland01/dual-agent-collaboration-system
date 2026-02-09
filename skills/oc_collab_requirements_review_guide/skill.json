@@ -101,5 +101,9 @@
         "correct": "必须提供具体意见，包括逆向思考"
       }
     ]
+  },
+  "outputs": {
+    "documents": ["docs/01-requirements/"],
+    "artifacts": []
   }
 }
