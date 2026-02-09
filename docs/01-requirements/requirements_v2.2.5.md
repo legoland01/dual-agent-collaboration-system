@@ -4,7 +4,9 @@
 **日期**: 2026-02-08
 **作者**: Agent 1 (产品经理)
 **状态**: DRAFT → 待Agent 2评审
-**关联**: ANALYSIS_v2.2.5_Requirements_Analysis.md (APPROVED)
+**关联**: 
+- ANALYSIS_v2.2.5_Requirements_Analysis.md (APPROVED)
+- docs/02-design/OUTLINE_v2.2.5.md (待评审)
 
 ---
 
