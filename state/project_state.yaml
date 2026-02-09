@@ -142,3 +142,27 @@ deployment:
   version: 2.2.4
   pypi: true
   git_tag: v2.2.4
+v2.2.5:
+  status: DEVELOPMENT
+  requirements:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-08'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-09'
+    status: APPROVED
+  design:
+    status: APPROVED
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-09'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-09'
+    design_doc: docs/02-design/DETAIL-2026-02-v2.2.5.md
+  development:
+    phase: in_progress
+    started_at: '2026-02-09T10:36:18.061052'
+    features:
+    - 'FR-OWNER-001: 文件Owner机制'
+    - 'FR-STATE-001: 状态识别修复'
+    - 'FR-SIGN-001: signoff修复'
+    - 'FR-PROC-001: 版本结束后需求分析流程'
+    - 'FR-PROC-002: 评审机制优化'
