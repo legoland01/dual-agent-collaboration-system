@@ -111,11 +111,11 @@ class TodoSyncManager:
             TodoSaveError: 保存失败
             ValueError: ID 重复
         """
-        # 检查 ID 唯一性
-        ids = [todo.id for todo in state.todos]
-        if len(ids) != len(set(ids)):
+        # 检查 TODO-ID 唯一性（只检查 TODO- 开头的 ID）
+        todo_ids = [todo.id for todo in state.todos if todo.id and todo.id.startswith("TODO-")]
+        if len(todo_ids) != len(set(todo_ids)):
             seen = set()
-            for todo_id in ids:
+            for todo_id in todo_ids:
                 if todo_id in seen:
                     raise ValueError(f"TODO ID 重复: {todo_id}")
                 seen.add(todo_id)

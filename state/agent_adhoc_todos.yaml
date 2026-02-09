@@ -419,30 +419,6 @@ adhoc_todos:
   agent_id: agent2
   created_at: '2026-02-09T12:14:41.239714'
   updated_at: '2026-02-09T15:00:00'
-  completed_at: '2026-02-09T15:00:00'
-  note: '完整验证结果（2026-02-09 15:00）：
-
-
-    FR-OWNER-001:
-
-    - ✅ 记录文件创建者
-
-    - ✅ 获取Owner
-
-    - ✅ Owner修改
-
-    - ✅ 非Owner修改（拒绝）
-
-    - ✅ Owner转移
-
-    - ✅ 转移后修改
-
-
-    FR-SIGN-001:
-
-    - ✅ 读取testing字段
-
-    - ✅ 字段映射（test/testing）'
 - id: TODO-082
   content: v2.2.5 测试签署（Agent1签署）
   status: completed
@@ -450,7 +426,6 @@ adhoc_todos:
   agent_id: 1
   created_at: '2026-02-09T12:58:48.542385'
   updated_at: '2026-02-09T13:05:23.921552'
-  completed_at: '2026-02-09T13:05:23.921559'
 - id: TODO-083
   content: v2.2.5 部署：PyPI发布 + Git tag
   status: pending
@@ -458,4 +433,39 @@ adhoc_todos:
   agent_id: agent2
   created_at: '2026-02-09T13:06:29.450483'
   updated_at: '2026-02-09T13:06:29.450490'
-total: 61
+- id: TODO-084
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T13:12:28.026875'
+  updated_at: '2026-02-09T13:12:28.026883'
+- id: TODO-085
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T13:13:54.501091'
+  updated_at: '2026-02-09T13:13:54.501096'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T13:13:54.614580'
+  updated_at: '2026-02-09T13:13:54.614600'
+- id: TODO-086
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T13:16:11.067427'
+  updated_at: '2026-02-09T13:16:11.067434'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T13:16:11.180094'
+  updated_at: '2026-02-09T13:16:11.180106'
+total: 67

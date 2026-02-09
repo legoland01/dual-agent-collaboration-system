@@ -142,18 +142,17 @@ class RoleBoundaryChecker:
                 # 首先检查文件Owner
                 owner = self.file_owner_manager.get_file_owner(target)
                 if owner and owner != agent_id:
-                    error_key = f"{agent_id}_denied_{denied_dir.replace('/', '').replace('-', '_')}"
                     return ComplianceResult(
                         check_type="role_boundary",
                         result_type=ComplianceResultType.DENIED,
                         agent_id=agent_id,
                         action=action,
                         target=target,
-                        message=self.ERROR_MESSAGES.get(
-                            error_key,
-                            f"⛔ 权限拒绝: 文件Owner是 {owner}，{agent_id} 无权修改",
-                        ),
+                        message=f"⛔ 权限拒绝: 文件Owner是 {owner}，{agent_id} 无权修改",
                     )
+                
+                # Owner为空或匹配，返回原来的错误消息
+                if "design" in denied_dir:
                     return ComplianceResult(
                         check_type="role_boundary",
                         result_type=ComplianceResultType.DENIED,
@@ -161,7 +160,7 @@ class RoleBoundaryChecker:
                         action=action,
                         target=target,
                         message=self.ERROR_MESSAGES.get(
-                            error_key,
+                            f"{agent_id}_denied_design",
                             self.ERROR_MESSAGES["action_denied"].format(
                                 agent_id=agent_id, action=action
                             ),
@@ -175,7 +174,7 @@ class RoleBoundaryChecker:
                         action=action,
                         target=target,
                         message=self.ERROR_MESSAGES.get(
-                            error_key,
+                            f"{agent_id}_denied_src",
                             self.ERROR_MESSAGES["action_denied"].format(
                                 agent_id=agent_id, action=action
                             ),
@@ -189,7 +188,7 @@ class RoleBoundaryChecker:
                         action=action,
                         target=target,
                         message=self.ERROR_MESSAGES.get(
-                            error_key,
+                            f"{agent_id}_denied_requirements",
                             self.ERROR_MESSAGES["action_denied"].format(
                                 agent_id=agent_id, action=action
                             ),
