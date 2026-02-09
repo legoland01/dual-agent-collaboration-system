@@ -722,9 +722,464 @@ adhoc_todos:
   updated_at: '2026-02-09T21:09:14.837622'
 - id: TODO-121
   content: 验收BUG-20260209-003修复：1）测试oc-collab todowrite无参数失败；2）测试oc-collab skill search/slice/enforce命令可用；3）运行黑盒测试确保通过
-  status: pending
+  status: completed
   priority: high
   agent_id: 1
   created_at: '2026-02-09T21:10:27.081319'
-  updated_at: '2026-02-09T21:10:27.081329'
-total: 104
+  updated_at: '2026-02-09T21:13:40.240612'
+- id: TODO-122
+  content: 完成设计
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-09T21:12:56.746664'
+  updated_at: '2026-02-09T21:12:56.746669'
+- id: TODO-123
+  content: 场景5测试_9cb63215
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T21:12:57.127542'
+  updated_at: '2026-02-09T21:12:57.127549'
+- id: TODO-124
+  content: 场景6测试_fc107d32
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T21:12:57.327181'
+  updated_at: '2026-02-09T21:12:57.327188'
+- id: TODO-125
+  content: 场景7重复测试_8a1e73a5
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T21:12:57.523487'
+  updated_at: '2026-02-09T21:12:57.523493'
+- id: TODO-126
+  content: 场景7重复测试_8a1e73a5
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T21:12:57.722316'
+  updated_at: '2026-02-09T21:12:57.722326'
+- id: TODO-127
+  content: 场景8优先级测试_bb6d8b32
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:57.922628'
+  updated_at: '2026-02-09T21:12:57.922635'
+- id: TODO-128
+  content: 场景8优先级测试_d9e2d28b
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:58.124504'
+  updated_at: '2026-02-09T21:12:58.124514'
+- id: TODO-129
+  content: 场景8优先级测试_53ac2e7f
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:58.323589'
+  updated_at: '2026-02-09T21:12:58.323596'
+- id: TODO-130
+  content: 场景8优先级测试_87b52d94
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:58.530068'
+  updated_at: '2026-02-09T21:12:58.530074'
+- id: TODO-131
+  content: 场景8优先级测试_22440447
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:58.724742'
+  updated_at: '2026-02-09T21:12:58.724749'
+- id: TODO-132
+  content: 场景8优先级测试_485b1cf8
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:58.923296'
+  updated_at: '2026-02-09T21:12:58.923302'
+- id: TODO-133
+  content: 场景8第6个_cd2f55da
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T21:12:59.122347'
+  updated_at: '2026-02-09T21:12:59.122357'
+- id: TODO-134
+  content: 部署v2.2.6：1）更新PyPI版本；2）更新Git tag；3）更新CHANGELOG
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T21:18:25.241102'
+  updated_at: '2026-02-09T21:18:25.241112'
+- id: TODO-135
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T23:05:48.482811'
+  updated_at: '2026-02-09T23:05:48.482816'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T23:05:48.732434'
+  updated_at: '2026-02-09T23:05:48.732445'
+- id: TODO-136
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T23:05:55.507243'
+  updated_at: '2026-02-09T23:05:55.507249'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T23:05:55.747618'
+  updated_at: '2026-02-09T23:05:55.747627'
+- id: TODO-137
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-09T23:06:07.061078'
+  updated_at: '2026-02-09T23:06:07.061085'
+- id: TODO-138
+  content: BB-AI-005测试 548fc0af
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:07.361205'
+  updated_at: '2026-02-09T23:06:07.361209'
+- id: TODO-139
+  content: BB-AI-006测试 f2e915bf
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:07.572568'
+  updated_at: '2026-02-09T23:06:07.572576'
+- id: TODO-140
+  content: BB-AI-007测试 f5271540
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:07.779668'
+  updated_at: '2026-02-09T23:06:07.779674'
+- id: TODO-141
+  content: BB-AI-008测试 31762c82
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:07.990158'
+  updated_at: '2026-02-09T23:06:07.990166'
+- id: TODO-142
+  content: BB-AI-010重复测试 0af71606
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:08.205675'
+  updated_at: '2026-02-09T23:06:08.205680'
+- id: TODO-143
+  content: BB-AI-010重复测试 0af71606
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:08.417711'
+  updated_at: '2026-02-09T23:06:08.417716'
+- id: TODO-144
+  content: BB-AI-011优先级测试 b6535499
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:08.635608'
+  updated_at: '2026-02-09T23:06:08.635615'
+- id: TODO-145
+  content: BB-AI-011优先级测试 228ad7fd
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:08.851328'
+  updated_at: '2026-02-09T23:06:08.851334'
+- id: TODO-146
+  content: BB-AI-011优先级测试 9bd4d54c
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:09.072664'
+  updated_at: '2026-02-09T23:06:09.072670'
+- id: TODO-147
+  content: BB-AI-011优先级测试 9107e59b
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:09.291191'
+  updated_at: '2026-02-09T23:06:09.291198'
+- id: TODO-148
+  content: BB-AI-011优先级测试 6950ef46
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:09.509862'
+  updated_at: '2026-02-09T23:06:09.509867'
+- id: TODO-149
+  content: BB-AI-011优先级测试 9ded6b98
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:09.731173'
+  updated_at: '2026-02-09T23:06:09.731179'
+- id: TODO-150
+  content: BB-AI-011第6个 8b7448a9
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:06:09.950393'
+  updated_at: '2026-02-09T23:06:09.950399'
+- id: TODO-151
+  content: BB-SKILL-009测试 33776fda
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:06:10.732989'
+  updated_at: '2026-02-09T23:06:10.732995'
+- id: TODO-152
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-09T23:14:56.809705'
+  updated_at: '2026-02-09T23:14:56.809711'
+- id: TODO-153
+  content: BB-AI-005测试 997b266c
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:57.117142'
+  updated_at: '2026-02-09T23:14:57.117147'
+- id: TODO-154
+  content: BB-AI-006测试 0244f0ed
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:14:57.342306'
+  updated_at: '2026-02-09T23:14:57.342311'
+- id: TODO-155
+  content: BB-AI-007测试 2d6d904e
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:14:57.564750'
+  updated_at: '2026-02-09T23:14:57.564755'
+- id: TODO-156
+  content: BB-AI-008测试 9be1a476
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:14:57.792964'
+  updated_at: '2026-02-09T23:14:57.792969'
+- id: TODO-157
+  content: BB-AI-010重复测试 8f87372e
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:14:58.018541'
+  updated_at: '2026-02-09T23:14:58.018546'
+- id: TODO-158
+  content: BB-AI-010重复测试 8f87372e
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:14:58.246258'
+  updated_at: '2026-02-09T23:14:58.246264'
+- id: TODO-159
+  content: BB-AI-011优先级测试 32a7199c
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:58.478221'
+  updated_at: '2026-02-09T23:14:58.478227'
+- id: TODO-160
+  content: BB-AI-011优先级测试 813ede50
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:58.710008'
+  updated_at: '2026-02-09T23:14:58.710013'
+- id: TODO-161
+  content: BB-AI-011优先级测试 1bb30f2b
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:58.939390'
+  updated_at: '2026-02-09T23:14:58.939395'
+- id: TODO-162
+  content: BB-AI-011优先级测试 3b9dbae5
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:59.168646'
+  updated_at: '2026-02-09T23:14:59.168650'
+- id: TODO-163
+  content: BB-AI-011优先级测试 c6c7a8d9
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:59.395091'
+  updated_at: '2026-02-09T23:14:59.395103'
+- id: TODO-164
+  content: BB-AI-011优先级测试 24fcb20c
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:59.623590'
+  updated_at: '2026-02-09T23:14:59.623596'
+- id: TODO-165
+  content: BB-AI-011第6个 b4c52fba
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:14:59.854559'
+  updated_at: '2026-02-09T23:14:59.854565'
+- id: TODO-166
+  content: BB-SKILL-009测试 922b0165
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:00.616420'
+  updated_at: '2026-02-09T23:15:00.616426'
+- id: TODO-167
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T23:15:33.676430'
+  updated_at: '2026-02-09T23:15:33.676438'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T23:15:33.967059'
+  updated_at: '2026-02-09T23:15:33.967067'
+- id: TODO-168
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-09T23:15:34.368349'
+  updated_at: '2026-02-09T23:15:34.368353'
+- id: TODO-169
+  content: BB-AI-005测试 3d71ca50
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:34.695345'
+  updated_at: '2026-02-09T23:15:34.695351'
+- id: TODO-170
+  content: BB-AI-006测试 0c61b212
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:34.940179'
+  updated_at: '2026-02-09T23:15:34.940185'
+- id: TODO-171
+  content: BB-AI-007测试 fb233a00
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:35.180962'
+  updated_at: '2026-02-09T23:15:35.180969'
+- id: TODO-172
+  content: BB-AI-008测试 55777ce5
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:35.424283'
+  updated_at: '2026-02-09T23:15:35.424289'
+- id: TODO-173
+  content: BB-AI-010重复测试 470f2865
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:35.669295'
+  updated_at: '2026-02-09T23:15:35.669302'
+- id: TODO-174
+  content: BB-AI-010重复测试 470f2865
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:35.913842'
+  updated_at: '2026-02-09T23:15:35.913848'
+- id: TODO-175
+  content: BB-AI-011优先级测试 ab68be34
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:36.158343'
+  updated_at: '2026-02-09T23:15:36.158349'
+- id: TODO-176
+  content: BB-AI-011优先级测试 915d6c33
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:36.413064'
+  updated_at: '2026-02-09T23:15:36.413070'
+- id: TODO-177
+  content: BB-AI-011优先级测试 9701e43d
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:36.663227'
+  updated_at: '2026-02-09T23:15:36.663233'
+- id: TODO-178
+  content: BB-AI-011优先级测试 04912a8c
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:36.907569'
+  updated_at: '2026-02-09T23:15:36.907575'
+- id: TODO-179
+  content: BB-AI-011优先级测试 4a35a18b
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:37.153565'
+  updated_at: '2026-02-09T23:15:37.153571'
+- id: TODO-180
+  content: BB-AI-011优先级测试 e9f20b26
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:37.407866'
+  updated_at: '2026-02-09T23:15:37.407871'
+- id: TODO-181
+  content: BB-AI-011第6个 42d8e471
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T23:15:37.663679'
+  updated_at: '2026-02-09T23:15:37.663686'
+- id: TODO-182
+  content: BB-SKILL-009测试 712733e0
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:15:38.483673'
+  updated_at: '2026-02-09T23:15:38.483678'
+- id: TODO-183
+  content: 修复BUG-20260209-001规范类问题：1）在oc_collab_requirements_guide中增加TODO创建检查规则；2）禁止替其他Agent分解任务；3）禁止创建大量重复TODO
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-09T23:17:55.742117'
+  updated_at: '2026-02-09T23:17:55.742122'
+total: 169
