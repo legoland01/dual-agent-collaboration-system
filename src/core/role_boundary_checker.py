@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 import re
 
 from .compliance_engine import ComplianceEngine, ComplianceResult, ComplianceResultType
+from .file_owner import FileOwnerManager
 
 
 class RoleBoundaryChecker:
@@ -88,6 +89,7 @@ class RoleBoundaryChecker:
     def __init__(self, project_path: str = "."):
         self.project_path = Path(project_path)
         self.permissions = self.ROLE_PERMISSIONS
+        self.file_owner_manager = FileOwnerManager(str(self.project_path))
 
     def check(
         self, agent_id: str, action: str, target: str
@@ -137,8 +139,21 @@ class RoleBoundaryChecker:
         denied_dirs = permissions.get("denied_dirs", [])
         for denied_dir in denied_dirs:
             if self._path_matches(target, denied_dir):
-                error_key = f"{agent_id}_denied_{denied_dir.replace('/', '').replace('-', '_')}"
-                if "design" in denied_dir:
+                # 首先检查文件Owner
+                owner = self.file_owner_manager.get_file_owner(target)
+                if owner and owner != agent_id:
+                    error_key = f"{agent_id}_denied_{denied_dir.replace('/', '').replace('-', '_')}"
+                    return ComplianceResult(
+                        check_type="role_boundary",
+                        result_type=ComplianceResultType.DENIED,
+                        agent_id=agent_id,
+                        action=action,
+                        target=target,
+                        message=self.ERROR_MESSAGES.get(
+                            error_key,
+                            f"⛔ 权限拒绝: 文件Owner是 {owner}，{agent_id} 无权修改",
+                        ),
+                    )
                     return ComplianceResult(
                         check_type="role_boundary",
                         result_type=ComplianceResultType.DENIED,

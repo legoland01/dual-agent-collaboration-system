@@ -343,6 +343,40 @@ class StateManager:
         """获取当前状态版本。"""
         return self._get_state_version()
     
+    def get_current_version(self) -> str:
+        """获取当前版本号（支持v2.2.x版本化结构）。"""
+        import re
+        state = self._read_state_file()
+        version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
+        if version_keys:
+            latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
+            return latest_version
+        return ""
+    
+    def get_current_stage(self, version: str = None) -> str:
+        """获取当前阶段（支持v2.2.x版本化结构）。"""
+        import re
+        state = self._read_state_file()
+        
+        if version is None:
+            version = self.get_current_version()
+        
+        if not version:
+            return state.get("phase", "unknown")
+        
+        version_data = state.get(version, {})
+        dev_status = version_data.get("development", {}).get("status", "")
+        if dev_status == "completed":
+            return "testing"
+        elif dev_status == "in_progress":
+            return "development"
+        elif version_data.get("design", {}).get("status") == "APPROVED":
+            return "design_completed"
+        elif version_data.get("requirements", {}).get("status") == "APPROVED":
+            return "requirements_completed"
+        
+        return state.get("phase", "unknown")
+    
     def get_current_phase(self) -> str:
         """获取当前阶段。"""
         try:

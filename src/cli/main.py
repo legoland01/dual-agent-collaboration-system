@@ -20,6 +20,7 @@ from ..core.phase_advance import PhaseAdvanceEngine
 from ..core.session_manager import SessionManager
 from ..core.compliance_engine import ComplianceEngine
 from ..core.git_sync_integrator import GitSyncIntegrator
+from ..core.file_owner import FileOwnerManager
 from ..utils.lock import LockExistsError
 from .enhanced_commands import (
     show_context_command,
@@ -100,7 +101,6 @@ def init_command(project_name: str, type: str, force: bool, no_git: bool):
 def status_command():
     """查看当前协作状态。"""
     try:
-        import re
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         state = state_manager.load_state()
@@ -116,10 +116,9 @@ def status_command():
 
         project_name = metadata.get("project_name") or project_info.get("name")
         if not project_name:
-            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
-            if version_keys:
-                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
-                project_name = f"oc-collab {latest_version}"
+            current_version = state_manager.get_current_version()
+            if current_version:
+                project_name = f"oc-collab {current_version}"
         if not project_name:
             project_name = "oc-collab"
 
@@ -128,18 +127,10 @@ def status_command():
         table.add_row("项目名称", project_name)
         table.add_row("项目类型", project_type)
 
-        current_phase = project_info.get("phase") or state.get("phase", "未知")
-        if current_phase == "未知":
-            version_keys = [k for k in state.keys() if re.match(r'^v2\.\d+', k)]
-            if version_keys:
-                latest_version = sorted(version_keys, key=lambda x: [int(n) for n in re.findall(r'\d+', x)])[-1]
-                version_data = state.get(latest_version, {})
-                dev_status = version_data.get("development", {}).get("status", "")
-                if dev_status == "completed":
-                    current_phase = "testing"
-                elif dev_status == "in_progress":
-                    current_phase = "development"
+        current_version = state_manager.get_current_version()
+        current_phase = state_manager.get_current_stage(current_version)
 
+        table.add_row("当前版本", current_version)
         table.add_row("当前阶段", current_phase)
 
         active_agent = state_manager.get_active_agent()
