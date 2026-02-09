@@ -488,8 +488,7 @@ adhoc_todos:
   priority: P0
   agent_id: '2'
   created_at: '2026-02-09T16:30:00'
-  completed_at: '2026-02-09T16:55:00'
-  note: '根因：TODO文件中存在重复ID（TODO-085重复），导致save_todos唯一性检查失败。解决：删除重复ID，测试通过'
+  updated_at: null
 - id: TODO-090
   content: 评估TODO文件结构优化方案：1）新TODO前插到文件开头提升读取效率；2）增加自动归档机制防止文件膨胀；3）增加重复创建检查防止生成重复ID和任务
   status: pending
@@ -513,9 +512,45 @@ adhoc_todos:
   updated_at: '2026-02-09T19:24:58.540726'
 - id: TODO-092
   content: 验证todowrite修复成功
-  status: pending
+  status: completed
   priority: high
   agent_id: 1
   created_at: '2026-02-09T19:25:03.332680'
-  updated_at: '2026-02-09T19:25:03.332690'
-total: 74
+  updated_at: '2026-02-09T19:32:56.573437'
+- id: TODO-093
+  content: 验收BUG-20260209-002修复结果：1）运行测试用例 test_todowrite_persistence.py；2）验证CLI todowrite命令正常；3）确认无重复ID问题
+  status: completed
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T19:27:11.570757'
+  updated_at: '2026-02-09T19:32:56.710157'
+- id: TODO-094
+  content: 评审v2.2.6需求文档+概要设计并签署
+  status: completed
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T19:29:56.297586'
+  completed_at: '2026-02-09T19:40:00'
+  note: '技术评审通过（有条件）：需确认ActionDetector模块存在性'
+- id: TODO-095
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-09T19:32:43.736403'
+  updated_at: '2026-02-09T19:32:43.736409'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-09T19:32:43.881010'
+  updated_at: '2026-02-09T19:32:43.881022'
+- id: TODO-096
+  content: 测试todowrite命令正常1
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T19:32:47.681917'
+  updated_at: '2026-02-09T19:32:47.681922'
+total: 79
