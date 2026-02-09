@@ -382,7 +382,7 @@ adhoc_todos:
   created_by: agent2
   created_at: '2026-02-09T10:35:00'
   description: '评审 DETAIL-2026-02-v2.2.5.md'
-- id: TODO-071
+- id: TODO-072
   content: 测试todowrite持久化
   status: pending
   priority: high
