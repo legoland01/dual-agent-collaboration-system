@@ -8,11 +8,11 @@ adhoc_todos:
   updated_at: '2026-02-08T21:50:39.350120'
 - id: TEST-SUCCESS
   content: 测试sync_with_rollback成功场景
-  status: pending
+  status: cancelled
   priority: high
   agent_id: null
   created_at: '2026-02-08T21:51:29.696589'
-  updated_at: '2026-02-08T21:51:29.696605'
+  updated_at: '2026-02-09T19:33:31.453668'
 - id: TODO-001
   content: null
   status: completed
@@ -491,11 +491,11 @@ adhoc_todos:
   updated_at: null
 - id: TODO-090
   content: 评估TODO文件结构优化方案：1）新TODO前插到文件开头提升读取效率；2）增加自动归档机制防止文件膨胀；3）增加重复创建检查防止生成重复ID和任务
-  status: pending
+  status: completed
   priority: medium
   agent_id: '1'
   created_at: '2026-02-09T16:45:00'
-  updated_at: null
+  updated_at: '2026-02-09T19:33:23.036738'
 - id: TEST-SUCCESS
   content: 测试sync_with_rollback成功场景
   status: pending
@@ -530,8 +530,7 @@ adhoc_todos:
   priority: high
   agent_id: 2
   created_at: '2026-02-09T19:29:56.297586'
-  completed_at: '2026-02-09T19:40:00'
-  note: '技术评审通过（有条件）：需确认ActionDetector模块存在性'
+  updated_at: null
 - id: TODO-095
   content: 测试todowrite持久化
   status: pending
@@ -548,9 +547,16 @@ adhoc_todos:
   updated_at: '2026-02-09T19:32:43.881022'
 - id: TODO-096
   content: 测试todowrite命令正常1
-  status: pending
+  status: cancelled
   priority: high
   agent_id: 1
   created_at: '2026-02-09T19:32:47.681917'
-  updated_at: '2026-02-09T19:32:47.681922'
-total: 79
+  updated_at: '2026-02-09T19:33:31.592441'
+- id: TODO-097
+  content: 确认v2.2.6概要设计中SkillEnforcer依赖的ActionDetector模块是否存在，如不存在需调整设计
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T19:37:07.138439'
+  updated_at: '2026-02-09T19:37:07.138446'
+total: 80
