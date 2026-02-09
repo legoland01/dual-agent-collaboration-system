@@ -406,36 +406,28 @@ adhoc_todos:
   created_by: agent1
   created_at: '2026-02-09T10:40:29.606159'
   description: '参考: DETAIL-2026-02-v2.2.5.md 第3节'
-- id: TODO-073
-  content: '开发 FR-SIGN-001: signoff修复 (signoff.py)'
+- id: TODO-077
+  content: v2.2.5 开发：FR-OWNER-001 + FR-STATE-001 + FR-SIGN-001 + FR-PROC-001/002
   status: pending
   priority: P0
   agent_id: agent2
   created_by: agent1
-  created_at: '2026-02-09T10:40:29.606170'
-  description: '参考: DETAIL-2026-02-v2.2.5.md 第4节'
-- id: TODO-074
-  content: '开发 FR-OWNER-001: 文件Owner机制 (file_owner.py)'
-  status: pending
-  priority: P0
-  agent_id: agent2
-  created_by: agent1
-  created_at: '2026-02-09T10:40:29.606171'
-  description: '核心功能。参考: DETAIL-2026-02-v2.2.5.md 第2节'
-- id: TODO-075
-  content: '开发 FR-PROC-001/002: 更新Skill (requirements_guide + collaboration_guide)'
-  status: pending
-  priority: P1
-  agent_id: agent2
-  created_by: agent1
-  created_at: '2026-02-09T10:40:29.606172'
-  description: '用Skill实现，无需代码。参考: DETAIL-2026-02-v2.2.5.md 第5-6节'
-- id: TODO-076
-  content: v2.2.5 开发完成，签署开发确认
-  status: pending
-  priority: P0
-  agent_id: agent2
-  created_by: agent1
-  created_at: '2026-02-09T10:40:29.606173'
-  description: 所有功能开发完成后，签署开发确认
+  created_at: '2026-02-09T10:42:08.650005'
+  description: '基于 DETAIL-2026-02-v2.2.5.md 开发所有功能
+
+
+    实现顺序（参考详细设计第9节）：
+
+    1. FR-STATE-001 (1h) - Bug修复
+
+    2. FR-SIGN-001 (1h) - Bug修复
+
+    3. FR-OWNER-001 (5.5h) - 核心功能
+
+    4. FR-PROC-001/002 (3h) - Skill更新
+
+
+    参考文档：
+
+    - docs/02-design/DETAIL-2026-02-v2.2.5.md'
 total: 55
