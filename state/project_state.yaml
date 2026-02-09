@@ -143,7 +143,7 @@ deployment:
   pypi: true
   git_tag: v2.2.4
 v2.2.5:
-  status: TESTING
+  status: APPROVED
   requirements:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-08'
@@ -172,3 +172,6 @@ v2.2.5:
     completed_at: '2026-02-09T14:45:00'
     started_at: '2026-02-09T14:30:00'
     tests_passed: 5
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-09 13:05:32'
+    status: APPROVED
