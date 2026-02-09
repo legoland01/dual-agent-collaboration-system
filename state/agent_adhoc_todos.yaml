@@ -319,10 +319,8 @@ adhoc_todos:
   status: completed
   priority: P0
   agent_id: '2'
-  created_by: agent1
   created_at: '2026-02-08T23:20:00'
-  completed_at: '2026-02-09T10:00:00'
-  note: BUG已关闭（非代码bug，是操作问题）。todowrite功能已验证正常
+  updated_at: null
 - id: TODO-065
   content: 测试todowrite持久化
   status: pending
@@ -370,20 +368,15 @@ adhoc_todos:
   status: completed
   priority: P0
   agent_id: agent2
-  created_by: agent1
   created_at: '2026-02-09T10:12:06.260802'
-  completed_at: '2026-02-09T10:30:00'
-  review_result: 待Agent 1评审
+  updated_at: null
 - id: TODO-071
   content: 评审 v2.2.5 详细设计并签署
   status: completed
   priority: P0
   agent_id: '1'
-  created_by: agent2
   created_at: '2026-02-09T10:35:00'
-  description: 评审 DETAIL-2026-02-v2.2.5.md
-  completed_at: '2026-02-09T10:36:37.433352'
-  review_result: 技术评审通过
+  updated_at: null
 - id: TODO-072
   content: 测试todowrite持久化
   status: pending
@@ -391,43 +384,18 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-09T10:13:52.296333'
   updated_at: '2026-02-09T10:13:52.296339'
-- id: TEST-SUCCESS
-  content: 测试sync_with_rollback成功场景
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-09T10:13:52.396855'
-  updated_at: '2026-02-09T10:13:52.396867'
-- id: TODO-072
-  content: '开发 FR-STATE-001: 状态识别修复 (state_manager.py)'
-  status: pending
-  priority: P0
-  agent_id: agent2
-  created_by: agent1
-  created_at: '2026-02-09T10:40:29.606159'
-  description: '参考: DETAIL-2026-02-v2.2.5.md 第3节'
 - id: TODO-077
   content: v2.2.5 开发：FR-OWNER-001 + FR-STATE-001 + FR-SIGN-001 + FR-PROC-001/002
   status: pending
   priority: P0
   agent_id: agent2
-  created_by: agent1
   created_at: '2026-02-09T10:42:08.650005'
-  description: '基于 DETAIL-2026-02-v2.2.5.md 开发所有功能
-
-
-    实现顺序（参考详细设计第9节）：
-
-    1. FR-STATE-001 (1h) - Bug修复
-
-    2. FR-SIGN-001 (1h) - Bug修复
-
-    3. FR-OWNER-001 (5.5h) - 核心功能
-
-    4. FR-PROC-001/002 (3h) - Skill更新
-
-
-    参考文档：
-
-    - docs/02-design/DETAIL-2026-02-v2.2.5.md'
-total: 55
+  updated_at: null
+- id: TODO-078
+  content: 修复 BUG-20260209-001（创建TODO时ID重复问题）
+  status: pending
+  priority: medium
+  agent_id: 2
+  created_at: '2026-02-09T10:45:35.107199'
+  updated_at: '2026-02-09T10:45:35.107207'
+total: 59
