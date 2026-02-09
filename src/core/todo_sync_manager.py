@@ -109,7 +109,17 @@ class TodoSyncManager:
 
         Raises:
             TodoSaveError: 保存失败
+            ValueError: ID 重复
         """
+        # 检查 ID 唯一性
+        ids = [todo.id for todo in state.todos]
+        if len(ids) != len(set(ids)):
+            seen = set()
+            for todo_id in ids:
+                if todo_id in seen:
+                    raise ValueError(f"TODO ID 重复: {todo_id}")
+                seen.add(todo_id)
+        
         try:
             todos_list = [
                 {

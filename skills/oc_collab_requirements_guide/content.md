@@ -1,25 +1,38 @@
 # OC-Collab 需求编写指南
 
-## 快速开始
+**版本**: v8.0.0
+**适用阶段**: requirements
+**适用角色**: Agent 1 (产品经理)
 
-### 创建新需求文档
+---
 
-```bash
-# 1. 先做需求分析
-#    分析所有历史文档，识别可用Skill解决的问题
-#    分析结果输出到 ANALYSIS_vX.X.X_Requirements_Analysis.md
+## SOP结构概览
 
-# 2. 复制模板
-cp docs/01-requirements/TEMPLATE_requirements.md docs/01-requirements/requirements_vX.X.X_DRAFT.md
+| SOP要素 | 内容 |
+|---------|------|
+| **1. 触发条件** | 需求分析完成后 |
+| **2. 操作步骤** | 见"2. 操作步骤" |
+| **3. 输出产物** | requirements_vX.X.X_DRAFT.md |
+| **4. 验收标准** | 见"4. 验收标准" |
 
-# 3. 编辑文档
-#    - 填写所有必须字段
-#    - 明确验收标准
-#    - 预估工时
+---
 
-# 4. 状态流转
-#    DRAFT → READY (产品完成) → APPROVED (开发确认)
+## 1. 触发条件 ⭐
+
+**什么情况下需要创建需求文档？**
+
 ```
+需求分析完成 ✅
+    │
+    └── 需求分析报告已创建并评审通过
+        └── ANALYSIS_vX.X.X_Requirements_Analysis.md
+```
+
+**禁止**：跳过需求分析直接创建需求文档
+
+---
+
+## 2. 操作步骤 ⭐
 
 ---
 
