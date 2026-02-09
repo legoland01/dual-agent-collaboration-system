@@ -168,5 +168,7 @@ v2.2.5:
     - 'FR-PROC-001: 版本结束后需求分析流程'
     - 'FR-PROC-002: 评审机制优化'
   testing:
-    phase: in_progress
+    phase: completed
+    completed_at: '2026-02-09T14:45:00'
     started_at: '2026-02-09T14:30:00'
+    tests_passed: 5
