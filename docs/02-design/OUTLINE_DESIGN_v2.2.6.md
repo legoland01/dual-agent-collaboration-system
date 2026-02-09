@@ -99,10 +99,10 @@ ContextCarrier ──→ TodoSyncManager, ProjectContext
 ConflictDetector ──→ TodoSyncManager
               │
 SkillSearcher ──┬──→ SkillManager
-               │
+                │
 SkillSlicer ─────→ SkillManager
-               │
-SkillEnforcer ──→ SkillManager, ActionDetector
+                │
+SkillEnforcer ──→ REQUIRED_SKILLS, skills/  # v2.2.4已有，不依赖ActionDetector
 ```
 
 ### 3.2 外部依赖
@@ -159,8 +159,14 @@ SkillEnforcer ──→ SkillManager, ActionDetector
 - ✅ 与需求文档对齐
 
 ### 待确认
-- SkillEnforcer → ActionDetector 模块是否存在？
+- SkillEnforcer → REQUIRED_SKILLS, skills/ 替代 ActionDetector ✅ 已修正
 
 ### 结论
 ✅ 技术评审通过（有条件）
-- 条件：确认 ActionDetector 模块存在性
+- 条件：确认 SkillEnforcer 依赖修正为 REQUIRED_SKILLS, skills/ 目录
+
+---
+
+**Agent 1 修正（2026-02-09）**：
+- ActionDetector 模块不存在，已修正依赖关系
+- v2.2.4 SkillEnforcer 实际依赖 REQUIRED_SKILLS 字典 + skills/ 目录

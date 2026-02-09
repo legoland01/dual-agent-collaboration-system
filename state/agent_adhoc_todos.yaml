@@ -554,9 +554,12 @@ adhoc_todos:
   updated_at: '2026-02-09T19:33:31.592441'
 - id: TODO-097
   content: 确认v2.2.6概要设计中SkillEnforcer依赖的ActionDetector模块是否存在，如不存在需调整设计
-  status: pending
+  status: completed
   priority: high
-  agent_id: 1
+  agent_id: '1'
   created_at: '2026-02-09T19:37:07.138439'
-  updated_at: '2026-02-09T19:37:07.138446'
+  updated_at: '2026-02-09T19:45:00'
+  note: ActionDetector不存在，v2.2.4的SkillEnforcer实际依赖REQUIRED_SKILLS+skills/目录
+  completed_at: '2026-02-09T19:45:00'
+
 total: 80
