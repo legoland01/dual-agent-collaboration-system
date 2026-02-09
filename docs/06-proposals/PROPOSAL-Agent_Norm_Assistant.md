@@ -653,6 +653,27 @@ slicing:
 
 ---
 
+## 关联文档
+
+| 文档 | 路径 | 说明 |
+|------|------|------|
+| RESEARCH_Skill_Evolution_Management_20260209.md | docs/07-research/RESEARCH_Skill_Evolution_Management_20260209.md | Skill演进路线图（Phase 1-4规划，本提案对应Phase 3） |
+| PROPOSAL-Skill_Reorganization_20260209.md | docs/06-proposals/PROPOSAL-Skill_Reorganization_20260209.md | Skill重整方案（已暂停，待RESEARCH评审后更新） |
+| MEETING-SOP_Reorganization_Thinking_20260209.md | docs/08-meeting-notes/MEETING-SOP_Reorganization_Thinking_20260209.md | SOP重整思路会议纪要（核心共识、面向未来的SOP设计要求） |
+
+**本文档与其他文档的关系**：
+- 本PROPOSAL是Agent2提出的智能辅助系统实现方案
+- RESEARCH将本提案纳入Phase 3（中期任务），对应T-SKILL-008/009/010
+- 会议纪要明确了本提案在SOP体系中的定位：便于嵌入、便于检索、便于强制执行
+- Skill重整方案的T-SKILL-001拆分是本提案的前置条件
+
+**阅读建议**：
+1. 先读RESEARCH了解整体规划中的Phase 3定位
+2. 再读会议纪要理解面向未来的SOP设计要求
+3. 如需SOP拆分细节，参考Skill重整方案（待更新）
+
+---
+
 **创建人**: Agent 2
 **创建日期**: 2026-02-08
 **状态**: 待评审

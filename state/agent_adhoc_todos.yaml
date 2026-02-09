@@ -342,8 +342,6 @@ adhoc_todos:
   agent_id: agent2
   created_at: '2026-02-08T22:10:00'
   updated_at: '2026-02-09T14:30:00'
-  completed_at: '2026-02-09T14:30:00'
-  note: BUG已修复。CLI命令正常工作，无需pip install -e .
 - id: TODO-068
   content: 评审 v2.2.5 需求文档 + 概要设计
   status: completed
@@ -400,8 +398,6 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-09T10:45:35.107199'
   updated_at: '2026-02-09T14:00:00'
-  completed_at: '2026-02-09T14:00:00'
-  note: 在 todo_sync_manager.py 的 save_todos 中添加 ID 唯一性检查
 - id: TODO-079
   content: 测试添加TODO
   status: pending
@@ -409,4 +405,11 @@ adhoc_todos:
   agent_id: 1
   created_at: '2026-02-09T11:11:29.631313'
   updated_at: '2026-02-09T11:11:29.631319'
-total: 58
+- id: TODO-080
+  content: v2.2.5 黑盒测试验收（FR-OWNER-001 + FR-STATE-001 + FR-SIGN-001 + FR-PROC-001/002）
+  status: pending
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-09T11:29:45.737646'
+  updated_at: '2026-02-09T11:29:45.737651'
+total: 59

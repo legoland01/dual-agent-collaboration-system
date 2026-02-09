@@ -365,10 +365,17 @@ class StateManager:
             return state.get("phase", "unknown")
         
         version_data = state.get(version, {})
-        dev_status = version_data.get("development", {}).get("status", "")
-        if dev_status == "completed":
+        
+        # 检查 testing.phase（v2.2.4+ 结构）
+        testing_phase = version_data.get("testing", {}).get("phase", "")
+        if testing_phase == "in_progress":
             return "testing"
-        elif dev_status == "in_progress":
+        
+        # 检查 development.phase
+        dev_phase = version_data.get("development", {}).get("phase", "")
+        if dev_phase == "completed":
+            return "testing"
+        elif dev_phase == "in_progress":
             return "development"
         elif version_data.get("design", {}).get("status") == "APPROVED":
             return "design_completed"
