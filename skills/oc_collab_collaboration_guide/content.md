@@ -710,6 +710,68 @@ oc-collab todo
 
 ---
 
+## SOP结构概览 ⭐
+
+| SOP要素 | 内容 |
+|---------|------|
+| **1. 触发条件** | 见"1. 触发条件"章节 |
+| **2. 操作步骤** | 见"2. 操作步骤"章节 |
+| **3. 输出产物** | 协作规范文档、状态记录 |
+| **4. 验收标准** | 见"4. 验收标准"章节 |
+
+---
+
+## 1. 触发条件 ⭐
+
+| 场景 | 触发条件 |
+|------|----------|
+| 新会话开始 | session_start 事件 |
+| Agent困惑时 | agent_confused 事件 |
+| 角色边界检查 | role_boundary_check 事件 |
+| 文档状态检查 | document_state_check 事件 |
+| 合规检查 | compliance_check 事件 |
+| Git同步 | git_sync 事件 |
+
+---
+
+## 2. 操作步骤 ⭐
+
+| 阶段 | 步骤 | 操作 |
+|------|------|------|
+| 会话开始 | 1 | 加载协作规则 |
+| 协作过程 | 2 | 按角色权限操作 |
+| 协作过程 | 3 | 遵守文档状态规范 |
+| 协作过程 | 4 | 执行合规检查 |
+| 版本推进 | 5 | Git同步 |
+
+参考详细步骤：
+- "评审优先级规则"
+- "Agent职责澄清"
+- "v2.2.2 新功能：协作规范强制执行"
+
+---
+
+## 3. 输出产物 ⭐
+
+| 产物 | 位置 | 格式 |
+|------|------|------|
+| 协作规范文档 | skills/oc_collab_collaboration_guide/content.md | Markdown |
+| 状态记录 | state/project_state.yaml | YAML |
+| 合规检查结果 | state/compliance_results.yaml | YAML |
+
+---
+
+## 4. 验收标准 ⭐
+
+| 标准 | 检查方法 |
+|------|----------|
+| 角色权限正确 | 检查 skill.json 中 permissions 配置 |
+| 文档状态正确 | 检查 state/project_state.yaml |
+| 合规检查通过 | 运行 oc-collab compliance check |
+| Git同步完成 | 检查 git log |
+
+---
+
 ## 版本历史（标准化格式）
 
 | 版本 | 日期 | 变更 | 作者 |

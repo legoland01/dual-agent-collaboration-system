@@ -59,7 +59,7 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-09T20:53:26.664225'
+updated_at: '2026-02-10T00:14:08.841190'
 v2.2.2:
   acceptance:
     agent1_signoff: true
@@ -186,11 +186,8 @@ v2.2.5:
     tests_passed: 5
 v2.2.6:
   deployment:
-    completed_at: '2026-02-09T15:05:00'
-    pypi_url: https://pypi.org/project/opencode-collaboration/2.2.5/
-    pypi_version: 2.2.5
-    started_at: '2026-02-09T15:00:00'
-    status: completed
+    phase: pending
+    status: pending
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-09'
@@ -203,24 +200,6 @@ v2.2.6:
     phase: completed
     started_at: '2026-02-09T20:15:00'
     status: completed
-  testing:
-    phase: completed
-    completed_at: '2026-02-09T21:30:00'
-    started_at: '2026-02-09T20:35:00'
-    status: completed
-    agent1_signoff: true
-    agent1_signoff_at: '2026-02-09T21:30:00'
-    bugs:
-    - description: "CLI命令未完整实现（todowrite --auto-check, skill search/slice/enforce）"
-      id: BUG-20260209-003
-      severity: P0
-      status: closed
-    unit_tests_passed: 52
-    coverage: ">80%"
-    acceptance_report: docs/03-test/user_scenario_acceptance_v2.2.6.md
-  deployment:
-    phase: pending
-    status: pending
   features:
   - "F-AI-001: todowrite\u53C2\u6570\u81EA\u52A8\u68C0\u67E5"
   - "F-AI-002: TODO\u4E0A\u4E0B\u6587\u643A\u5E26"
@@ -228,5 +207,21 @@ v2.2.6:
   - "F-SKILL-001: Skill\u5173\u952E\u8BCD\u68C0\u7D22"
   - "F-SKILL-002: Skill\u5207\u7247\u673A\u5236"
   - "F-SKILL-003: Skill\u5F3A\u5236\u67E5\u627E\u589E\u5F3A"
+  testing:
+    acceptance_report: docs/03-test/user_scenario_acceptance_v2.2.6.md
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-09T21:30:00'
+    bugs:
+    - description: "CLI\u547D\u4EE4\u672A\u5B8C\u6574\u5B9E\u73B0\uFF08todowrite --auto-check,\
+        \ skill search/slice/enforce\uFF09"
+      id: BUG-20260209-003
+      severity: P0
+      status: closed
+    completed_at: '2026-02-09T21:30:00'
+    coverage: '>80%'
+    phase: completed
+    started_at: '2026-02-09T20:35:00'
+    status: completed
+    unit_tests_passed: 52
   version: 2.2.6
   workload: 16h
