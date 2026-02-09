@@ -54,9 +54,15 @@ oc-collab advance -p design
 | `oc-collab todowrite` | 创建待办任务 (v2.2.3) |
 | `oc-collab todoedit` | 编辑待办任务 (v2.2.3) |
 | `oc-collab todo` | 查看待办事项 |
+| `oc-collab todowrite --auto-check` | 创建TODO，自动检查参数并携带上下文 (v2.2.6) |
+| `oc-collab skill search --keywords <kw>` | 搜索Skill文档 (v2.2.6) |
+| `oc-collab skill slice <skill>` | 查看Skill特定切片 (v2.2.6) |
+| `oc-collab skill enforce` | 检查Skill加载状态 (v2.2.6) |
 | `oc-collab advance -p <phase>` | 推进到指定阶段 |
 | `oc-collab signoff <stage>` | 签署确认 |
 | `oc-collab history` | 查看协作历史 |
+| `oc-collab compliance check` | 合规检查 (v2.2.2) |
+| `oc-collab git sync` | Git同步 (v2.2.2) |
 
 ---
 
@@ -103,6 +109,9 @@ myproject/
 
 | 版本 | 日期 | 功能 |
 |------|------|------|
+| v2.2.6 | 2026-02-09 | 智能辅助：todowrite自动检查、TODO上下文携带、冲突检测；Skill关键词检索、切片查看、强制查找 |
+| v2.2.5 | 2026-02-09 | 文件Owner机制、signoff修复、版本结束后需求分析流程、评审机制优化 |
+| v2.2.4 | 2026-02-08 | Skill强制加载检查、Git提交前签署验证、需求文档完整性检查 |
 | v2.2.3 | 2026-02-08 | Agent体验优化：`.a`项目信息、任务同步、状态摘要 |
 | v2.2.2 | 2026-02-07 | 协作规范强制执行、Git同步集成 |
 | v2.2.1 | 2026-02-07 | 双代理认知免疫系统、动态Checklist |

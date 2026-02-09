@@ -1,6 +1,44 @@
 # CHANGELOG - oc-collab 双Agent协作框架
 
-## v2.2.4 (2026-02-08)
+## v2.2.6 (2026-02-09)
+
+### 新增功能
+
+| 功能ID | 功能描述 | 来源 |
+|--------|----------|------|
+| F-AI-001 | todowrite参数自动检查 | requirements_v2.2.6.md |
+| F-AI-002 | TODO上下文携带 | requirements_v2.2.6.md |
+| F-AI-003 | 冲突检测 | requirements_v2.2.6.md |
+| F-SKILL-001 | Skill关键词检索 | requirements_v2.2.6.md |
+| F-SKILL-002 | Skill切片机制 | requirements_v2.2.6.md |
+| F-SKILL-003 | Skill强制查找增强 | requirements_v2.2.6.md |
+
+### 新增模块
+
+| 模块 | 文件 | 功能 |
+|------|------|------|
+| AutoChecker | src/core/auto_checker.py | todowrite参数自动检查 |
+| ContextCarrier | src/core/context_carrier.py | TODO上下文携带 |
+| ConflictDetector | src/core/conflict_detector.py | 冲突检测 |
+| SkillSearcher | src/core/skill_searcher.py | Skill关键词检索 |
+| SkillSlicer | src/core/skill_slicer.py | Skill切片机制 |
+
+### 新增CLI命令
+
+| 命令 | 功能 |
+|------|------|
+| `oc-collab todowrite --auto-check` | 自动检查参数并携带上下文 |
+| `oc-collab skill search --keywords <kw>` | 搜索Skill文档 |
+| `oc-collab skill slice <skill>` | 查看Skill特定切片 |
+| `oc-collab skill enforce` | Skill强制查找机制 |
+
+### 核心目标
+
+**解决Agent"找不到、看不懂、记不住"Skill的问题**
+
+---
+
+## v2.2.5 (2026-02-09)
 
 ### 新增功能
 
@@ -49,6 +87,34 @@
 - 新增单元测试：34 tests passed
 - 新增E2E测试：5 tests passed
 - 测试覆盖率：85%
+
+---
+
+## v2.2.5 (2026-02-09)
+
+### 新增功能
+
+| 功能ID | 功能描述 | 来源 |
+|--------|----------|------|
+| FR-OWNER-001 | 文件Owner机制 | requirements_v2.2.5.md |
+| FR-STATE-001 | 状态识别修复 | requirements_v2.2.5.md |
+| FR-SIGN-001 | signoff修复 | requirements_v2.2.5.md |
+| FR-PROC-001 | 版本结束后需求分析流程 | requirements_v2.2.5.md |
+| FR-PROC-002 | 评审机制优化 | requirements_v2.2.5.md |
+
+### Bug修复
+
+| Bug ID | 描述 | 状态 |
+|--------|------|------|
+| BUG-20260208-003 | SessionManager识别v2.2.x项目结构 | ✅ 已修复 |
+| BUG-20260208-004 | signoff.py不支持v2.2.x结构 | ✅ 已修复 |
+| BUG-20260208-006 | signoff.py字段名不匹配 | ✅ 已修复 |
+
+### 改进
+
+- Skill更新：文件Owner管理机制
+- Skill更新：状态识别与修复流程
+- Skill更新：signoff修复规范
 
 ---
 
