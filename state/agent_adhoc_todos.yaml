@@ -322,7 +322,7 @@ adhoc_todos:
   created_by: agent1
   created_at: '2026-02-08T23:20:00'
   completed_at: '2026-02-09T10:00:00'
-  note: 'BUG已关闭（非代码bug，是操作问题）。todowrite功能已验证正常'
+  note: BUG已关闭（非代码bug，是操作问题）。todowrite功能已验证正常
 - id: TODO-065
   content: 测试todowrite持久化
   status: pending
@@ -373,15 +373,17 @@ adhoc_todos:
   created_by: agent1
   created_at: '2026-02-09T10:12:06.260802'
   completed_at: '2026-02-09T10:30:00'
-  review_result: '待Agent 1评审'
+  review_result: 待Agent 1评审
 - id: TODO-071
   content: 评审 v2.2.5 详细设计并签署
-  status: pending
+  status: completed
   priority: P0
   agent_id: '1'
   created_by: agent2
   created_at: '2026-02-09T10:35:00'
-  description: '评审 DETAIL-2026-02-v2.2.5.md'
+  description: 评审 DETAIL-2026-02-v2.2.5.md
+  completed_at: '2026-02-09T10:36:37.433352'
+  review_result: 技术评审通过
 - id: TODO-072
   content: 测试todowrite持久化
   status: pending
