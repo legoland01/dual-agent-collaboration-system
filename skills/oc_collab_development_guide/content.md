@@ -278,6 +278,10 @@ yaml.dump(state, 'state/project_state.yaml')
 | 查看状态 | `oc-collab status` |
 | 查看待办 | `oc-collab todo` |
 | 添加待办 | `oc-collab todowrite --content "任务" --priority high` |
+| 添加待办(自动检查) | `oc-collab todowrite --content "任务" --agent 1 --priority high` (v2.2.6+) |
+| 搜索Skill | `oc-collab skill search --keywords <关键词>` (v2.2.6+) |
+| 查看Skill切片 | `oc-collab skill slice <skill_name>` (v2.2.6+) |
+| 检查Skill | `oc-collab skill enforce` (v2.2.6+) |
 | 更新待办 | `oc-collab todoedit TODO-001 --status completed` |
 | 运行测试 | `python3 -m pytest tests/test_v2_2_x.py -v` |
 | 提交代码 | `git commit -m "feat: xxx"` |
@@ -323,6 +327,7 @@ yaml.dump(state, 'state/project_state.yaml')
 | v1.0.0 | 2026-02-08 | 初始版本 |
 | v1.1.0 | 2026-02-08 | 强调开发基于详细设计，增加概要设计参考 |
 | v1.2 | 2026-02-08 | 添加任务交接检查清单，修复后标注"已修复" |
+| v1.3 | 2026-02-09 | 添加v2.2.6新命令：todowrite自动检查、skill search/slice/enforce |
 
 **维护者**: Agent 2
-**更新日期**: 2026-02-08
+**更新日期**: 2026-02-09
