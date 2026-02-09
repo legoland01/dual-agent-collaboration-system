@@ -1,5 +1,59 @@
 # Changelog
 
+## v2.2.6 - v2.2.6 Released
+
+**Date**: 2026-02-09
+**Status**: ✅ **RELEASED** - AI-Assisted TODO Management + Skill Search Enhancement
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-09
+- Agent2: ✅ 2026-02-09
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **F-AI: Smart TODO System** | | |
+| ├─ F-AI-001 | AutoChecker (todowrite参数自动检查) | ✅ |
+| ├─ F-AI-002 | ContextCarrier (TODO上下文携带) | ✅ |
+| └─ F-AI-003 | ConflictDetector (TODO冲突检测) | ✅ |
+| **F-SKILL: Skill Search Enhancement** | | |
+| ├─ F-SKILL-001 | SkillSearcher (关键词检索) | ✅ |
+| ├─ F-SKILL-002 | SkillSlicer (切片机制) | ✅ |
+| └─ F-SKILL-003 | SkillEnforcer (强制查找增强) | ✅ |
+| **F-PROC: Agent Behavior Standardization** | | |
+| ├─ F-PROC-001 | Search Strategy Update | ✅ |
+| └─ F-PROC-002 | Path Handling Standardization | ✅ |
+
+### Changes
+
+- **src/core/auto_checker.py** - 参数自动检查器
+- **src/core/context_carrier.py** - TODO上下文携带器
+- **src/core/conflict_detector.py** - TODO冲突检测器
+- **src/core/skill_searcher.py** - Skill关键词检索器
+- **src/core/skill_slicer.py** - Skill切片器
+- **src/core/skill_enforcer.py** - Skill强制查找增强（v2.2.6增强版）
+- **src/cli/enhanced_commands.py** - todowrite命令增强（--auto-check）
+- **src/cli/skill_commands.py** - skill命令增强（search/slice/enforce）
+- **docs/02-design/DETAIL-2026-02-v2.2.6.md** - 详细设计文档
+
+### CLI Changes
+
+- **`oc-collab todowrite --auto-check`** - 参数自动检查（默认启用）
+- **`oc-collab todowrite --test-mode`** - 测试模式（不创建正式TODO）
+- **`oc-collab skill search -k <keywords>`** - Skill关键词检索
+- **`oc-collab skill slice <skill> --level <chapter|section>`** - Skill章节切片
+- **`oc-collab skill enforce -a <action>`** - Skill强制查找
+
+### Tests
+
+- **tests/test_v226_ai_modules.py** - F-AI模块单元测试（22个用例）
+- **tests/test_v226_skill_modules.py** - F-SKILL模块单元测试（30个用例）
+- **tests/test_blackbox_v226.py** - v2.2.6黑盒测试（17个用例）
+- **Coverage**: 核心模块代码覆盖率 ≥ 80%
+
+---
+
 ## v2.2.2 - v2.2.2 Released
 
 **Date**: 2026-02-08
