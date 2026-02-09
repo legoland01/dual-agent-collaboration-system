@@ -451,4 +451,11 @@ adhoc_todos:
   created_at: '2026-02-09T12:58:48.542385'
   updated_at: '2026-02-09T13:05:23.921552'
   completed_at: '2026-02-09T13:05:23.921559'
+- id: TODO-083
+  content: v2.2.5 部署：PyPI发布 + Git tag
+  status: pending
+  priority: P0
+  agent_id: agent2
+  created_at: '2026-02-09T13:06:29.450483'
+  updated_at: '2026-02-09T13:06:29.450490'
 total: 61
