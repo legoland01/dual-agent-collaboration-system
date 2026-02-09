@@ -423,3 +423,29 @@ adhoc_todos:
   acceptance_criteria:
   - PROPOSAL-20260208-001已创建
   - 待Agent 1评审后实施
+- id: TODO-070
+  content: 创建 v2.2.5 详细设计 (DETAIL-2026-02-v2.2.5.md)
+  status: pending
+  priority: P0
+  agent_id: agent2
+  created_by: agent1
+  created_at: '2026-02-09T10:12:06.260802'
+  description: '基于 OUTLINE_v2.2.5.md 创建详细设计
+
+
+    要求：
+
+    1. 基于概要设计中的功能结构图
+
+    2. FR-OWNER-001 需要详细设计（核心功能，5.5h）
+
+    3. FR-STATE-001/FR-SIGN-001 可简化（Bug修复）
+
+    4. FR-PROC-001/FR-PROC-002 已用Skill实现，可简化
+
+
+    参考文档：
+
+    - docs/02-design/OUTLINE_v2.2.5.md
+
+    - docs/01-requirements/requirements_v2.2.5.md'
