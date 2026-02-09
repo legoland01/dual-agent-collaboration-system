@@ -56,12 +56,14 @@ def show_context_command():
 @click.option("--agent", type=click.Choice(["1", "2"]), help="Agent 编号")
 @click.option("--auto-check/--no-auto-check", default=True,
               help="是否自动检查参数 (默认启用)")
-def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str], auto_check: bool):
+@click.option("--test-mode", is_flag=True, help="测试模式（不创建正式TODO，仅验证参数）")
+def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str], auto_check: bool, test_mode: bool):
     """
     创建待办任务。
 
     示例:
       oc-collab todowrite --content "完成设计" --priority high --agent 2
+      oc-collab todowrite --content "测试" --test-mode  # 测试模式，不创建正式TODO
     """
     from ..core.auto_checker import AutoChecker, ValidationError
 
@@ -83,6 +85,13 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
     # 检查是否有内容可创建
     if not content and not todos:
         raise click.ClickException("请提供 --content 或导入 TODO 文件")
+
+    # 测试模式：只验证，不创建正式TODO
+    if test_mode:
+        click.echo(f"[TEST] 待办内容验证通过: {content}")
+        click.echo(f"[TEST] Agent: {agent}, Priority: {priority}")
+        click.echo(f"[TEST] 测试模式下未创建正式TODO")
+        return
 
     sync_manager = TodoSyncManager()
 
