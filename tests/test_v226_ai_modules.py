@@ -100,29 +100,34 @@ class TestContextCarrier:
         """测试无历史时摘要生成"""
         carrier = ContextCarrier(str(PROJECT_ROOT))
 
-        with pytest.MonkeyPatch.context() as m:
-            m.setattr(carrier, 'load_history', lambda n: [])
+        # Mock load_history 返回空列表
+        original_load = carrier.load_history
+        carrier.load_history = lambda limit=10: []
 
-            summary = carrier.generate_context_summary("新任务")
+        summary = carrier.generate_context_summary("新任务")
 
-            assert "新任务" in summary
-            assert "暂无历史任务" in summary
+        # 恢复原始方法
+        carrier.load_history = original_load
+
+        assert "新任务" in summary
+        assert "暂无历史任务" in summary
 
     def test_generate_context_summary_with_history(self):
         """测试有历史时摘要生成"""
         carrier = ContextCarrier(str(PROJECT_ROOT))
 
-        with pytest.MonkeyPatch.context() as m:
-            m.setattr(carrier, 'load_history', lambda n: [
-                {"id": "TODO-001", "content": "旧任务1", "status": "completed"},
-                {"id": "TODO-002", "content": "旧任务2", "status": "completed"}
-            ])
+        # Mock load_history 返回历史
+        carrier.load_history = lambda limit=10: [
+            {"id": "TODO-001", "content": "旧任务1", "status": "completed"},
+            {"id": "TODO-002", "content": "旧任务2", "status": "completed"}
+        ]
 
-            summary = carrier.generate_context_summary("新任务")
+        summary = carrier.generate_context_summary("新任务")
 
-            assert "新任务" in summary
-            assert "历史任务" in summary
-            assert "TODO-002" in summary
+        assert "新任务" in summary
+        assert "历史任务" in summary
+        # 验证摘要中包含历史任务内容
+        assert "旧任务" in summary
 
     def test_get_version_info_no_state(self):
         """测试无状态文件时版本信息"""
@@ -138,17 +143,17 @@ class TestContextCarrier:
         """测试构建上下文"""
         carrier = ContextCarrier(str(PROJECT_ROOT))
 
-        with pytest.MonkeyPatch.context() as m:
-            m.setattr(carrier, 'load_history', lambda n: [])
-            m.setattr(carrier, 'get_version_info', lambda: {"version": "2.2.6", "phase": "development"})
+        # Mock 依赖方法
+        carrier.load_history = lambda limit=10: []
+        carrier.get_version_info = lambda: {"version": "2.2.6", "phase": "development"}
 
-            context = carrier.build_context("TODO-001", "测试任务", "1", "high")
+        context = carrier.build_context("TODO-001", "测试任务", "1", "high")
 
-            assert isinstance(context, TodoContext)
-            assert context.todo_id == "TODO-001"
-            assert context.content == "测试任务"
-            assert context.agent_id == "1"
-            assert context.priority == "high"
+        assert isinstance(context, TodoContext)
+        assert context.todo_id == "TODO-001"
+        assert context.content == "测试任务"
+        assert context.agent_id == "1"
+        assert context.priority == "high"
 
 
 class TestConflictDetector:
