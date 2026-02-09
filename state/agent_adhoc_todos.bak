@@ -486,12 +486,4 @@ adhoc_todos:
   completed_at: '2026-02-09T15:30:00'
   review_result: 技术评审通过（有条件）
   note: 条件：补充验收标准 + 明确工时拆分方案
-- id: TODO-087
-  content: 补充v2.2.6验收标准 + 明确工时拆分方案
-  status: pending
-  priority: high
-  agent_id: '1'
-  created_by: agent2
-  created_at: '2026-02-09T15:35:00'
-  description: '条件：补充每个功能的验收标准 + 明确F-AI-001/002拆分方案'
-total: 68
+total: 67
