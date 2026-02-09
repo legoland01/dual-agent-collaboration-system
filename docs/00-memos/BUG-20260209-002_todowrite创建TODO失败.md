@@ -2,7 +2,7 @@
 
 **Bug ID**: BUG-20260209-002
 **严重程度**: P0
-**状态**: 待修复
+**状态**: 已修复
 **发现人**: Agent 1
 **发现日期**: 2026-02-09
 
@@ -73,9 +73,9 @@ assert False is True
 
 | 行动 | 执行人 | 状态 |
 |------|--------|------|
-| 排查 todowrite/sync_with_rollback 失败原因 | Agent 2 | 待处理 |
-| 修复代码 | Agent 2 | 待处理 |
-| 验证修复 | Agent 2 | 待处理 |
+| 排查 todowrite/sync_with_rollback 失败原因 | Agent 2 | 已完成 |
+| 修复代码 | Agent 2 | 已完成 |
+| 验证修复 | Agent 2 | 已完成 |
 | 更新 Skill（如需要） | Agent 1 | 待处理 |
 
 ---
@@ -91,4 +91,4 @@ assert False is True
 
 **创建人**: Agent 1
 **日期**: 2026-02-09
-**状态**: 待修复
+**状态**: 已修复
