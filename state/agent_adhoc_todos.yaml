@@ -1,157 +1,38 @@
 adhoc_todos:
-- id: TODO-033
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 21:35:00
-  updated_at: null
-- id: TODO-040
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-08 12:00:00
-  updated_at: null
-- id: TODO-034
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 22:00:00
-  updated_at: null
-- id: TODO-038
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-08 00:05:00
-  updated_at: null
-- id: TODO-036
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 23:55:00
-  updated_at: null
-- id: TODO-033
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 21:35:00
-  updated_at: null
-- id: TODO-037
-  content: null
+- id: TEST-001
+  content: 测试save_todos方法
   status: pending
-  priority: P1
+  priority: high
   agent_id: null
-  created_at: 2026-02-07 23:55:00
-  updated_at: null
-- id: TODO-032
+  created_at: '2026-02-08T21:50:39.350110'
+  updated_at: '2026-02-08T21:50:39.350120'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-08T21:51:29.696589'
+  updated_at: '2026-02-08T21:51:29.696605'
+- id: TODO-001
   content: null
   status: completed
   priority: P1
   agent_id: null
-  created_at: 2026-02-07 21:00:00
+  created_at: 2026-02-05 22:50:00
   updated_at: null
-- id: TODO-031
+- id: TODO-002
   content: null
   status: completed
-  priority: P0
+  priority: P1
   agent_id: null
-  created_at: 2026-02-07 17:00:00
+  created_at: 2026-02-06 12:00:00
   updated_at: null
-- id: TODO-030
-  content: null
-  status: archived
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 15:10:00
-  updated_at: null
-- id: TODO-021
-  content: v2.2.1 测试签署和阶段推进
-  status: completed
-  priority: P0
-  agent_id: '1'
-  created_at: 2026-02-07 04:10:00
-  updated_at: '2026-02-08T19:52:00'
-- id: TODO-027
-  content: null
-  status: archived
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 14:35:00
-  updated_at: null
-- id: TODO-025
-  content: null
-  status: archived
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 04:20:00
-  updated_at: null
-- id: TODO-020
+- id: TODO-003
   content: null
   status: completed
-  priority: P0
+  priority: P1
   agent_id: null
-  created_at: 2026-02-07 03:15:00
-  updated_at: null
-- id: TODO-014
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 02:08:00
-  updated_at: null
-- id: TODO-013
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 02:07:00
-  updated_at: null
-- id: TODO-012
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 02:06:00
-  updated_at: null
-- id: TODO-011
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 02:05:00
-  updated_at: null
-- id: TODO-010
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 02:00:00
-  updated_at: null
-- id: TODO-008
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 01:00:00
-  updated_at: null
-- id: TODO-007
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 00:30:00
-  updated_at: null
-- id: TODO-006
-  content: null
-  status: completed
-  priority: P0
-  agent_id: null
-  created_at: 2026-02-07 00:10:00
+  created_at: 2026-02-06 23:00:00
   updated_at: null
 - id: TODO-004
   content: null
@@ -167,26 +48,152 @@ adhoc_todos:
   agent_id: null
   created_at: 2026-02-06 23:50:00
   updated_at: null
-- id: TODO-003
+- id: TODO-006
   content: null
   status: completed
-  priority: P1
+  priority: P0
   agent_id: null
-  created_at: 2026-02-06 23:00:00
+  created_at: 2026-02-07 00:10:00
   updated_at: null
-- id: TODO-002
+- id: TODO-007
   content: null
   status: completed
-  priority: P1
+  priority: P0
   agent_id: null
-  created_at: 2026-02-06 12:00:00
+  created_at: 2026-02-07 00:30:00
   updated_at: null
-- id: TODO-001
+- id: TODO-008
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 01:00:00
+  updated_at: null
+- id: TODO-010
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:00:00
+  updated_at: null
+- id: TODO-011
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:05:00
+  updated_at: null
+- id: TODO-012
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:06:00
+  updated_at: null
+- id: TODO-013
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:07:00
+  updated_at: null
+- id: TODO-014
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 02:08:00
+  updated_at: null
+- id: TODO-020
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 03:15:00
+  updated_at: null
+- id: TODO-021
+  content: v2.2.1 测试签署和阶段推进
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: 2026-02-07 04:10:00
+  updated_at: '2026-02-08T19:52:00'
+- id: TODO-025
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 04:20:00
+  updated_at: null
+- id: TODO-027
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 14:35:00
+  updated_at: null
+- id: TODO-030
+  content: null
+  status: archived
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 15:10:00
+  updated_at: null
+- id: TODO-031
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 17:00:00
+  updated_at: null
+- id: TODO-032
   content: null
   status: completed
   priority: P1
   agent_id: null
-  created_at: 2026-02-05 22:50:00
+  created_at: 2026-02-07 21:00:00
+  updated_at: null
+- id: TODO-033
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 21:35:00
+  updated_at: null
+- id: TODO-034
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 22:00:00
+  updated_at: null
+- id: TODO-036
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-07 23:55:00
+  updated_at: null
+- id: TODO-037
+  content: null
+  status: pending
+  priority: P1
+  agent_id: null
+  created_at: 2026-02-07 23:55:00
+  updated_at: null
+- id: TODO-038
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 00:05:00
+  updated_at: null
+- id: TODO-040
+  content: null
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: 2026-02-08 12:00:00
   updated_at: null
 - id: TODO-041
   content: null
@@ -273,12 +280,12 @@ adhoc_todos:
   created_at: '2026-02-08T22:20:00'
   updated_at: null
 - id: TODO-058
-  content: 测试TODO persistence
+  content: 修复 BUG-20260208-006（signoff.py字段名'test'不匹配v2.2.4的'testing'）
   status: completed
-  priority: high
-  agent_id: 2
-  created_at: '2026-02-08T21:21:30.905954'
-  updated_at: '2026-02-08T21:21:30.905961'
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-08T22:30:00'
+  updated_at: null
 - id: TODO-059
   content: 测试失败TODO
   status: pending
@@ -293,13 +300,6 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-08T21:22:43.260580'
   updated_at: '2026-02-08T21:22:43.260586'
-- id: TODO-058
-  content: 修复 BUG-20260208-006（signoff.py字段名'test'不匹配v2.2.4的'testing'）
-  status: completed
-  priority: P0
-  agent_id: '2'
-  created_at: '2026-02-08T22:30:00'
-  updated_at: null
 - id: TODO-061
   content: 验证todowrite功能
   status: pending
@@ -322,13 +322,6 @@ adhoc_todos:
   agent_id: '2'
   created_at: '2026-02-08T23:20:00'
   updated_at: null
-- id: TEST-001
-  content: 测试save_todos方法
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-08T21:50:39.350110'
-  updated_at: '2026-02-08T21:50:39.350120'
 - id: TODO-065
   content: 测试todowrite持久化
   status: pending
@@ -336,28 +329,7 @@ adhoc_todos:
   agent_id: 2
   created_at: '2026-02-08T21:51:29.601233'
   updated_at: '2026-02-08T21:51:29.601242'
-- id: TEST-SUCCESS
-  content: 测试sync_with_rollback成功场景
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-08T21:51:29.696589'
-  updated_at: '2026-02-08T21:51:29.696605'
-- id: TODO-BUG-008
-  content: Agent2 创建PROPOSAL-FileOwner.md（文件Owner机制）
-  status: completed
-  priority: P0
-  agent_id: '2'
-  created_at: '2026-02-08T23:50:00'
-  bug_id: BUG-20260208-008
-  testing_cmd: oc-collab compliance check --role --action edit --target "src/"
-  completed_at: '2026-02-08T22:24:25.051999'
-  acceptance_criteria:
-  - PROPOSAL-20260208-001已创建
-  - 待Agent 1评审后实施
-total: 50
-TODO-066:
-  id: TODO-066
+- id: TODO-066
   status: pending
   priority: P0
   agent_id: agent2
@@ -377,8 +349,7 @@ TODO-066:
     - docs/01-requirements/ANALYSIS_v2.2.5_Requirements_Analysis.md
 
     - 用户背景说明：Agent间通信的重要性'
-TODO-067:
-  id: TODO-067
+- id: TODO-067
   content: 修复 BUG-20260208-009 oc-collab CLI无法执行
   status: pending
   priority: P1
@@ -400,14 +371,15 @@ TODO-067:
     参考文档：
 
     - docs/00-memos/BUG-20260208-009_oc_collab_CLI_无法执行.md'
-TODO-068:
-  id: TODO-068
+- id: TODO-068
   content: 评审 v2.2.5 需求文档 + 概要设计
-  status: pending
+  status: completed
   priority: P0
   agent_id: agent2
   created_by: agent1
   created_at: '2026-02-08T23:30:00'
+  completed_at: '2026-02-09T09:40:00'
+  review_result: '技术评审通过（有条件）'
   description: '评审重点：
 
     1. 功能范围是否合理
@@ -426,3 +398,27 @@ TODO-068:
     - docs/02-design/OUTLINE_v2.2.5.md（概要设计）
 
     - docs/01-requirements/ANALYSIS_v2.2.5_Requirements_Analysis.md（分析报告）'
+- id: TODO-069
+  content: 补充 FR-OWNER-001 验收标准（CLI 测试命令）
+  status: pending
+  priority: P0
+  agent_id: '1'
+  created_by: agent2
+  created_at: '2026-02-09T09:40:00'
+  description: '在 requirements_v2.2.5.md 第42-46行补充：
+
+    1. 非Owner修改时的拒绝场景
+
+    2. CLI 测试命令：oc-collab compliance check --role --action edit --target <文件>'
+- id: TODO-BUG-008
+  content: Agent2 创建PROPOSAL-FileOwner.md（文件Owner机制）
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-08T23:50:00'
+  bug_id: BUG-20260208-008
+  testing_cmd: oc-collab compliance check --role --action edit --target "src/"
+  completed_at: '2026-02-08T22:24:25.051999'
+  acceptance_criteria:
+  - PROPOSAL-20260208-001已创建
+  - 待Agent 1评审后实施
