@@ -1,9 +1,9 @@
 # Skill SOP重组需求分析报告
 
 **文档编号**: ANALYSIS-SKILL-SOP-001
-**版本**: v1.0
+**版本**: v1.1
 **日期**: 2026-02-09
-**状态**: DRAFT → 待Agent2评审
+**状态**: APPROVED
 
 ---
 
@@ -16,6 +16,17 @@
 | RESEARCH_Skill_Evolution_Management_20260209.md | DRAFT | Skill演进路线图 |
 | PROPOSAL-Skill_Reorganization_20260209.md | 已暂停 | 重整方案待更新 |
 | PROPOSAL-Agent_Norm_Assistant.md | 已实现 | 智能辅助系统(v2.2.6) |
+
+### 1.2 责任人分工 ⭐
+
+| 阶段 | 任务 | Agent 1 | Agent 2 |
+|------|------|---------|---------|
+| **Phase 1** | skill.json标准化 | oc_collab_bug_management_guide, oc_collab_test_acceptance_guide, oc_collab_requirements_guide, oc_collab_requirements_review_guide, oc_collab_outline_design_guide | oc_collab_development_guide, oc_collab_detailed_design_guide, oc_collab_deployment_guide |
+| **Phase 2** | SOP四要素补充 | oc_collab_bug_management_guide, oc_collab_test_acceptance_guide | oc_collab_development_guide, oc_collab_deployment_guide |
+| **Phase 3** | 版本历史统一 | 全部Skill | - |
+| **Phase 4** | Skill预切片 | 定义切片粒度标准 | 配合F-SKILL实现预切片 |
+
+**原则**：谁维护谁负责，每个Skill的维护者负责该Skill的标准化工作
 
 ### 1.2 当前问题
 
@@ -189,10 +200,31 @@
 
 ### Phase 4: Skill预切片（优先级P2，与v2.2.6 F-SKILL配合）
 
+**预切片粒度标准**：
+
+| 粒度级别 | 切片单位 | 适用场景 |
+|-----------|----------|----------|
+| **L1: SOP元素级** | 触发条件、操作步骤、输出产物、验收标准 | 快速检索单元素 |
+| **L2: 章节级** | 每个二级标题(##)作为一个切片 | 检索完整操作流程 |
+| **L3: 规则级** | 每个独立规则/检查清单作为一个切片 | 精准定位规则 |
+| **L4: 子规则级** | 每个子项检查清单作为一个切片 | 最细粒度检索 |
+
+**预切片原则**：
+- 优先做 L2（章节级），因为与现有Markdown结构一致
+- 长文档（>400行）增加 L1（触发条件单独切片）
+- FAQ和常见问题做 L3/L4
+
+**切片标签规范**：
+```json
+{
+  "tags": ["阶段", "角色", "操作类型", "优先级"]
+}
+```
+
 | 优先级 | Skill | 操作 |
 |--------|-------|------|
-| P2 | collaboration_guide | 预切片，支持快速检索 |
-| P2 | bug_management_guide | 预切片，支持快速检索 |
+| P2 | collaboration_guide | 预切片(L1+L2)，支持快速检索 |
+| P2 | bug_management_guide | 预切片(L1+L2)，支持快速检索 |
 
 ---
 
@@ -282,11 +314,11 @@
 
 | 角色 | 签署人 | 日期 |
 |------|--------|------|
-| Agent 1（产品） | 待签署 | 2026-02-09 |
+| Agent 1（产品） | Agent 1 | 2026-02-09 |
 | Agent 2（开发） | Agent 2 | 2026-02-09 |
 
 ---
 
 **创建人**: Agent 1
 **日期**: 2026-02-09
-**状态**: DRAFT → 待Agent2评审
+**状态**: APPROVED
