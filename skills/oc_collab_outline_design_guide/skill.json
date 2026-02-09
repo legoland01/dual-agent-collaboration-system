@@ -1,24 +1,32 @@
 {
-  "name": "oc_collab_outline_design_guide",
-  "description": "OC-Collab 概要设计指南 - 功能视角，由Agent 1负责",
-  "version": "v1",
-  "author": "OC-Collab Team",
-  "trigger_keywords": [
-    "概要设计",
-    "outline design",
-    "功能模块",
-    "产品路线图"
+  "id": "oc_collab_outline_design_guide",
+  "name": "OC-Collab 概要设计指南",
+  "version": "v1.0.0",
+  "description": "概要设计文档规范 - 功能模块抽象、用户视角、模块关系",
+  "author": "Agent 1",
+  "created_at": "2026-02-08",
+  "updated_at": "2026-02-09",
+  "tags": ["design", "outline", "workflow"],
+  "applicable_phase": "outline_design",
+  "applicable_role": "Agent1",
+  "triggers": [
+    {
+      "condition": "requirements_approved",
+      "priority": "high",
+      "description": "需求文档已签署（APPROVED）"
+    },
+    {
+      "condition": "agent_asks_design",
+      "priority": "high",
+      "description": "Agent询问如何做概要设计时"
+    }
   ],
-  "parameters": {},
-  "examples": [
-    "创建概要设计",
-    "功能模块有哪些",
-    "本版本在路线图中的位置"
-  ],
+  "outputs": {
+    "documents": ["docs/02-design/OUTLINE_DESIGN_v*.md"],
+    "artifacts": ["state/project_state.yaml"]
+  },
   "related_skills": [
-    "oc_collab_detailed_design_guide",
     "oc_collab_requirements_guide",
-    "oc_collab_requirements_review_guide"
-  ],
-  "documentation_path": "skills/oc_collab_outline_design_guide/content.md"
+    "oc_collab_detailed_design_guide"
+  ]
 }
