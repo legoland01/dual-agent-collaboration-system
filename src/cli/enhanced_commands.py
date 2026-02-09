@@ -54,22 +54,49 @@ def show_context_command():
 @click.option("--content", help="待办内容")
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), default="medium")
 @click.option("--agent", type=click.Choice(["1", "2"]), help="Agent 编号")
-def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str]):
+@click.option("--auto-check/--no-auto-check", default=True,
+              help="是否自动检查参数 (默认启用)")
+def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str], auto_check: bool):
     """
     创建待办任务。
 
     示例:
-      oc-collab todowrite --content "完成设计" --priority high
+      oc-collab todowrite --content "完成设计" --priority high --agent 2
     """
+    from ..core.auto_checker import AutoChecker, ValidationError
+
     sync_manager = TodoSyncManager()
 
     def _do_todowrite():
         if content:
             agent_id = int(agent) if agent else None
+
+            # v2.2.6: 自动检查
+            if auto_check:
+                checker = AutoChecker()
+                result = checker.check_all(content, agent, priority)
+
+                if result["warnings"]:
+                    for warning in result["warnings"]:
+                        click.echo(f"⚠️  {warning}")
+
+                if not result["valid"]:
+                    for error in result["errors"]:
+                        click.echo(f"❌ {error}")
+                    raise click.ClickException("参数验证失败")
+
             todo = sync_manager.add_todo(content, agent_id=agent_id, priority=priority)
             click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
             click.echo(f"   优先级: {todo.priority}")
             click.echo(f"   状态: {todo.status}")
+
+            # v2.2.6: 上下文摘要
+            if auto_check:
+                from ..core.context_carrier import ContextCarrier
+                carrier = ContextCarrier()
+                summary = carrier.generate_context_summary(content)
+                if summary:
+                    click.echo(f"\n{summary}")
 
         for todo_file in todos:
             path = Path(todo_file)

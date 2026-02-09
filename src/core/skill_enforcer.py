@@ -23,13 +23,20 @@ class SkillLoadError(SkillEnforcerError):
 
 
 class SkillEnforcer:
-    """Skill强制加载检查器"""
-    
+    """Skill强制加载检查器 - v2.2.6增强版"""
+
     REQUIRED_SKILLS = {
         "requirements_review": "oc_collab_requirements_review_guide",
         "development": "oc_collab_development_guide",
         "testing": "oc_collab_test_acceptance_guide",
         "deployment": "oc_collab_deployment_guide",
+        "requirements": "oc_collab_requirements_guide",          # v2.2.6 新增
+        "design": "oc_collab_design_guide",                     # v2.2.6 新增
+    }
+
+    OPTIONAL_SKILLS = {
+        "bug_management": "oc_collab_bug_management_guide",
+        "collaboration": "oc_collab_collaboration_guide",
     }
     
     def __init__(self, skills_dir: Optional[str] = None):
@@ -95,7 +102,7 @@ class SkillEnforcer:
     def list_missing_skills(self) -> list[str]:
         """
         列出缺失的Skill
-        
+
         Returns:
             缺失的Skill列表
         """
@@ -105,3 +112,51 @@ class SkillEnforcer:
             if not skill_path.exists():
                 missing.append(skill_name)
         return missing
+
+    def check_before_action(self, action: str) -> dict:
+        """
+        行动前检查
+
+        Args:
+            action: 行动类型 (如 "todowrite", "signoff", "review")
+
+        Returns:
+            检查结果字典
+        """
+        from typing import Dict, Any
+
+        result: Dict[str, Any] = {
+            "action": action,
+            "required_skills": [],
+            "optional_skills": [],
+            "missing": [],
+            "suggestions": []
+        }
+
+        # 根据行动类型确定相关Skill
+        skill_mapping = {
+            "todowrite": ["requirements", "collaboration"],
+            "signoff": ["requirements_review", "development"],
+            "review": ["requirements_review"],
+            "phase_advance": ["requirements", "design"],
+        }
+
+        phases = skill_mapping.get(action, [])
+
+        for phase in phases:
+            if phase in self.REQUIRED_SKILLS:
+                result["required_skills"].append(self.REQUIRED_SKILLS[phase])
+
+                skill_path = self.skills_dir / self.REQUIRED_SKILLS[phase]
+                if not skill_path.exists():
+                    result["missing"].append(self.REQUIRED_SKILLS[phase])
+
+            if phase in self.OPTIONAL_SKILLS:
+                result["optional_skills"].append(self.OPTIONAL_SKILLS[phase])
+
+        if result["missing"]:
+            result["suggestions"].append(
+                f"建议加载相关Skill: {'; '.join(result['missing'])}"
+            )
+
+        return result
