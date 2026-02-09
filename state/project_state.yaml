@@ -146,6 +146,11 @@ v2.2.4:
   version: 2.2.4
   workload: 14h
 v2.2.5:
+  deployment:
+    completed_at: '2026-02-09T15:05:00'
+    pypi_url: 'https://pypi.org/project/opencode-collaboration/2.2.5/'
+    pypi_version: '2.2.5'
+    status: completed
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-09'
@@ -156,13 +161,14 @@ v2.2.5:
   development:
     completed_at: '2026-02-09T12:00:00'
     features:
-    - "FR-OWNER-001: \u6587\u4EF6Owner\u673A\u5236"
-    - "FR-STATE-001: \u72B6\u6001\u8BC6\u522B\u4FEE\u590D"
-    - "FR-SIGN-001: signoff\u4FEE\u590D"
-    - "FR-PROC-001: \u7248\u672C\u7ED3\u675F\u540E\u9700\u6C42\u5206\u6790\u6D41\u7A0B"
-    - "FR-PROC-002: \u8BC4\u5BA1\u673A\u5236\u4F18\u5316"
+    - "FR-OWNER-001: 文件Owner机制"
+    - "FR-STATE-001: 状态识别修复"
+    - "FR-SIGN-001: signoff修复"
+    - "FR-PROC-001: 版本结束后需求分析流程"
+    - "FR-PROC-002: 评审机制优化"
     phase: completed
     started_at: '2026-02-09T10:36:18.061052'
+    status: completed
   requirements:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-08'
@@ -178,6 +184,27 @@ v2.2.5:
     started_at: '2026-02-09T14:30:00'
     status: APPROVED
     tests_passed: 5
+v2.2.6:
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-09'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-09'
+    design_doc: docs/02-design/DETAIL-2026-02-v2.2.6.md
+    status: APPROVED
+  development:
+    phase: in_progress
+    started_at: '2026-02-09T20:15:00'
+    status: in_progress
+  features:
+  - "F-AI-001: todowrite参数自动检查"
+  - "F-AI-002: TODO上下文携带"
+  - "F-AI-003: 冲突检测"
+  - "F-SKILL-001: Skill关键词检索"
+  - "F-SKILL-002: Skill切片机制"
+  - "F-SKILL-003: Skill强制查找增强"
+  workload: 16h
+  version: 2.2.6
   deployment:
     status: completed
     started_at: '2026-02-09T15:00:00'
