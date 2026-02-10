@@ -399,7 +399,7 @@ oc-collab sync-all -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
 
 ### 引用部署指南
 
-**详细部署步骤**: [oc_collab_deployment_guide](../oc_collab_deployment_guide/content.md)
+**详细部署步骤**: [oc_collab_deployment_guide](../oc_collab_deployment_guide/)
 
 ```
 部署阶段指南包含：

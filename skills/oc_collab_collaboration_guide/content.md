@@ -91,7 +91,8 @@ oc-collab advance --no-sync
 | 操作 | 自动同步 |
 |------|---------|
 | `oc-collab advance` | ✅ 自动 git add → commit → push |
-| `oc-collab todowrite/todoedit` | ✅ 自动 git add → commit |
+| `oc-collab todowrite` | ✅ 自动 git add → commit |
+| `oc-collab todoedit` | ✅ 自动 git add → commit |
 
 ---
 

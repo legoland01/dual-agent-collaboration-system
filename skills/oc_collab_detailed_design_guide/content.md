@@ -172,7 +172,7 @@ class RequirementManager:
 | 命令 | 函数 | 描述 | 工时 |
 |------|------|------|------|
 | `oc-collab requirements create` | `create()` | 创建需求 | Xh |
-| `oc-collab requirements review` | `review()` | 评审需求 | Xh |
+| `oc-collab review requirements` | `review()` | 评审需求 | Xh |
 ```
 
 ### 4. 数据结构
