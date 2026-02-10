@@ -227,8 +227,10 @@ v2.2.6:
   workload: 16h
 v2.2.7:
   deployment:
-    completed_at: '2026-02-10T19:50:00'
+    completed_at: '2026-02-10T21:30:00'
     git_tag: v2.2.7
+    pypi_url: https://pypi.org/project/opencode-collaboration/2.2.7/
+    pypi_version: 2.2.7
     status: completed
   design:
     agent1_signoff: true
