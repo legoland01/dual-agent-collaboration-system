@@ -77,18 +77,18 @@ class TodoSyncManager:
             if data is None:
                 return TodoState()
 
-            todos = [
-                TodoItem(
+            todos = []
+            for item in data.get("adhoc_todos", data.get("todos", [])):
+                todo = TodoItem(
                     id=item.get("id"),
                     content=item.get("content"),
                     status=item.get("status", "pending"),
                     priority=item.get("priority", "medium"),
-                    agent_id=item.get("agent_id"),
+                    agent_id=item.get("agent_id") or item.get("to", {}).get("agent_id") if isinstance(item.get("to"), dict) else None,
                     created_at=item.get("created_at"),
                     updated_at=item.get("updated_at"),
                 )
-                for item in data.get("adhoc_todos", [])
-            ]
+                todos.append(todo)
 
             return TodoState(
                 todos=todos,
@@ -135,7 +135,7 @@ class TodoSyncManager:
             ]
 
             data = {
-                "adhoc_todos": todos_list,
+                "todos": todos_list,
                 "total": len(todos_list),
             }
 
