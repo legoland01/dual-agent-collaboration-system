@@ -13,16 +13,13 @@ todos:
   agent_id: null
   created_at: '2026-02-10T15:30:00'
   updated_at: '2026-02-10T16:00:00'
-  review_doc: 'docs/02-design/design_review_v2.2.7.md'
 - id: TODO-262
-  content: '修复v2.2.7详细设计评审意见：3项修改'
+  content: 修复v2.2.7详细设计评审意见：3项修改
   status: pending
   priority: P1
-  agent_id: "2"
+  agent_id: null
   created_at: '2026-02-10T16:00:00'
   updated_at: null
-  description: '根据design_review_v2.2.7.md修复3项问题，并更新DETAIL状态为APPROVED'
-  review_doc: 'docs/02-design/design_review_v2.2.7.md'
 - id: TODO-247
   content: test
   status: pending
@@ -125,16 +122,146 @@ todos:
   content: BB-SKILL-009测试 2ddb2fa8
   status: pending
   priority: medium
-  agent_id: 1
+  agent_id: null
   created_at: '2026-02-10T15:10:46.502981'
   updated_at: '2026-02-10T15:10:46.502988'
-- id: "TODO-263"
-  content: "v2.2.7详细设计已通过评审，可以开始开发"
-  from: "agent2"
-  to: "agent1"
-  phase: "development"
+- id: TODO-263
+  content: v2.2.7详细设计已通过评审，可以开始开发
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-10T16:30:00'
+  updated_at: null
+- id: TODO-264
+  content: v2.2.7 开发阶段：实现所有模块
+  status: pending
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-10T17:00:00'
+  updated_at: null
+- id: TODO-265
+  content: 创建 oc-collab 问题追踪系统 skill
+  status: completed
+  priority: P2
+  agent_id: null
+  created_at: '2026-02-10T18:00:00'
+  updated_at: null
+- id: TODO-266
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:16.573872'
+  updated_at: '2026-02-10T15:49:16.573880'
+- id: TODO-267
+  content: BB-AI-005测试 b37dad0b
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:16.798638'
+  updated_at: '2026-02-10T15:49:16.798645'
+- id: TODO-268
+  content: BB-AI-006测试 6144fc0e
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:16.923289'
+  updated_at: '2026-02-10T15:49:16.923298'
+- id: TODO-269
+  content: BB-AI-007测试 d61b4fd0
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.050245'
+  updated_at: '2026-02-10T15:49:17.050253'
+- id: TODO-270
+  content: BB-AI-008测试 a14a7032
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.180642'
+  updated_at: '2026-02-10T15:49:17.180649'
+- id: TODO-271
+  content: BB-AI-010重复测试 ce966d56
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.309570'
+  updated_at: '2026-02-10T15:49:17.309578'
+- id: TODO-272
+  content: BB-AI-010重复测试 ce966d56
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.437897'
+  updated_at: '2026-02-10T15:49:17.437905'
+- id: TODO-273
+  content: BB-AI-011优先级测试 84f08ead
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.571270'
+  updated_at: '2026-02-10T15:49:17.571277'
+- id: TODO-281
+  content: 执行v2.2.7黑盒测试 skill test/skill coverage/webhook init/start/stop
+  from: "agent1"
+  to: "agent2"
+  phase: "blackbox_testing"
+  priority: "P0"
+  status: "completed"
+  created_at: "2026-02-10T19:10:00"
+  updated_at: "2026-02-10T19:30:00"
+  description: "执行v2.2.7 CLI命令黑盒测试，验证skill test、skill coverage、webhook init/start/stop功能"
+  result: "全部通过"
+- id: TODO-275
+  content: BB-AI-011优先级测试 592155ea
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.841371'
+  updated_at: '2026-02-10T15:49:17.841378'
+- id: TODO-276
+  content: BB-AI-011优先级测试 c240bee3
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:17.979336'
+  updated_at: '2026-02-10T15:49:17.979342'
+- id: TODO-277
+  content: BB-AI-011优先级测试 62f144b6
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:18.114998'
+  updated_at: '2026-02-10T15:49:18.115005'
+- id: TODO-278
+  content: BB-AI-011优先级测试 2ff41d5d
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:18.254587'
+  updated_at: '2026-02-10T15:49:18.254594'
+- id: TODO-279
+  content: BB-AI-011第6个 a88a62a4
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-10T15:49:18.395034'
+  updated_at: '2026-02-10T15:49:18.395040'
+- id: TODO-280
+  content: BB-SKILL-009测试 140dd339
+  status: pending
+  priority: medium
+  agent_id: 1
+  created_at: '2026-02-10T15:49:19.163064'
+  updated_at: '2026-02-10T15:49:19.163071'
+- id: TODO-282
+  content: 发布v2.2.7版本 版本更新/CHANGELOG/Tag/PyPI
+  from: "agent1"
+  to: "agent2"
+  phase: "release"
   priority: "P0"
   status: "pending"
-  created_at: "2026-02-10T16:30:00"
-  description: "v2.2.7详细设计(DETAIL-2026-02-v2.2.7.md)已APPROVED，可进入开发阶段"
-total: 18
+  created_at: "2026-02-10T19:40:00"
+  description: "发布v2.2.7版本：更新pyproject.toml版本号、CHANGELOG、创建git tag v2.2.7"
+total: 37

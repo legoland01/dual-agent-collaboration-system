@@ -1,5 +1,53 @@
 # CHANGELOG - oc-collab 双Agent协作框架
 
+## v2.2.7 (2026-02-10)
+
+### 新增功能
+
+| 功能ID | 功能描述 | 来源 |
+|--------|----------|------|
+| F-TEST-001 | Skill内容准确性测试 | requirements_v2.2.7.md |
+| F-TEST-002 | Skill覆盖率统计 | requirements_v2.2.7.md |
+| F-WEB-001 | Webhook配置管理 | requirements_v2.2.7.md |
+| F-WEB-002 | 事件监听与崩溃恢复 | requirements_v2.2.7.md |
+
+### 新增模块
+
+| 模块 | 文件 | 功能 |
+|------|------|------|
+| SkillTester | src/core/skill_tester.py | Skill内容准确性验证 |
+| ReferenceValidator | src/core/reference_validator.py | 引用关系验证 |
+| CLIActionValidator | src/core/cli_action_validator.py | CLI命令验证 |
+| CoverageCalculator | src/core/coverage_calculator.py | 覆盖率统计 |
+| WebhookConfig | src/core/webhook_config.py | Webhook配置管理 |
+| EventListener | src/core/event_listener.py | 事件监听+崩溃恢复 |
+
+### 新增CLI命令
+
+| 命令 | 功能 |
+|------|------|
+| `oc-collab skill test [--skill <id>]` | Skill内容准确性测试 |
+| `oc-collab skill coverage [--skill <id>]` | Skill覆盖率统计 |
+| `oc-collab webhook init` | 初始化Webhook配置 |
+| `oc-collab webhook status` | 显示Webhook状态 |
+| `oc-collab webhook start [--port <port>]` | 启动Webhook监听服务 |
+| `oc-collab webhook stop` | 停止Webhook监听服务 |
+
+### 核心目标
+
+**构建质量保障体系与外部通知基础设施**
+
+- Skill测试覆盖率统计
+- Webhook事件监听
+- 崩溃恢复机制
+
+### 测试结果
+
+- 单元测试: 26/26 PASSED
+- 黑盒测试: 7/9 PASSED (2个跳过)
+
+---
+
 ## v2.2.6 (2026-02-09)
 
 ### 新增功能

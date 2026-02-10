@@ -11,6 +11,10 @@ from rich.table import Table
 from ..core.skill_enforcer import SkillEnforcer
 from ..core.skill_searcher import SkillSearcher
 from ..core.skill_slicer import SkillSlicer
+from ..core.skill_tester import SkillTester
+from ..core.coverage_calculator import CoverageCalculator
+from ..core.reference_validator import ReferenceValidator
+from ..core.cli_action_validator import CLIActionValidator
 
 console = Console()
 
@@ -179,8 +183,132 @@ def skill_group():
     pass
 
 
+@click.command(name="test")
+@click.option("--skill", "-s", help="指定测试的Skill ID")
+@click.option("--verbose", "-v", is_flag=True, help="输出详细结果")
+@click.option("--json", "output_json", is_flag=True, help="JSON格式输出")
+def skill_test(skill: Optional[str], verbose: bool, output_json: bool):
+    """
+    运行Skill内容准确性测试。
+
+    示例:
+      oc-collab skill test                    # 测试所有Skill
+      oc-collab skill test -s oc_collab_development_guide  # 测试指定Skill
+      oc-collab skill test -v                 # 详细输出
+    """
+    tester = SkillTester(verbose=verbose)
+    report = tester.run_all_tests(skill)
+
+    if output_json:
+        import json
+        output = {
+            'timestamp': report.timestamp,
+            'total': report.total_skills,
+            'passed': report.passed_skills,
+            'success_rate': f"{report.success_rate:.1f}%",
+            'results': [
+                {
+                    'skill_id': r.skill_id,
+                    'passed': r.passed,
+                    'errors': r.error_count,
+                    'warnings': r.warning_count,
+                    'items': [
+                        {
+                            'code': item.code,
+                            'level': item.level.value,
+                            'message': item.message
+                        }
+                        for item in r.items
+                    ]
+                }
+                for r in report.results
+            ]
+        }
+        click.echo(json.dumps(output, ensure_ascii=False, indent=2))
+        return
+
+    click.echo(f"=== Skill测试报告 ===")
+    click.echo(f"时间: {report.timestamp}")
+    click.echo(f"总计: {report.total_skills}个Skill")
+    click.echo(f"通过: {report.passed_skills}个")
+    click.echo(f"成功率: {report.success_rate:.1f}%")
+    click.echo("")
+
+    for result in report.results:
+        status = "✅" if result.passed else "❌"
+        click.echo(f"{status} {result.skill_id}")
+        if not result.passed and verbose:
+            for item in result.items:
+                level_icon = "⚠️" if item.level.value == "WARNING" else "❌"
+                click.echo(f"   {level_icon} [{item.code}] {item.message}")
+                if item.suggestion:
+                    click.echo(f"      建议: {item.suggestion}")
+
+    if report.success_rate < 100:
+        click.echo(f"\n⚠️  测试未完全通过，请检查以上问题")
+        raise click.Abort()
+
+
+@click.command(name="coverage")
+@click.option("--skill", "-s", help="指定统计的Skill ID")
+@click.option("--threshold", "-t", type=float, default=95.0, help="覆盖率阈值")
+@click.option("--json", "output_json", is_flag=True, help="JSON格式输出")
+def skill_coverage(skill: Optional[str], threshold: float, output_json: bool):
+    """
+    统计Skill内容的切片覆盖率。
+
+    示例:
+      oc-collab skill coverage               # 统计所有Skill
+      oc-collab skill coverage -s oc_collab_development_guide
+      oc-collab skill coverage -t 80         # 设置阈值为80%
+    """
+    calculator = CoverageCalculator(threshold=threshold)
+    reports = calculator.generate_report(skill)
+
+    if output_json:
+        import json
+        output = {
+            'threshold': threshold,
+            'total': len(reports),
+            'passed': sum(1 for r in reports if r.passed),
+            'reports': [
+                {
+                    'skill_id': r.skill_id,
+                    'total_chapters': r.total_chapters,
+                    'sliced_chapters': r.sliced_chapters,
+                    'coverage_rate': f"{r.coverage_rate:.1f}%",
+                    'passed': r.passed
+                }
+                for r in reports
+            ]
+        }
+        click.echo(json.dumps(output, ensure_ascii=False, indent=2))
+        return
+
+    click.echo(f"=== Skill覆盖率报告 (阈值: {threshold}%) ===")
+    click.echo(f"总计: {len(reports)}个Skill")
+    click.echo("")
+
+    passed_count = 0
+    for report in reports:
+        status = "✅" if report.passed else "❌"
+        click.echo(f"{status} {report.skill_id}")
+        click.echo(f"   章节: {report.sliced_chapters}/{report.total_chapters}")
+        click.echo(f"   覆盖率: {report.coverage_rate:.1f}%")
+        if report.passed:
+            passed_count += 1
+
+    click.echo("")
+    click.echo(f"通过: {passed_count}/{len(reports)}")
+
+    if passed_count < len(reports):
+        click.echo(f"\n⚠️  覆盖率未达标的Skill需要补充切片")
+
+
 skill_group.add_command(skill_check_command, "check")
 skill_group.add_command(skill_status_command, "status")
 skill_group.add_command(skill_search, "search")
 skill_group.add_command(skill_slice, "slice")
 skill_group.add_command(skill_enforce, "enforce")
+skill_group.add_command(skill_test, "test")
+skill_group.add_command(skill_coverage, "coverage")
