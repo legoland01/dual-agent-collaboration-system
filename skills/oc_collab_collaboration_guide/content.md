@@ -82,16 +82,16 @@ oc-collab git sync-state
 oc-collab git warn
 
 # 阶段推进（自动同步）
-oc-collab phase-advance --sync
-oc-collab phase-advance --no-sync
+oc-collab advance --sync
+oc-collab advance --no-sync
 ```
 
 #### 自动同步行为
 
 | 操作 | 自动同步 |
 |------|---------|
-| `oc-collab phase-advance` | ✅ 自动 git add → commit → push |
-| `oc-collab todo done` | ✅ 自动 git add → commit |
+| `oc-collab advance` | ✅ 自动 git add → commit → push |
+| `oc-collab todowrite/todoedit` | ✅ 自动 git add → commit |
 
 ---
 

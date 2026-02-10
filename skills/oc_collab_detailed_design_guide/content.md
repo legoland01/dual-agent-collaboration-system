@@ -171,8 +171,8 @@ class RequirementManager:
 
 | 命令 | 函数 | 描述 | 工时 |
 |------|------|------|------|
-| `oc-collab requirement create` | `create()` | 创建需求 | Xh |
-| `oc-collab requirement review` | `review()` | 评审需求 | Xh |
+| `oc-collab requirements create` | `create()` | 创建需求 | Xh |
+| `oc-collab requirements review` | `review()` | 评审需求 | Xh |
 ```
 
 ### 4. 数据结构
@@ -258,7 +258,7 @@ xxx:
 
 | 命令 | 参数 | 返回值 | 说明 |
 |------|------|--------|------|
-| `oc-collab xxx` | xxx | xxx | xxx |
+| `oc-collab xxx` (示例) | xxx | xxx | xxx |
 
 ### 6.2 外部API（可选）
 
@@ -404,6 +404,8 @@ oc-collab sync-all -m "sync: 更新todo状态 - 进入开发阶段"
 ---
 
 ## 1. 触发条件 ⭐
+
+**触发关键词**: `进入详细设计阶段，需要创建技术实现方案`, `需要创建模块的详细设计`
 
 | 场景 | 触发条件 |
 |------|----------|

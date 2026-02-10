@@ -402,6 +402,8 @@ grep -E "v2\.2\.[0-9]" README.md
 
 ## 1. 触发条件 ⭐
 
+**触发关键词**: `development_completed`, `agent_asks_test`, `before_deployment`
+
 | 场景 | 触发条件 |
 |------|----------|
 | 开发完成 | development.status: completed |

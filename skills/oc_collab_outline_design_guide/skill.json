@@ -22,7 +22,7 @@
     }
   ],
   "outputs": {
-    "documents": ["docs/02-design/OUTLINE_DESIGN_v*.md"],
+    "documents": ["docs/02-design/"],
     "artifacts": ["state/project_state.yaml"]
   },
   "related_skills": [

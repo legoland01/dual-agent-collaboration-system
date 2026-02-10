@@ -19,6 +19,8 @@
 
 ## 1. 触发条件 ⭐
 
+**触发关键词**: `session_start`, `before_requirements_review`, `agent_asks_template`
+
 **什么情况下需要创建需求文档？**
 
 ```
@@ -190,7 +192,7 @@ docs/01-requirements/ANALYSIS_vX.X.X_Requirements_Analysis.md
 ### 3.1 用Skill实现（无需代码开发，不需要评审）
 | 编号 | 功能 | 现有Skill | 操作 |
 |------|------|----------|------|
-| S-001 | xxx | oc_collab_xxx_guide | 更新/创建Skill |
+| S-001 | xxx | oc_collab_collaboration_guide | 更新/创建Skill |
 
 ### 3.2 需开发（需要代码实现，需要创建需求文档并评审）
 | 编号 | 功能 | 工时 | 优先级 |
@@ -291,7 +293,7 @@ docs/01-requirements/ANALYSIS_vX.X.X_Requirements_Analysis.md
 
 | 命令 | 说明 | 工时 |
 |------|------|------|
-| `oc-collab xxx` | 说明 | Xh |
+| `oc-collab xxx` (示例) | 说明 | Xh |
 ```
 
 ---

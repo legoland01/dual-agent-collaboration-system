@@ -27,7 +27,7 @@
     }
   ],
   "outputs": {
-    "documents": ["docs/03-test/*.md"],
+    "documents": ["docs/03-test/"],
     "artifacts": ["state/project_state.yaml"]
   },
   "related_skills": [

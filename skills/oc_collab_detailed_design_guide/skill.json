@@ -22,7 +22,7 @@
     }
   ],
   "outputs": {
-    "documents": ["docs/02-design/DETAIL-*.md"],
+    "documents": ["docs/02-design/"],
     "artifacts": []
   },
   "related_skills": [

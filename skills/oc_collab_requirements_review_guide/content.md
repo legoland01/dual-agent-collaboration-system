@@ -200,6 +200,8 @@ oc-collab sync-all -m "docs: 更新需求签署状态"
 
 ## 1. 触发条件 ⭐
 
+**触发关键词**: `before_reviewing_requirements`, `agent_signs_requirements`, `agent_asks_who_does_what`
+
 | 场景 | 触发条件 |
 |------|----------|
 | 需求已创建 | requirements.status: DRAFT/REVIEW_PENDING |

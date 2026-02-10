@@ -22,8 +22,8 @@
     }
   ],
   "outputs": {
-    "documents": ["dist/**/*.whl", "dist/**/*.tar.gz"],
-    "artifacts": ["project_state.yaml", "pyproject.toml"]
+    "documents": ["dist/"],
+    "artifacts": ["state/project_state.yaml", "pyproject.toml"]
   },
   "related_skills": [
     "oc_collab_test_acceptance_guide",

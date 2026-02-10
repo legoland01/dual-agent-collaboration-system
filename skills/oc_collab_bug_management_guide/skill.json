@@ -27,7 +27,7 @@
     }
   ],
   "outputs": {
-    "documents": ["docs/00-memos/BUG-YYYYMMDD-XXX.md"],
+    "documents": ["docs/00-memos/"],
     "artifacts": ["state/project_state.yaml"]
   },
   "related_skills": [

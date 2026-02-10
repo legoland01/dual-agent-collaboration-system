@@ -301,6 +301,8 @@ oc-collab sync-all -m "sync: 更新todo状态 - Agent2评审概要设计"
 
 ## 1. 触发条件 ⭐
 
+**触发关键词**: `requirements_approved`, `agent_asks_design`
+
 | 场景 | 触发条件 |
 |------|----------|
 | 需求已签署 | requirements.status: APPROVED |

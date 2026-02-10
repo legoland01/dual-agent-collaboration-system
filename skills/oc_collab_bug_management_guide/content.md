@@ -372,11 +372,11 @@ oc-collab sync-all -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
 | 步骤 | 操作 | 引用 |
 |------|------|------|
 | 1 | 验收确认 | 本节 |
-| 2 | 版本号升级 | [部署指南](../oc_collab_deployment_guide/content.md) |
-| 3 | 构建包 | [部署指南](../oc_collab_deployment_guide/content.md) |
-| 4 | PyPI上传 | [部署指南](../oc_collab_deployment_guide/content.md) |
-| 5 | Git推送 | [部署指南](../oc_collab_deployment_guide/content.md) |
-| 6 | 验证发布 | [部署指南](../oc_collab_deployment_guide/content.md) |
+| 2 | 版本号升级 | [部署指南](../oc_collab_deployment_guide/) |
+| 3 | 构建包 | [部署指南](../oc_collab_deployment_guide/) |
+| 4 | PyPI上传 | [部署指南](../oc_collab_deployment_guide/) |
+| 5 | Git推送 | [部署指南](../oc_collab_deployment_guide/) |
+| 6 | 验证发布 | [部署指南](../oc_collab_deployment_guide/) |
 
 ### ⚠️ 发布规则
 
@@ -453,7 +453,7 @@ v2.2.X.Y
 4. ✅ Git已推送
 5. ✅ Bug报告中记录发布日期
 
-详细步骤: [oc_collab_deployment_guide](../oc_collab_deployment_guide/content.md)
+详细步骤: [oc_collab_deployment_guide](../oc_collab_deployment_guide/)
 ```
 
 ---
@@ -740,6 +740,8 @@ git push --tags
 ---
 
 ## 1. 触发条件 ⭐
+
+**触发关键词**: `test_failure`, `collaboration_slow`, `tool_error`
 
 | 场景 | 触发条件 |
 |------|----------|

@@ -22,8 +22,8 @@
     }
   ],
   "outputs": {
-    "documents": ["src/**/*.py", "tests/**/*.py"],
-    "artifacts": ["project_state.yaml"]
+    "documents": ["src/", "tests/"],
+    "artifacts": ["state/project_state.yaml"]
   },
   "related_skills": [
     "oc_collab_detailed_design_guide",
