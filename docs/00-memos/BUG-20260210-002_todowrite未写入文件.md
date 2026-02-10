@@ -2,9 +2,38 @@
 
 **Bug ID**: BUG-20260210-002
 **严重程度**: P0
-**状态**: 待修复
+**状态**: ✅ 已修复
 **发现人**: Agent 1 / Agent 2
 **发现日期**: 2026-02-10
+**修复人**: Agent 2
+**修复日期**: 2026-02-10
+**修复版本**: v2.2.6 (patch)
+
+---
+
+## 修复内容
+
+**修复commit**: `5336189`
+
+**修复方案**:
+- `load_todos`: 兼容 `todos:` 和 `adhoc_todos:` 两种文件格式
+- `save_todos`: 使用 `todos:` 格式保存，与手动编辑保持一致
+
+**测试结果**:
+- 69个v2.2.6测试全部通过
+- todowrite命令正常工作
+
+---
+
+## Bug描述
+
+### 问题表现
+
+执行 `oc-collab todowrite` 命令创建TODO后，TODO未保存到 `state/agent_adhoc_todos.yaml` 文件中。
+
+### 根因
+
+文件格式不匹配：代码保存为`adhoc_todos:`，手动编辑使用`todos:`
 
 ---
 
