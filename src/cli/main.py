@@ -30,6 +30,7 @@ from .enhanced_commands import (
     status_command,
 )
 from .skill_commands import skill_group
+from .webhook_commands import webhook_group
 
 
 console = Console()
@@ -1638,6 +1639,7 @@ def owner_check_command(target: str, agent: str):
 
 main.add_command(owner_group, "owner")
 main.add_command(skill_group, "skill")
+main.add_command(webhook_group, "webhook")
 
 
 if __name__ == "__main__":
