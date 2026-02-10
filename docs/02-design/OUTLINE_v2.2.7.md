@@ -240,20 +240,25 @@ class StateNotifier:
 
 ## 3. 详细设计任务分配
 
-### 3.1 Agent 2 负责（详细设计）
+### 3.1 Agent 2 负责（v2.2.7 详细设计）
 
 | 功能 | 详细设计文档 | 工时 |
 |------|-------------|------|
-| SkillTester | DETAIL-2026-02-F-TEST_SkillTester.md | 2h |
+| SkillTester + 错误码 | DETAIL-2026-02-F-TEST_SkillTester.md | 2h |
 | ReferenceValidator | DETAIL-2026-02-F-TEST_ReferenceValidator.md | 2h |
 | CLIActionValidator | DETAIL-2026-02-F-TEST_CLIActionValidator.md | 2h |
 | CoverageCalculator | DETAIL-2026-02-F-TEST_CoverageCalculator.md | 4h |
 | WebhookConfig | DETAIL-2026-02-F-WEB_WebhookConfig.md | 4h |
-| EventListener | DETAIL-2026-02-F-WEB_EventListener.md | 4h |
+| EventListener + 崩溃恢复 | DETAIL-2026-02-F-WEB_EventListener.md | 4h |
+
+### 3.2 Agent 2 负责（v2.2.8 详细设计）
+
+| 功能 | 详细设计文档 | 工时 |
+|------|-------------|------|
 | EventDispatcher | DETAIL-2026-02-F-WEB_EventDispatcher.md | 3h |
 | StateNotifier | DETAIL-2026-02-F-WEB_StateNotifier.md | 3h |
 
-### 3.2 Agent 1 负责（Skill更新）
+### 3.3 Agent 1 负责（Skill更新）
 
 | 功能 | 目标文档 | 工时 |
 |------|---------|------|
@@ -314,66 +319,108 @@ StateNotifier ───→ EventDispatcher, state/project_state.yaml
 
 ## 6. 里程碑
 
-### 6.1 v2.2.7 完整方案（27h）
+### 6.1 v2.2.7 阶段（采纳评审建议）
 
 | 里程碑 | 内容 | 时间点 |
 |--------|------|--------|
-| M1 | Skill测试模块 (Tester/Validator) | 第1-3天 |
+| M1 | Skill测试模块 (Tester/Validator/错误码) | 第1-3天 |
 | M2 | Skill覆盖率统计 | 第4天 |
-| M3 | Webhook配置 + 监听 | 第5-6天 |
-| M4 | Webhook分发 + 通知 | 第7天 |
-| M5 | Skill文档更新 | 第8天 |
-| M6 | 测试验收 | 第9天 |
+| M3 | Webhook配置 + 监听 + 崩溃恢复 | 第5-6天 |
+| M4 | Skill文档更新 | 第7天 |
+| M5 | 测试验收 | 第8天 |
 
-### 6.2 分阶段方案（建议）
+### 6.2 v2.2.8 阶段
 
-| 阶段 | 内容 | 工时 | 交付物 |
-|------|------|------|--------|
-| v2.2.7 | Skill保障 + Webhook基础 | 17h | Skill测试 + Webhook配置+监听 |
-| v2.2.8 | Webhook完成 | 10h | 事件分发+状态通知 |
+| 里程碑 | 内容 | 时间点 |
+|--------|------|--------|
+| M1 | EventDispatcher (事件分发) | 第1-2天 |
+| M2 | StateNotifier (状态通知) | 第3天 |
+| M3 | 测试验收 | 第4天
 
 ---
 
-## 7. 风险与应对
+## 7. 风险与应对 ⭐
 
 | 风险 | 应对措施 |
 |------|----------|
 | Webhook监听稳定性 | 提供 `--no-webhook` 选项 |
-| Skill测试覆盖率不达标 | 提供 `--threshold` 可配置 |
-| 配置文件格式变更 | 使用版本号 `v1` 兼容 |
+| Webhook并发处理能力有限 | 使用http.server内置库，单线程处理 |
+| Webhook崩溃恢复 | 自动重启 + 指数退避（最多3次） |
+| Skill测试覆盖率阈值设定困难 | 提供 `--threshold` 可配置，默认95% |
+| 多Webhook平台同时触发 | 顺序处理，不并行 |
+
+**采纳Agent2评审建议**：
+1. ✅ 已补充：Webhook崩溃恢复机制
+2. ✅ 已补充：Skill测试错误码设计
+3. ⏳ 待确认：CLI命令验证是否需要离线运行测试
 
 ---
 
 **创建人**: Agent 1
 **日期**: 2026-02-10
-**状态**: DRAFT → 待Agent2评审
+**状态**: DRAFT → 待Agent2确认
 
 ---
 
 ## Agent 2 评审
 
-### 阅读理解
+### 1. 阅读理解
 
-- [ ] 核心目标清晰
-- [ ] 功能范围明确
+- ✅ 核心目标清晰 - Skill保障 + Webhook基础设施
+- ✅ 功能范围明确 - 8个功能模块，27h工时
 
-### 完整性
+### 2. 完整性
 
-- [ ] 模块设计完整
-- [ ] 依赖关系清晰
+- ✅ 模块设计完整 - Skill测试4模块 + Webhook4模块
+- ✅ 依赖关系清晰 - 内部依赖/外部依赖都明确
+- ✅ 工时预估合理 - 总工时27h，Agent2承担25h
 
-### 一致性
+### 3. 一致性
 
-- [ ] 需求与设计对齐
-- [ ] CLI命令与设计一致
+- ✅ 需求与设计对齐 - 需求F-TEST/F-WEB与设计模块完全对应
+- ✅ CLI命令与设计一致 - 7个新增命令，1个变更命令
+- ⚠️ 工时略有不一致 - 需求27h，设计29h（差2h为Skill文档工时，Agent1负责）
 
-### 可行性
+### 4. 可测试性
 
-- [ ] 工时可控
-- [ ] 技术方案可行
+- ✅ Skill测试CLI支持 `--verbose` 输出详细结果
+- ✅ Webhook支持 `--no-webhook` 回退选项
+- ⚠️ 建议补充：CLI命令验证是否需要离线运行测试
 
-### 结论
+### 5. 可行性
+
+- ✅ 工时可控 - 日均4h可在一周内完成
+- ✅ 技术方案可行 - 使用Python内置库，无额外依赖
+- ⚠️ 风险：Webhook监听使用http.server内置库，并发处理能力有限
+
+### 6. 逆向挑刺 ⭐
+
+**这个需求解决了什么问题？不解决会怎样？**
+- Skill内容与实际行为不一致的问题暂无自动检测手段 - 不解决可能导致协作效率降低
+- 双机协作状态同步依赖人工 - 不解决可能导致信息不对称
+
+**是否有更低成本的替代方案？**
+- Skill测试：可先人工Review，不一定需要完整的自动化框架
+- Webhook通知：可使用现有state文件轮询机制替代，降低复杂度
+
+**实现后可能带来什么副作用？**
+- Webhook后台监听可能增加系统资源消耗
+- Skill测试框架可能增加维护成本（测试覆盖率的阈值设定困难）
+
+**边界情况是否都考虑到了？**
+- ⚠️ 未考虑：Webhook监听服务崩溃后的恢复机制
+- ⚠️ 未考虑：Skill测试失败后的错误码设计
+- ⚠️ 未考虑：多Webhook平台（GitHub+Gitee）同时触发的处理
+
+### 7. 评审结论
 
 | 角色 | 签署人 | 状态 | 日期 |
 |------|--------|------|------|
-| 开发负责人 | Agent 2 | ⏳ | 待评审 |
+| 开发负责人 | Agent 2 | ✅ 技术评审通过（有条件） | 2026-02-10 |
+
+**有条件通过说明**：
+1. 建议采纳分阶段方案：v2.2.7完成Skill保障+Webhook基础(17h)，v2.2.8完成Webhook分发+通知(10h)
+2. 建议补充：Webhook监听服务崩溃后的恢复机制
+3. 建议补充：Skill测试失败后的错误码设计
+
+**评审结论**: 建议通过，进入详细设计阶段

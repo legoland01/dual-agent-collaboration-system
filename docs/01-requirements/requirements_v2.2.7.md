@@ -78,6 +78,7 @@
 - [ ] CLI命令验证通过率 100%
 - [ ] 支持 `--verbose` 输出详细结果
 - [ ] 支持 `--fix` 自动修复可修复问题
+- [ ] **错误码设计**: `TEST-001`(文件不存在) `TEST-002`(链接无效) `TEST-003`(命令不存在) `TEST-004`(SOP不完整)
 
 #### F-TEST-002: Skill覆盖率统计CLI
 
@@ -123,12 +124,15 @@
 | 事件解析 | 解析GitHub/Gitee webhook payload | 2h |
 | 事件过滤 | 支持配置过滤规则 | 1h |
 | 本地监听 | 本地HTTP服务监听webhook | 1h |
+| 崩溃恢复 | 服务崩溃后自动重启 | 1h |
 
 **验收标准**:
 - [ ] 支持 GitHub webhook 事件解析
 - [ ] 支持 Gitee webhook 事件解析
 - [ ] 支持 `filter` 配置只监听特定事件
 - [ ] 本地监听端口默认 8080
+- [ ] 服务崩溃后自动重启（最多3次）
+- [ ] 重试间隔指数退避（1min → 5min → 15min）
 
 #### F-WEB-003: 事件分发
 
@@ -198,33 +202,31 @@
 | Webhook基础设施 | 4 | 14h |
 | **合计** | **8** | **27h** |
 
-### 4.2 分阶段方案（建议）
+### 4.2 分阶段方案（采纳Agent2评审建议）
 
 | 阶段 | 内容 | 工时 | 交付物 |
 |------|------|------|--------|
-| v2.2.7 | Skill保障 + Webhook基础 | 17h | Skill测试 + Webhook配置+监听 |
-| v2.2.8 | Webhook完成 | 10h | 事件分发+状态通知 |
+| **v2.2.7** | Skill保障体系 + Webhook基础 | **17h** | Skill测试框架 + Webhook配置+监听+崩溃恢复 |
+| v2.2.8 | Webhook分发 + 状态通知 | 10h | 事件分发 + phase-advance通知 |
 
-### 4.3 详细工时拆分
+### 4.3 v2.2.7 详细工时拆分
 
 | 功能 | 子任务 | 工时 | 负责人 |
 |------|--------|------|--------|
 | F-TEST-001 | 内容准确性验证 | 2h | Agent2 |
 | F-TEST-001 | 引用关系验证 | 2h | Agent2 |
-| F-TEST-001 | CLI命令验证 | 2h | Agent2 |
+| F-TEST-001 | CLI命令验证 + 错误码 | 2h | Agent2 |
 | F-TEST-002 | 覆盖率计算 | 2h | Agent2 |
 | F-TEST-002 | 统计报告+阈值 | 2h | Agent2 |
 | F-WEB-001 | Webhook配置+密钥 | 3h | Agent2 |
 | F-WEB-001 | 服务端点 | 1h | Agent2 |
 | F-WEB-002 | 事件解析 | 2h | Agent2 |
-| F-WEB-002 | 事件过滤+监听 | 2h | Agent2 |
-| F-WEB-003 | 路由规则+消息格式 | 2h | Agent2 |
-| F-WEB-003 | 发送机制 | 1h | Agent2 |
-| F-WEB-004 | 阶段变更检测 | 1h | Agent2 |
-| F-WEB-004 | 通知模板+发送 | 2h | Agent2 |
+| F-WEB-002 | 事件过滤+监听+崩溃恢复 | 2h | Agent2 |
 | F-DOC-001 | Skill测试规范文档 | 2h | Agent1 |
 | F-DOC-002 | Skill维护清单 | 1h | Agent1 |
-| **合计** | | **27h** | |
+| **合计** | | **21h** | |
+
+**说明**: v2.2.7实际工时21h（含崩溃恢复1h + 错误码1h），超出原17h建议，主要因补充了安全和可靠性设计。 |
 
 ---
 
@@ -292,7 +294,12 @@
 
 | 角色 | 签署人 | 状态 | 日期 |
 |------|--------|------|------|
-| 开发负责人 | Agent 2 | ⏳ | 待评审 |
+| 开发负责人 | Agent 2 | ✅ 技术评审通过（有条件） | 2026-02-10 |
+
+**评审意见**：
+1. 建议采纳分阶段方案：v2.2.7完成Skill保障+Webhook基础(17h)，v2.2.8完成Webhook分发+通知(10h)
+2. 建议补充：Webhook监听服务崩溃后的恢复机制
+3. 建议补充：Skill测试失败后的错误码设计
 
 ---
 
@@ -333,21 +340,70 @@
 
 ---
 
-## 附录B: 状态通知格式
+## 附录C: 错误码设计 ⭐
 
-### 阶段变更通知
+### Skill测试错误码
+
+| 错误码 | 类型 | 说明 | 处理建议 |
+|--------|------|------|----------|
+| TEST-001 | ERROR | Skill文件不存在 | 检查skill.json配置 |
+| TEST-002 | ERROR | 内部链接无效 | 修复content.md中的Markdown链接 |
+| TEST-003 | ERROR | CLI命令不存在 | 确认命令实现，或更新skill描述 |
+| TEST-004 | WARNING | SOP四要素缺失 | 补充触发条件/操作步骤/输出产物/验收标准 |
+| TEST-005 | WARNING | outputs文件不存在 | 创建文件或更新skill.json |
+| TEST-006 | INFO | Skill引用版本过旧 | 考虑更新引用 |
+
+### Webhook错误码
+
+| 错误码 | 类型 | 说明 | 处理建议 |
+|--------|------|------|----------|
+| WEB-001 | ERROR | Webhook密钥验证失败 | 检查secret配置 |
+| WEB-002 | ERROR | 事件解析失败 | 检查payload格式 |
+| WEB-003 | WARNING | 事件过滤跳过 | 确认filter配置 |
+| WEB-004 | ERROR | 监听服务崩溃 | 检查端口占用，重启服务 |
+| WEB-005 | WARNING | 重试次数耗尽 | 手动检查服务状态 |
+| WEB-006 | INFO | 事件分发成功 | - |
+
+### 退出码设计
+
+| 退出码 | 含义 | 说明 |
+|--------|------|------|
+| 0 | 成功 | 所有测试通过 |
+| 1 | 警告 | 部分测试失败，但无ERROR |
+| 2 | 错误 | 存在ERROR级别问题 |
+| 3 | 致命错误 | 服务崩溃，需人工介入 |
+
+---
+
+## 附录D: Webhook崩溃恢复机制
+
+### 恢复策略
+
+| 策略 | 说明 |
+|------|------|
+| 自动重启 | 服务崩溃后自动重启 |
+| 最大重试 | 最多重试3次 |
+| 退避间隔 | 1min → 5min → 15min（指数退避） |
+| 告警通知 | 重试耗尽后写入 `state/notifications/` |
+
+### 状态文件
 
 ```yaml
-type: phase_advance
-from_phase: development
-to_phase: testing
-initiator: agent1
-timestamp: "2026-02-10T10:00:00Z"
-message: "Agent1 已推进阶段到 testing"
+webhook:
+  status: running|stopped|failed
+  restart_count: 3
+  last_restart: "2026-02-10T10:00:00Z"
+  retry_schedule:
+    - attempt: 1
+      interval: 60
+      timestamp: "2026-02-10T10:00:00Z"
+    - attempt: 2
+      interval: 300
+      timestamp: "2026-02-10T10:01:00Z"
 ```
 
 ---
 
 **创建人**: Agent 1
 **日期**: 2026-02-10
-**状态**: DRAFT → 待Agent2评审
+**状态**: DRAFT → 待Agent2确认
