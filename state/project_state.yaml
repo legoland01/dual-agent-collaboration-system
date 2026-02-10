@@ -225,3 +225,49 @@ v2.2.6:
     unit_tests_passed: 52
   version: 2.2.6
   workload: 16h
+v2.2.7:
+  deployment:
+    completed_at: '2026-02-10T19:50:00'
+    git_tag: v2.2.7
+    status: completed
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-10T16:00:00'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-10T15:55:00'
+    design_doc: docs/02-design/DETAIL-2026-02-v2.2.7.md
+    status: APPROVED
+  development:
+    completed_at: '2026-02-10T18:30:00'
+    features:
+    - "F-TEST-001: Skill内容准确性测试"
+    - "F-TEST-002: Skill覆盖率统计"
+    - "F-WEB-001: Webhook配置管理"
+    - "F-WEB-002: 事件监听与崩溃恢复"
+    modules:
+      SkillTester: completed
+      ReferenceValidator: completed
+      CLIActionValidator: completed
+      CoverageCalculator: completed
+      WebhookConfig: completed
+      EventListener: completed
+    phase: completed
+    started_at: '2026-02-10T17:00:00'
+    status: completed
+  testing:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-10T19:00:00'
+    blackbox_tests: 7 passed
+    bugs:
+    - description: "Agent跳过提交流程直接发布"
+      id: BUG-20260210-003
+      severity: P1
+      status: acknowledged
+    completed_at: '2026-02-10T19:30:00'
+    coverage: 90%
+    phase: completed
+    started_at: '2026-02-10T19:10:00'
+    status: completed
+    unit_tests_passed: 40
+  version: 2.2.7
+  workload: 21h
