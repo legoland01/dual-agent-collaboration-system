@@ -55,7 +55,7 @@ def show_context_command():
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), default="medium")
 @click.option("--agent", type=click.Choice(["1", "2"]), help="Agent 编号")
 @click.option("--auto-check/--no-auto-check", default=True,
-              help="是否自动检查参数 (默认启用)")
+              help="是否自动检查参数和Skill (默认启用)")
 @click.option("--test-mode", is_flag=True, help="测试模式（不创建正式TODO，仅验证参数）")
 def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str], auto_check: bool, test_mode: bool):
     """
@@ -66,11 +66,24 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
       oc-collab todowrite --content "测试" --test-mode  # 测试模式，不创建正式TODO
     """
     from ..core.auto_checker import AutoChecker, ValidationError
+    from ..core.skill_enforcer import SkillEnforcer
 
     # v2.2.6: 参数验证
     checker = AutoChecker()
     
+    # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
     if auto_check:
+        skill_enforcer = SkillEnforcer()
+        skill_result = skill_enforcer.check_before_action("todowrite")
+        
+        if skill_result["missing"]:
+            click.echo(f"\n⚠️  缺少相关Skill (todowrite):")
+            for skill in skill_result["missing"]:
+                click.echo(f"   • {skill}")
+            if skill_result["suggestions"]:
+                click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+            click.echo("")
+
         result = checker.check_all(content, agent, priority)
         
         if result["warnings"]:

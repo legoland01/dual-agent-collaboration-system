@@ -21,6 +21,7 @@ from ..core.session_manager import SessionManager
 from ..core.compliance_engine import ComplianceEngine
 from ..core.git_sync_integrator import GitSyncIntegrator
 from ..core.file_owner import FileOwnerManager
+from ..core.skill_enforcer import SkillEnforcer
 from ..utils.lock import LockExistsError
 from .enhanced_commands import (
     show_context_command,
@@ -226,9 +227,24 @@ def review_command(stage: str, file: str, new: bool, list: bool):
 @click.option("--comment", "-m", default="")
 @click.option("--reject", "-r", default=None)
 @click.option("--sync", "-s", is_flag=True, default=False, help="签署后自动同步到远程")
-def signoff_command(stage: str, comment: str, reject: str, sync: bool):
+@click.option("--auto-check/--no-auto-check", default=True,
+              help="是否自动检查Skill (默认启用)")
+def signoff_command(stage: str, comment: str, reject: str, sync: bool, auto_check: bool):
     """签署确认。"""
     try:
+        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
+        if auto_check:
+            skill_enforcer = SkillEnforcer()
+            skill_result = skill_enforcer.check_before_action("signoff")
+            
+            if skill_result["missing"]:
+                click.echo(f"\n⚠️  缺少相关Skill (signoff):")
+                for skill in skill_result["missing"]:
+                    click.echo(f"   • {skill}")
+                if skill_result["suggestions"]:
+                    click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+                click.echo("")
+
         project_path = get_project_path()
         state_manager = StateManager(project_path)
         workflow_engine = WorkflowEngine(state_manager)
@@ -1286,9 +1302,24 @@ def project_command(action: str, type: str, value: str, cases: int,
 @click.option("--force", "-f", is_flag=True, help="强制推进")
 @click.option("--check", "-c", is_flag=True, help="仅检查条件")
 @click.option("--sync/--no-sync", "-s", default=True, help="推进后自动同步到 Git")
-def advance_command(phase: str, force: bool, check: bool, sync: bool):
+@click.option("--auto-check/--no-auto-check", default=True,
+              help="是否自动检查Skill (默认启用)")
+def advance_command(phase: str, force: bool, check: bool, sync: bool, auto_check: bool):
     """推进到下一阶段 (v2.2.2: 推进后自动同步 Git 状态)。"""
     try:
+        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
+        if auto_check:
+            skill_enforcer = SkillEnforcer()
+            skill_result = skill_enforcer.check_before_action("phase_advance")
+            
+            if skill_result["missing"]:
+                click.echo(f"\n⚠️  缺少相关Skill (phase_advance):")
+                for skill in skill_result["missing"]:
+                    click.echo(f"   • {skill}")
+                if skill_result["suggestions"]:
+                    click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+                click.echo("")
+
         project_path = get_project_path()
         phase_engine = PhaseAdvanceEngine(project_path)
 
