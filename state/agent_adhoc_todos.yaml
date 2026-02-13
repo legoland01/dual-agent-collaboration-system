@@ -266,6 +266,23 @@ todos:
     - RulesInitializer
   estimated_hours: 3
   result: DETAIL_v2.2.8.md已创建，包含完整类设计和CLI命令设计
+- id: TODO-301
+  content: 评审 v2.2.8 详细设计 (DETAIL_v2.2.8.md) 并更新状态为APPROVED
+  from: agent2
+  to: agent1
+  phase: detailed_design_review
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T12:10:00'
+  description: 详细设计已完成，需Agent1评审通过后才能进入开发阶段
+  design_doc: docs/02-design/DETAIL_v2.2.8.md
+  review_items:
+    - 类设计完整性
+    - CLI命令设计
+    - 数据结构正确性
+    - 错误处理合理性
+    - 测试策略可行性
+  result: pending
 - id: TODO-300
   content: v2.2.8 开发阶段 (F-WEB-003/004/005, F-INIT-001)
   from: agent2
@@ -274,7 +291,7 @@ todos:
   priority: P0
   status: pending
   created_at: '2026-02-13T12:05:00'
-  description: 详细设计已完成，进入开发阶段。4个模块总工时16h
+  description: 详细设计评审通过后才能进入开发阶段
   design_doc: docs/02-design/DETAIL_v2.2.8.md
   features:
     - F-WEB-003: EventDispatcher (5h)
@@ -282,4 +299,4 @@ todos:
     - F-WEB-005: HMACValidator (3h)
     - F-INIT-001: RulesInitializer (3h)
   estimated_hours: 16
-- id: TODO-299
+total: 17

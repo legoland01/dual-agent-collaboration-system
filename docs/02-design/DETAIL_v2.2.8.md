@@ -5,7 +5,7 @@
 **作者**: Agent 2 (开发负责人)
 **关联概要设计**: docs/02-design/OUTLINE_v2.2.8.md
 **版本号**: v2.2.8
-**状态**: DRAFT → READY
+**状态**: READY → 待 Agent1 评审
 
 ---
 
