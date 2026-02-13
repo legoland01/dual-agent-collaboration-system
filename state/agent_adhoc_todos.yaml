@@ -20,7 +20,6 @@ todos:
   agent_id: null
   created_at: '2026-02-10T16:00:00'
   updated_at: '2026-02-10T20:45:00'
-  result: v2.2.7已发布
 - id: TODO-247
   content: test
   status: pending
@@ -42,7 +41,6 @@ todos:
   agent_id: null
   created_at: '2026-02-10T17:00:00'
   updated_at: '2026-02-10T20:45:00'
-  result: 6个模块已实现，40个测试通过
 - id: TODO-265
   content: 创建 oc-collab 问题追踪系统 skill
   status: completed
@@ -59,391 +57,252 @@ todos:
   updated_at: '2026-02-10T15:49:16.573880'
 - id: TODO-281
   content: 执行v2.2.7黑盒测试 skill test/skill coverage/webhook init/start/stop
-  from: agent1
-  to: agent2
-  phase: blackbox_testing
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-10T19:10:00'
   updated_at: '2026-02-10T19:30:00'
-  description: 执行v2.2.7 CLI命令黑盒测试，验证skill test、skill coverage、webhook init/start/stop功能
-  result: 全部通过
 - id: TODO-283
   content: 提交v2.2.7黑盒测试结果供Agent1验收
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-10T19:35:00'
+  updated_at: '2026-02-10T19:35:00'
+- id: TODO-282
+  content: 发布v2.2.7版本 版本更新/CHANGELOG/Tag/PyPI
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-10T19:40:00'
+  updated_at: '2026-02-10T19:50:00'
+- id: TODO-284
+  content: 完善v2.2.7测试：覆盖率提升至≥80%
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-10T20:00:00'
+  updated_at: '2026-02-10T20:30:00'
+- id: TODO-285
+  content: 清理历史BB-AI/BB-SKILL测试TODO
+  status: completed
+  priority: P2
+  agent_id: null
+  created_at: '2026-02-10T20:35:00'
+  updated_at: '2026-02-10T20:40:00'
+- id: TODO-287
+  content: 告知v2.2.7后续工作完成情况
+  status: completed
+  priority: P2
+  agent_id: null
+  created_at: '2026-02-10T20:50:00'
+  updated_at: '2026-02-10T21:00:00'
+- id: TODO-288
+  content: 补充 project_state.yaml 中的 v2.2.7 记录
+  status: completed
+  priority: P2
+  agent_id: null
+  created_at: '2026-02-10T21:10:00'
+  updated_at: '2026-02-10T21:15:00'
+- id: TODO-289
+  content: v2.2.8 需求分析：Webhook分发器、状态通知器、HMAC验证、init命令
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: '2026-02-10T21:20:00'
+  updated_at: '2026-02-13T10:00:00'
+- id: TODO-291
+  content: 修复v2.2.8需求文档评审问题
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T10:35:00'
+  updated_at: '2026-02-13T10:50:00'
+- id: TODO-292
+  content: 再评审 v2.2.8 需求文档 (requirements_v2.2.8.md)
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T10:50:00'
+  updated_at: '2026-02-13T11:00:00'
+- id: TODO-293
+  content: 澄清 v2.2.8 开放问题Q4 (rules init内置规则内容)
+  status: completed
+  priority: P1
+  agent_id: null
+  created_at: '2026-02-13T11:05:00'
+  updated_at: '2026-02-13T11:10:00'
+- id: TODO-290
+  content: 评审 v2.2.8 需求文档 (requirements_v2.2.8.md) 并更新状态为APPROVED
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T10:00:00'
+  updated_at: '2026-02-13T10:30:00'
+- id: TODO-294
+  content: 确认开放问题Q4澄清并正式通过 v2.2.8 需求文档
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T11:15:00'
+  updated_at: '2026-02-13T11:20:00'
+- id: TODO-296
+  content: 创建 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T11:25:00'
+  updated_at: '2026-02-13T11:45:00'
+- id: TODO-297
+  content: 评审 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T11:45:00'
+  updated_at: '2026-02-13T11:50:00'
+- id: TODO-298
+  content: 创建 v2.2.8 详细设计 (docs/02-design/DETAIL_v2.2.8.md)
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T11:55:00'
+  updated_at: '2026-02-13T12:00:00'
+- id: TODO-301
+  content: 评审 v2.2.8 详细设计 (DETAIL_v2.2.8.md) 并更新状态为APPROVED
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T12:10:00'
+  updated_at: '2026-02-13T12:30:00'
+- id: TODO-302
+  content: v2.2.8 开发阶段：实现所有模块
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T12:35:00'
+  updated_at: '2026-02-13T13:30:00'
+- id: TODO-311
+  content: v2.2.8 黑盒测试
+  status: pending
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T13:35:00'
+  updated_at: '2026-02-13T18:00:00'
+  result: v2.2.8已就绪：4模块+CLI命令已实现，31单元测试通过。请Agent1执行黑盒测试验收
   from: agent2
   to: agent1
   phase: blackbox_testing
-  priority: P0
-  status: completed
-  created_at: '2026-02-10T19:35:00'
-  updated_at: '2026-02-10T19:35:00'
-  description: 提交黑盒测试结果：7/9通过，2个跳过
-  result: 通过
-  memo: MEMO-2026-02-v2.2.7_blackbox_test.md
-- id: TODO-282
-  content: 发布v2.2.7版本 版本更新/CHANGELOG/Tag/PyPI
-  from: agent1
-  to: agent2
-  phase: release
-  priority: P0
-  status: completed
-  created_at: '2026-02-10T19:40:00'
-  updated_at: '2026-02-10T19:50:00'
-  description: 发布v2.2.7版本：更新pyproject.toml版本号、CHANGELOG、创建git tag v2.2.7
-  result: 已推送到origin/main, tag v2.2.7
-- id: TODO-284
-  content: 完善v2.2.7测试：覆盖率提升至≥80%
-  from: agent1
-  to: agent2
-  phase: testing
-  priority: P0
-  status: completed
-  created_at: '2026-02-10T20:00:00'
-  updated_at: '2026-02-10T20:30:00'
-  description: 根据BUG-20260210-003，完善测试使覆盖率≥80%
-  bug_id: BUG-20260210-003
-  result: 40/40 PASSED, 覆盖率90%
-- id: TODO-285
-  content: 清理历史BB-AI/BB-SKILL测试TODO
-  from: agent1
-  to: agent1
-  phase: maintenance
-  priority: P2
-  status: completed
-  created_at: '2026-02-10T20:35:00'
-  updated_at: '2026-02-10T20:40:00'
-  description: 清理27个历史测试TODO，归档到state/archives/
-  archived_count: 27
-- id: TODO-287
-  content: 告知v2.2.7后续工作完成情况
-  from: agent2
-  to: agent1
-  phase: summary
-  priority: P2
-  status: completed
-  created_at: '2026-02-10T20:50:00'
-  updated_at: '2026-02-10T21:00:00'
-  description: '告知Agent1: 1) v2.2.7测试覆盖率90%(40/40 PASSED); 2) 27个历史TODO已归档; 3) 历史TODO状态已更新'
-  summary:
-  - v2.2.7测试覆盖率90%
-  - 40/40 测试通过
-  - 27个历史TODO已归档
-  - 27个历史TODO已归档
-  - TODO-262/264状态已更新
-  - 流程改进提案PROPOSAL-2026-02待评审
-- id: TODO-288
-  content: 补充 project_state.yaml 中的 v2.2.7 记录
-  from: agent1
-  to: agent2
-  phase: release
-  priority: P2
-  status: completed
-  created_at: '2026-02-10T21:10:00'
-  updated_at: '2026-02-10T21:15:00'
-  description: 根据 BUG-20260210-004，在 project_state.yaml 中添加 v2.2.7 记录
-  bug_id: BUG-20260210-004
-  result: 已添加v2.2.7完整记录
-- id: TODO-289
-  content: v2.2.8 需求分析：Webhook分发器、状态通知器、HMAC验证、init命令
-  from: agent1
-  to: agent1
-  phase: requirements
-  priority: P1
-  status: completed
-  created_at: '2026-02-10T21:20:00'
-  updated_at: '2026-02-13T10:00:00'
-  description: 创建 v2.2.8 需求文档，包含4个功能：F-WEB-003/004/005、F-INIT-001
-  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
-  merge_target: v2.2.8
-  output: docs/01-requirements/requirements_v2.2.8.md
-  result: '已完成4功能规划(16h开发/26h总工时)，更新CORE_ARCHITECTURE.md版本记录'
-- id: TODO-291
-  content: 修复v2.2.8需求文档评审问题
-  from: agent2
-  to: agent1
-  phase: requirements_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T10:35:00'
-  updated_at: '2026-02-13T10:50:00'
-  description: 根据Agent2评审意见：1)补充F-WEB-005验收标准；2)补充F-INIT-001验收标准；3)澄清开放问题
-  review_comments: "oc-collab init已改名为oc-collab rules init，无需推迟"
-  result: '已完成：1)F-WEB-005验收标准；2)F-INIT-001完整章节+验收标准；3)开放问题更新'
-- id: TODO-292
-  content: 再评审 v2.2.8 需求文档 (requirements_v2.2.8.md)
-  from: agent1
-  to: agent2
-  phase: requirements_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T10:50:00'
-  updated_at: '2026-02-13T11:00:00'
-  description: 根据上次评审意见已更新：1)F-WEB-005完整章节；2)F-INIT-001改名为oc-collab rules init并补充验收标准；3)澄清与现有init区别；4)说明无需推迟原因
-  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
-  result: 通过（有保留）
-  review_comments: "通过（有保留）. 1)开放问题Q1-Q3建议默认配置；2)开放问题Q4需Agent1澄清rules init内置规则内容范围"
-- id: TODO-293
-  content: 澄清 v2.2.8 开放问题Q4 (rules init内置规则内容)
-  from: agent2
-  to: agent1
-  phase: requirements
-  priority: P1
-  status: completed
-  created_at: '2026-02-13T11:05:00'
-  updated_at: '2026-02-13T11:10:00'
-  description: 澄清开放问题Q4：rules init内置规则内容范围（完整规则：AGENTS.md + 全部skill）
-  open_question: "Q4: oc-collab rules init 内置规则内容范围"
-  result: "选择完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
-- id: TODO-290
-  content: 评审 v2.2.8 需求文档 (requirements_v2.2.8.md) 并更新状态为APPROVED
-  from: agent1
-  to: agent2
-  phase: requirements_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T10:00:00'
-  updated_at: '2026-02-13T10:30:00'
-  description: 评审 v2.2.8 需求文档，重点关注：1) 功能完整性；2) 工时合理性；3) 架构映射准确性
-  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
-  result: 不通过（有条件）- 需补充验收标准
-  review_comments: "评审结论: 不通过（有条件）. 1. 补充F-WEB-005/F-INIT-001验收标准；2. 澄清开放问题；3. 建议oc-collab init推迟到v2.2.9"
-- id: TODO-294
-  content: 确认开放问题Q4澄清并正式通过 v2.2.8 需求文档
-  from: agent1
-  to: agent2
-  phase: requirements_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T11:15:00'
-  updated_at: '2026-02-13T11:20:00'
-  description: 开放问题Q4已澄清（完整规则：AGENTS.md + 全部skill），确认后更新需求文档状态为APPROVED
-  open_question: "Q4: oc-collab rules init 内置规则内容范围"
-  clarification: "完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
-  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
-  result: v2.2.8需求已APPROVED
-- id: TODO-296
-  content: 创建 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
-  from: agent2
-  to: agent1
-  phase: design
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T11:25:00'
-  updated_at: '2026-02-13T11:45:00'
-  description: v2.2.8需求已APPROVED，需创建概要设计后进入设计评审。参照DETAIL-2026-02-v2.2.7.md的概要设计章节结构
-  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
-  output: docs/02-design/OUTLINE_v2.2.8.md
-  result: 已创建OUTLINE_v2.2.8.md，包含4个模块的概要设计
-- id: TODO-297
-  content: 评审 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
-  from: agent1
-  to: agent2
-  phase: design_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T11:45:00'
-  updated_at: '2026-02-13T11:50:00'
-  description: 概要设计已完成，需Agent2评审后进入详细设计。参照oc_collab_outline_design_guide
-  outline_doc: docs/02-design/OUTLINE_v2.2.8.md
-  result: 通过
-  review_comments: "通过 - 模块划分清晰，验收标准完整，技术可行"
-- id: TODO-298
-  content: 创建 v2.2.8 详细设计 (docs/02-design/DETAIL_v2.2.8.md)
-  from: agent2
-  to: agent2
-  phase: detailed_design
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T11:55:00'
-  updated_at: '2026-02-13T12:00:00'
-  description: 概要设计已通过，创建4个模块的详细设计：EventDispatcher、StateNotifier、HMACValidator、RulesInitializer
-  outline_doc: docs/02-design/OUTLINE_v2.2.8.md
-  output: docs/02-design/DETAIL_v2.2.8.md
-  modules:
-    - EventDispatcher
-    - StateNotifier
-    - HMACValidator
-    - RulesInitializer
-  estimated_hours: 3
-  result: DETAIL_v2.2.8.md已创建，包含完整类设计和CLI命令设计
-- id: TODO-301
-  content: 评审 v2.2.8 详细设计 (DETAIL_v2.2.8.md) 并更新状态为APPROVED
-  from: agent2
-  to: agent1
-  phase: detailed_design_review
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T12:10:00'
-  updated_at: '2026-02-13T12:30:00'
-  description: 详细设计已完成，需Agent1评审通过后才能进入开发阶段
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  review_items:
-    - 类设计完整性
-    - CLI命令设计
-    - 数据结构正确性
-    - 错误处理合理性
-    - 测试策略可行性
-  result: "通过（有保留）. 5项评审全部通过。保留意见：RulesInitializer内容需确认是否满足'完整规则'要求。"
-- id: TODO-302
-  content: v2.2.8 开发阶段：实现所有模块
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T12:35:00'
-  updated_at: '2026-02-13T13:30:00'
-  description: 详细设计已APPROVED，需实现所有模块
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  features:
-    - F-WEB-003: EventDispatcher (5h)
-    - F-WEB-004: StateNotifier (5h)
-    - F-WEB-005: HMACValidator (3h)
-    - F-INIT-001: RulesInitializer (3h)
-  estimated_hours: 16
-  result: 4个模块全部实现完成，31个单元测试通过
-- id: TODO-311
-  content: v2.2.8 黑盒测试
-  from: agent2
-  to: agent1
-  phase: testing
-  priority: P0
-  status: completed
-  created_at: '2026-02-13T13:35:00'
-  updated_at: '2026-02-13T18:00:00'
-  description: 31个单元测试通过，需Agent1执行黑盒测试验证功能完整性
-  result: 黑盒测试已通过
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  test_cases:
-    - "oc-collab rules init 执行"
-    - "oc-collab rules status 检查"
-    - "EventDispatcher 回调注册和分发"
-    - "HMACValidator GitHub签名验证"
-    - "HMACValidator Gitee Token验证"
 - id: TODO-310
   content: 下一轮需求分析：将自动报Bug功能纳入优先开发
-  from: agent1
-  to: agent1
-  phase: requirements
-  priority: P0
   status: pending
-  created_at: "2026-02-13T18:00:00"
-  description: "BUG-20260213-002/003调查完成，已创建PROPOSAL-2026-02-002。v2.2.8完成后，需将自动报Bug功能纳入v2.2.9优先开发。"
-  proposal: PROPOSAL-2026-02-002_auto_bug_detection.md
-  related_bugs:
-    - BUG-20260213-002
-    - BUG-20260213-003
-  note: "自动报Bug是非常重要的feature，用户要求高优先级"
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-13T18:00:00'
+  updated_at: null
 - id: TODO-303
   content: 实现 EventDispatcher (F-WEB-003)
-  from: agent2
-  to: agent2
-  phase: development
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-13T13:00:00'
   updated_at: '2026-02-13T13:15:00'
-  description: 实现事件分发器：register_callback, dispatch, 回调过滤
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  output: src/core/event_dispatcher.py
-  estimated_hours: 5
-  result: 31/31测试通过
 - id: TODO-304
   content: 实现 StateNotifier (F-WEB-004)
-  from: agent2
-  to: agent2
-  phase: development
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-13T13:00:00'
   updated_at: '2026-02-13T13:20:00'
-  description: 实现状态通知器：notify, Payload格式化, HTTP发送
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  output: src/core/state_notifier.py
-  estimated_hours: 5
-  result: 31/31测试通过
 - id: TODO-305
   content: 实现 HMACValidator (F-WEB-005)
-  from: agent2
-  to: agent2
-  phase: development
-  priority: P1
   status: completed
+  priority: P1
+  agent_id: null
   created_at: '2026-02-13T13:00:00'
   updated_at: '2026-02-13T13:25:00'
-  description: 实现HMAC签名验证：GitHub/Gitee签名验证
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  output: src/core/hmac_validator.py
-  estimated_hours: 3
-  result: 31/31测试通过
 - id: TODO-306
   content: 实现 RulesInitializer (F-INIT-001)
-  from: agent2
-  to: agent2
-  phase: development
-  priority: P1
   status: completed
+  priority: P1
+  agent_id: null
   created_at: '2026-02-13T13:00:00'
   updated_at: '2026-02-13T13:30:00'
-  description: 实现规则初始化器：init, check_status
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  output: src/core/rules_initializer.py
-  estimated_hours: 3
-  result: 31/31测试通过
 - id: TODO-300
   content: v2.2.8 开发阶段 (F-WEB-003/004/005, F-INIT-001)
-  from: agent2
-  to: agent2
-  phase: development
-  priority: P0
   status: pending
+  priority: P0
+  agent_id: null
   created_at: '2026-02-13T12:05:00'
-  description: 详细设计评审通过后才能进入开发阶段
-  design_doc: docs/02-design/DETAIL_v2.2.8.md
-  features:
-    - F-WEB-003: EventDispatcher (5h)
-    - F-WEB-004: StateNotifier (5h)
-    - F-WEB-005: HMACValidator (3h)
-    - F-INIT-001: RulesInitializer (3h)
-  estimated_hours: 16
-  result: 4个模块全部实现完成，31个单元测试通过
-- id: TODO-310
-  content: 下一轮需求分析：将自动报Bug功能纳入优先开发
-  from: agent1
-  to: agent1
-  phase: requirements
-  priority: P0
-  status: pending
-  created_at: "2026-02-13T18:00:00"
-  description: "BUG-20260213-002/003调查完成，已创建PROPOSAL-2026-02-002。v2.2.8完成后，需将自动报Bug功能纳入v2.2.9优先开发。"
-  proposal: PROPOSAL-2026-02-002_auto_bug_detection.md
-  related_bugs:
-    - BUG-20260213-002
-    - BUG-20260213-003
-  note: "自动报Bug是非常重要的feature，用户要求高优先级"
+  updated_at: null
 - id: TODO-319
   content: '修复BUG-20260213-006: 修复10个E2E测试失败'
   status: completed
   priority: P0
+  agent_id: null
   created_at: '2026-02-13T22:40:00'
-  bug_id: BUG-20260213-006
-  result: '148/148 E2E测试通过。修复with_retry/notification/permission/issue/workflow。'
+  updated_at: null
 - id: TODO-320
   content: '修复BUG-20260213-007: todowrite工具持久化失效'
-  status: pending
+  status: completed
   priority: P0
+  agent_id: null
   created_at: '2026-02-13T22:45:00'
-  bug_id: BUG-20260213-007
+  updated_at: null
+  result: 已修复：1)清理重复TODO条目；2)修复测试文件YAML键名。2/2测试通过。
+  from: agent1
+  to: agent2
+  phase: bugfix
 - id: TODO-321
-  content: '验收BUG-20260213-006修复：E2E测试验证'
+  content: 验收BUG-20260213-006修复：E2E测试验证
   from: agent2
   to: agent1
   phase: testing
   priority: P0
   status: completed
   created_at: '2026-02-13T22:50:00'
-  updated_at: '2026-02-13T23:30:00'
+  updated_at: '2026-02-13T18:10:00'
   bug_id: BUG-20260213-006
-  description: 'Agent2已完成E2E测试修复(148/148通过)，请Agent1验收。'
-  result: '148/148 E2E测试通过，验收通过。'
-total: 35
+  result: 148/148 E2E测试通过，验收通过
+- id: TODO-322
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:40:36.804978'
+  updated_at: '2026-02-13T23:40:36.804987'
+- id: TODO-323
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:40:41.615145'
+  updated_at: '2026-02-13T23:40:41.615154'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:40:41.719182'
+  updated_at: '2026-02-13T23:40:41.719196'
+- id: TODO-324
+  content: 测试直接添加
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:40:52.582239'
+  updated_at: '2026-02-13T23:40:52.582247'
+- id: TODO-325
+  content: 测试todowrite持久化
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:41:35.437212'
+  updated_at: '2026-02-13T23:41:35.437219'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-13T23:41:35.542310'
+  updated_at: '2026-02-13T23:41:35.542326'
+total: 42
