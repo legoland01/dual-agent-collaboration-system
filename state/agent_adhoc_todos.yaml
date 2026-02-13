@@ -221,15 +221,46 @@ todos:
   clarification: "完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
   requirements_doc: docs/01-requirements/requirements_v2.2.8.md
   result: v2.2.8需求已APPROVED
-- id: TODO-295
+- id: TODO-296
   content: 创建 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
   from: agent2
   to: agent1
   phase: design
   priority: P0
-  status: pending
+  status: completed
   created_at: '2026-02-13T11:25:00'
+  updated_at: '2026-02-13T11:45:00'
   description: v2.2.8需求已APPROVED，需创建概要设计后进入设计评审。参照DETAIL-2026-02-v2.2.7.md的概要设计章节结构
   requirements_doc: docs/01-requirements/requirements_v2.2.8.md
   output: docs/02-design/OUTLINE_v2.2.8.md
-total: 16
+  result: 已创建OUTLINE_v2.2.8.md，包含4个模块的概要设计
+- id: TODO-297
+  content: 评审 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
+  from: agent1
+  to: agent2
+  phase: design_review
+  priority: P0
+  status: completed
+  created_at: '2026-02-13T11:45:00'
+  updated_at: '2026-02-13T11:50:00'
+  description: 概要设计已完成，需Agent2评审后进入详细设计。参照oc_collab_outline_design_guide
+  outline_doc: docs/02-design/OUTLINE_v2.2.8.md
+  result: 通过
+  review_comments: "通过 - 模块划分清晰，验收标准完整，技术可行"
+- id: TODO-298
+  content: 创建 v2.2.8 详细设计 (docs/02-design/DETAIL_v2.2.8.md)
+  from: agent2
+  to: agent2
+  phase: detailed_design
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T11:55:00'
+  description: 概要设计已通过，创建4个模块的详细设计：EventDispatcher、StateNotifier、HMACValidator、RulesInitializer
+  outline_doc: docs/02-design/OUTLINE_v2.2.8.md
+  output: docs/02-design/DETAIL_v2.2.8.md
+  modules:
+    - EventDispatcher
+    - StateNotifier
+    - HMACValidator
+    - RulesInitializer
+  estimated_hours: 3
