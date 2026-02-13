@@ -551,6 +551,31 @@ Agent2评审 → TODO设为complete（评审工作完成）
 | Agent2发现Bug | 创建"Agent2修复"的TODO + 提前创建"Agent1重新测试"的TODO ❌ | 只创建"Agent2修复"的TODO，Agent1看到修复后自主创建测试TODO ✅ |
 | Agent1提交需求 | 替Agent2创建开发TODO ❌ | 创建"评审需求"TODO，让Agent2决定如何分解 ✅ |
 
+### 开发TODO创建规则 ⭐ (BUG-20260214-002补充)
+
+**规则**：设计阶段完成后，Agent1必须创建开发TODO给Agent2。
+
+| 阶段 | TODO创建者 | TODO类型 | 示例 |
+|------|-----------|----------|------|
+| 需求评审 | Agent1 | 评审TODO | "Agent2评审需求文档" |
+| 设计评审 | Agent1 | 评审TODO | "Agent2评审详细设计" |
+| **开发阶段** | **Agent1** | **开发TODO** | "Agent2实现StateNotifier集成" |
+
+**示例**：
+```
+正确做法：
+oc-collab todowrite --content "实现v2.2.9功能：StateNotifier集成todowrite" --priority high --agent 2
+
+错误做法：
+- Agent2自己创建开发TODO给自己 ❌
+- Agent1不创建开发TODO给Agent2 ❌
+```
+
+**原理**：
+- Agent1把控需求和设计，清楚功能范围
+- Agent2基于TODO执行开发，不需要自己分解任务
+- 避免Agent2自己给自己创建TODO（违反职责边界）
+
 ---
 
 **核心原则**：
@@ -567,6 +592,7 @@ Agent2评审 → TODO设为complete（评审工作完成）
 | v1 | 2026-02-08 | 初始版本 |
 | v2 | 2026-02-08 | 新增"需求分析"环节 |
 | v3 | 2026-02-08 | 新增"跨Agent协作规范"：独立Session调用、Todo机制、Git同步规范 |
+| v8.1 | 2026-02-14 | 补充"开发TODO创建规则"（BUG-20260214-002） |
 | v4 | 2026-02-08 | **改进清晰度**：明确Proposal和需求文档的区别；"纳代码"改为"需开发"；添加"关键澄清"表格；明确每种决策的下一步 |
 | v5 | 2026-02-08 | 新增"版本结束后需求分析"环节；明确Proposal/Skill不需要评审；新增"版本周期规则" |
 | v6 | 2026-02-08 | 细化"版本周期规则"：做完一期→重新需求分析→调整排期→做当期需求文档；禁止跨期做需求文档 |
