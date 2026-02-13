@@ -285,6 +285,15 @@ v2.2.8:
     status: closed
     agent1_signoff: true
     agent1_signoff_at: '2026-02-14'
+  deployment:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14T18:30:00'
+    completed_at: '2026-02-14T18:30:00'
+    git_commit: b3e256c
+    git_tag: v2.2.8
+    pypi_url: https://pypi.org/project/opencode-collaboration/2.2.8/
+    pypi_version: 2.2.8
+    status: completed
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-13'
