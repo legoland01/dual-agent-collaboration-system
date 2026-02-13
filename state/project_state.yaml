@@ -279,6 +279,12 @@ v2.2.8:
     id: BUG-20260213-004
     severity: P1
     status: closed
+  - description: todowrite工具持久化失效
+    id: BUG-20260213-007
+    severity: P0
+    status: closed
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-13'
@@ -307,7 +313,9 @@ v2.2.8:
   status: completed
   testing:
     agent1_signoff: true
-    agent1_signoff_at: '2026-02-13'
+    agent1_signoff_at: '2026-02-14T18:15:00'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-13'
     blackbox_tests: 9 passed
     completed_at: '2026-02-13T18:00:00'
     phase: completed
