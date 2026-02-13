@@ -14,6 +14,7 @@ from ..core.todo_sync_manager import (
     TodoSyncManager,
     TodoState,
 )
+from ..core.state_notifier import StateNotifier
 
 
 def get_project_path() -> str:
@@ -115,6 +116,19 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
             click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
             click.echo(f"   优先级: {todo.priority}")
             click.echo(f"   状态: {todo.status}")
+
+            # v2.2.9: StateNotifier集成 - 发送Webhook通知
+            from ..core.context_manager import ContextManager, ContextNotFoundError
+            try:
+                context = ContextManager().load_context()
+                current_agent = context.agent
+                notifier = StateNotifier()
+                if notifier.notify_todo_created(todo.id, todo.content, f"agent{current_agent}"):
+                    click.echo("   🔔 Webhook通知已发送")
+                else:
+                    click.echo("   ℹ️ Webhook未配置（静默跳过）")
+            except (ContextNotFoundError, Exception):
+                click.echo("   ℹ️ Webhook通知跳过（上下文不存在）")
 
             # v2.2.6: 上下文摘要
             if auto_check:

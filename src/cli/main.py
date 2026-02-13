@@ -31,6 +31,7 @@ from .enhanced_commands import (
 )
 from .skill_commands import skill_group
 from .webhook_commands import webhook_group
+from .rules_commands import rules_group
 
 
 console = Console()
@@ -265,6 +266,14 @@ def signoff_command(stage: str, comment: str, reject: str, sync: bool, auto_chec
             else:
                 result = signoff_engine.sign(stage, agent_id, comment)
                 click.echo(f"已签署 {stage} 阶段")
+
+            # v2.2.9: StateNotifier集成 - 发送Webhook通知
+            from ..core.state_notifier import StateNotifier
+            notifier = StateNotifier()
+            if notifier.notify_signoff_completed(stage, f"agent{agent_id}"):
+                click.echo("🔔 Webhook通知已发送")
+            else:
+                click.echo("ℹ️ Webhook未配置（静默跳过）")
 
             if state_manager.can_proceed_to_next_phase():
                 click.echo("双方已签署，可以推进到下一阶段")
@@ -1346,6 +1355,15 @@ def advance_command(phase: str, force: bool, check: bool, sync: bool, auto_check
                     title="阶段推进",
                     style="green"
                 ))
+                
+                # v2.2.9: StateNotifier集成 - 发送Webhook通知
+                from ..core.state_notifier import StateNotifier
+                notifier = StateNotifier()
+                if notifier.notify_phase_advanced(result["from_phase"], result["to_phase"], "agent1"):
+                    click.echo("🔔 Webhook通知已发送")
+                else:
+                    click.echo("ℹ️ Webhook未配置（静默跳过）")
+                
                 if sync:
                     git_sync = GitSyncIntegrator(project_path)
                     sync_result = git_sync.sync_state()
@@ -1640,6 +1658,7 @@ def owner_check_command(target: str, agent: str):
 main.add_command(owner_group, "owner")
 main.add_command(skill_group, "skill")
 main.add_command(webhook_group, "webhook")
+main.add_command(rules_group, "rules")
 
 
 if __name__ == "__main__":
