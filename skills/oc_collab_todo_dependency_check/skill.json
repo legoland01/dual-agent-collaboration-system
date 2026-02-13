@@ -1,0 +1,51 @@
+{
+  "id": "oc_collab_todo_dependency_check",
+  "name": "OC-Collab TODO依赖检查",
+  "version": "1.0",
+  "description": "收到TODO时检查前置依赖状态，避免流程断裂",
+  "author": "Agent 1",
+  "created_at": "2026-02-13",
+  "updated_at": "2026-02-13",
+  "tags": ["todo", "dependency", "workflow", "v2.2.8"],
+  "version_info": {
+    "current": "v2.2.8",
+    "previous": null
+  },
+  "triggers": [
+    {
+      "condition": "todo_received",
+      "priority": "high",
+      "description": "收到新TODO时立即执行依赖检查"
+    }
+  ],
+  "commands": {
+    "check": {
+      "description": "检查TODO依赖状态",
+      "options": [
+        {
+          "name": "current",
+          "args": "<todo_id>",
+          "description": "检查指定TODO的依赖状态"
+        },
+        {
+          "name": "pending",
+          "args": "",
+          "description": "列出所有pending状态的依赖TODO"
+        },
+        {
+          "name": "verify",
+          "args": "<todo_id>",
+          "description": "验证TODO是否可以执行"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "required": ["agent_adhoc_todos.yaml"],
+    "optional": []
+  },
+  "outputs": {
+    "documents": [],
+    "artifacts": []
+  }
+}

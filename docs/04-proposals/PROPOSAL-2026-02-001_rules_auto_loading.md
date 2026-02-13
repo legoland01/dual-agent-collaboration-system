@@ -94,7 +94,10 @@ project/
 ## 6. 验收标准
 
 - [ ] 任意项目运行 `oc-collab todowrite` 自动加载内置规则
-- [ ] `oc-collab init` 命令生成标准目录结构
+- [ ] `oc-collab rules init` 命令生成完整目录结构
+- [ ] 生成 `AGENTS.md`（内置全部核心规则）
+- [ ] 生成 `skills/` 目录（包含全部skill）
+- [ ] 生成 `docs/00-memos/` 目录
 - [ ] 项目 AGENTS.md 可覆盖内置规则
 - [ ] Compaction 后规则不丢失
 
