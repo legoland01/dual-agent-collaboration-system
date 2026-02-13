@@ -1,5 +1,49 @@
 # Changelog
 
+## v2.2.8 - v2.2.8 Released
+
+**Date**: 2026-02-14
+**Status**: ✅ **RELEASED** - Webhook Event Dispatcher + HMAC Security
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-14
+- Agent2: ✅ 2026-02-13
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **F-WEB-003** | EventDispatcher (事件分发器) | ✅ |
+| **F-WEB-004** | StateNotifier (状态通知器) | ✅ |
+| **F-WEB-005** | HMACValidator (HMAC签名验证) | ✅ |
+| **F-INIT-001** | RulesInitializer (规则初始化器) | ✅ |
+
+### Bug Fixes
+
+| Bug | Description | Status |
+|-----|-------------|--------|
+| BUG-20260213-006 | E2E回归测试失败(10个测试) | ✅ Fixed |
+| BUG-20260213-007 | todowrite持久化失效 | ✅ Fixed |
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Unit Tests | 31 | 31 | ✅ |
+| E2E Tests | 148 | 148 | ✅ |
+| Blackbox Tests | 9 | 9 | ✅ |
+| **Total** | **188** | **188** | **✅ All Passed** |
+
+### Changes
+
+- **src/core/event_dispatcher.py** - 事件分发器
+- **src/core/state_notifier.py** - 状态通知器
+- **src/core/hmac_validator.py** - HMAC签名验证器
+- **src/core/rules_initializer.py** - 规则初始化器
+- **src/cli/rules_commands.py** - rules init/status 命令
+
+---
+
 ## v2.2.6 - v2.2.6 Released
 
 **Date**: 2026-02-09

@@ -63,6 +63,9 @@ oc-collab advance -p design
 | `oc-collab history` | 查看协作历史 |
 | `oc-collab compliance check` | 合规检查 (v2.2.2) |
 | `oc-collab git sync` | Git同步 (v2.2.2) |
+| `oc-collab rules init [--force]` | 初始化框架规则 (v2.2.8) |
+| `oc-collab rules status` | 检查规则初始化状态 (v2.2.8) |
+| `oc-collab webhook notify test` | 测试Webhook通知功能 (v2.2.8) |
 
 ---
 
