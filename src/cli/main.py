@@ -32,6 +32,7 @@ from .enhanced_commands import (
 from .skill_commands import skill_group
 from .webhook_commands import webhook_group
 from .rules_commands import rules_group
+from .compliance_commands import compliance_group
 
 
 console = Console()
@@ -1659,6 +1660,7 @@ main.add_command(owner_group, "owner")
 main.add_command(skill_group, "skill")
 main.add_command(webhook_group, "webhook")
 main.add_command(rules_group, "rules")
+main.add_command(compliance_group, "compliance")
 
 
 if __name__ == "__main__":

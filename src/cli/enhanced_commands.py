@@ -95,6 +95,23 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
             for error in result["errors"]:
                 click.echo(f"❌ {error}")
             raise click.ClickException("参数验证失败")
+
+    # v2.2.9: ComplianceEnforcer集成 - Agent1禁止执行todowrite
+    from ..core.compliance_enforcer import ComplianceEnforcer
+    try:
+        context = ContextManager().load_context()
+        current_agent_id = context.agent
+        enforcer = ComplianceEnforcer(current_agent_id)
+        compliance_result = enforcer.check("todowrite")
+
+        if not compliance_result.allowed:
+            click.echo(f"\n{compliance_result.message}\n")
+            enforcer.record_violation(compliance_result)
+            raise click.Abort()
+    except ContextNotFoundError:
+        pass
+    except Exception as e:
+        click.echo(f"⚠️ 合规检查跳过: {e}")
     
     # 检查是否有内容可创建
     if not content and not todos:
