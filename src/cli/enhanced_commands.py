@@ -185,6 +185,25 @@ def todoedit_command(todo_id: str, content: Optional[str], status: Optional[str]
             click.echo(f"✅ 待办已更新: [{todo.id}] {todo.content}")
             click.echo(f"   状态: {todo.status}")
             click.echo(f"   优先级: {todo.priority}")
+
+            # v2.2.9: AutoBugDetector集成 - TODO完成时检查文档状态
+            if status == "completed":
+                from ..core.auto_bug_detector import AutoBugDetector
+                from ..core.state_manager import StateManager
+                try:
+                    project_path = get_project_path()
+                    state_manager = StateManager(project_path)
+                    detector = AutoBugDetector(state_manager=state_manager)
+                    bugs = detector.check_todo_completion(todo_id)
+                    if bugs:
+                        click.echo(f"\n⚠️  检测到 {len(bugs)} 个问题:")
+                        for bug in bugs:
+                            file_path = detector.generate_bug_report(bug)
+                            click.echo(f"   📄 Bug报告: {bug.bug_id}")
+                            click.echo(f"      {bug.description}")
+                except Exception as e:
+                    click.echo(f"   ℹ️ 自动检查跳过: {e}")
+
             click.echo(f"\n✓ 已同步到 {sync_manager.todo_file}")
         else:
             raise click.ClickException(f"未找到待办: {todo_id}")
