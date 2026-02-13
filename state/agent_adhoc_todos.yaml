@@ -321,4 +321,15 @@ todos:
   status: pending
   created_at: '2026-02-14T00:10:00'
   description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
+- id: TODO-329
+  content: 处理v2.2.9评审保留意见
+  from: agent2
+  to: agent1
+  phase: requirements
+  priority: P0
+  status: pending
+  requirements:
+  - 1. 文档版本v1→v2
+  - 2. Agent1签署区添加修复确认行
+  - 3. 更新工时、F-COMP-001、F-AUTO-005相关内容
 total: 42
