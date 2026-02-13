@@ -29,10 +29,15 @@ class StateNotifier:
         self.config = webhook_config
         self.dispatcher = dispatcher
         self._default_webhook_url: Optional[str] = None
+        self._use_enhancer: bool = True
 
     def set_default_webhook_url(self, url: str):
         """设置默认Webhook URL"""
         self._default_webhook_url = url
+
+    def enable_enhancer(self, enabled: bool = True):
+        """启用/禁用Webhook增强器"""
+        self._use_enhancer = enabled
 
     def notify(self, event: StateChangeEvent, webhook_url: Optional[str] = None) -> bool:
         """发送状态变更通知
@@ -51,6 +56,36 @@ class StateNotifier:
 
         payload = self._format_payload(event)
 
+        if self._use_enhancer:
+            return self._notify_with_enhancer(event.event_type, payload, target_url)
+
+        return self._notify_direct(event.event_type, payload, target_url)
+
+    def _notify_with_enhancer(self, event_type: str, payload: Dict, target_url: str) -> bool:
+        """使用Webhook增强器发送通知"""
+        try:
+            from src.core.webhook_enhancer import WebhookEnhancer
+            enhancer = WebhookEnhancer()
+
+            enhanced_payload = enhancer.format_payload_with_id(
+                payload,
+                enhancer.generate_webhook_id(),
+                event_type
+            )
+
+            notification = enhancer.send_with_retry(target_url, enhanced_payload, event_type)
+
+            return notification.status == "sent"
+
+        except ImportError:
+            logger.warning("WebhookEnhancer不可用，使用直接发送")
+            return self._notify_direct(event_type, payload, target_url)
+        except Exception as e:
+            logger.error(f"WebhookEnhancer发送失败: {e}")
+            return self._notify_direct(event_type, payload, target_url)
+
+    def _notify_direct(self, event_type: str, payload: Dict, target_url: str) -> bool:
+        """直接发送通知（无增强）"""
         try:
             if self.dispatcher:
                 from src.core.event_dispatcher import DispatchEvent
@@ -69,7 +104,7 @@ class StateNotifier:
             )
 
             if response.status_code in (200, 201, 204):
-                logger.info(f"状态变更通知已发送: {event.event_type}")
+                logger.info(f"状态变更通知已发送: {event_type}")
                 return True
             else:
                 logger.error(f"状态变更通知发送失败: {response.status_code}")
