@@ -266,4 +266,20 @@ todos:
     - RulesInitializer
   estimated_hours: 3
   result: DETAIL_v2.2.8.md已创建，包含完整类设计和CLI命令设计
+- id: TODO-300
+  content: v2.2.8 开发阶段 (F-WEB-003/004/005, F-INIT-001)
+  from: agent2
+  to: agent2
+  phase: development
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T12:05:00'
+  description: 详细设计已完成，进入开发阶段。4个模块总工时16h
+  design_doc: docs/02-design/DETAIL_v2.2.8.md
+  features:
+    - F-WEB-003: EventDispatcher (5h)
+    - F-WEB-004: StateNotifier (5h)
+    - F-WEB-005: HMACValidator (3h)
+    - F-INIT-001: RulesInitializer (3h)
+  estimated_hours: 16
 - id: TODO-299

@@ -273,3 +273,34 @@ v2.2.7:
     unit_tests_passed: 40
   version: 2.2.7
   workload: 21h
+v2.2.8:
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-13'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-13'
+    design_doc: docs/02-design/DETAIL_v2.2.8.md
+    outline_doc: docs/02-design/OUTLINE_v2.2.8.md
+    status: APPROVED
+  development:
+    phase: pending
+    status: pending
+  features:
+    - "F-WEB-003: EventDispatcher"
+    - "F-WEB-004: StateNotifier"
+    - "F-WEB-005: HMACValidator"
+    - "F-INIT-001: RulesInitializer"
+  phase: development
+  requirements:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-13'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-13'
+    requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+    status: APPROVED
+  status: development
+  testing:
+    phase: pending
+    status: pending
+  version: 2.2.8
+  workload: 26h
