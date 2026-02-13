@@ -300,4 +300,15 @@ todos:
   phase: requirements
   description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
   result: 技术评审通过（有条件）：1)工时偏高需控制25h内；2)F-COMP-001需确认；3)F-AUTO-005验收标准需更具体
+- id: TODO-327
+  content: 处理v2.2.9评审保留意见：工时/F-COMP-001/F-AUTO-005
+  from: agent2
+  to: agent1
+  phase: requirements
+  priority: P0
+  status: pending
+  requirements:
+  - 工时控制在25h内，考虑拆分F-AUTO-005
+  - F-COMP-001禁用规则与现有Skill冲突需确认
+  - F-AUTO-005验收标准需更具体
 total: 42
