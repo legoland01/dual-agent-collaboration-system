@@ -419,4 +419,27 @@ todos:
     - BUG-20260213-002
     - BUG-20260213-003
   note: "自动报Bug是非常重要的feature，用户要求高优先级"
-total: 32
+- id: TODO-319
+  content: '修复BUG-20260213-006: 修复10个E2E测试失败'
+  status: completed
+  priority: P0
+  created_at: '2026-02-13T22:40:00'
+  bug_id: BUG-20260213-006
+  result: '148/148 E2E测试通过。修复with_retry/notification/permission/issue/workflow。'
+- id: TODO-320
+  content: '修复BUG-20260213-007: todowrite工具持久化失效'
+  status: pending
+  priority: P0
+  created_at: '2026-02-13T22:45:00'
+  bug_id: BUG-20260213-007
+- id: TODO-321
+  content: '验收BUG-20260213-006修复：E2E测试验证'
+  from: agent2
+  to: agent1
+  phase: testing
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T22:50:00'
+  bug_id: BUG-20260213-006
+  description: 'Agent2已完成E2E测试修复(148/148通过)，请Agent1验收。'
+total: 35
