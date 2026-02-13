@@ -59,7 +59,7 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-10T16:03:11.447259'
+updated_at: '2026-02-13T23:37:28.832191'
 v2.2.2:
   acceptance:
     agent1_signoff: true
@@ -242,17 +242,17 @@ v2.2.7:
   development:
     completed_at: '2026-02-10T18:30:00'
     features:
-    - "F-TEST-001: Skill内容准确性测试"
-    - "F-TEST-002: Skill覆盖率统计"
-    - "F-WEB-001: Webhook配置管理"
-    - "F-WEB-002: 事件监听与崩溃恢复"
+    - "F-TEST-001: Skill\u5185\u5BB9\u51C6\u786E\u6027\u6D4B\u8BD5"
+    - "F-TEST-002: Skill\u8986\u76D6\u7387\u7EDF\u8BA1"
+    - "F-WEB-001: Webhook\u914D\u7F6E\u7BA1\u7406"
+    - "F-WEB-002: \u4E8B\u4EF6\u76D1\u542C\u4E0E\u5D29\u6E83\u6062\u590D"
     modules:
-      SkillTester: completed
-      ReferenceValidator: completed
       CLIActionValidator: completed
       CoverageCalculator: completed
-      WebhookConfig: completed
       EventListener: completed
+      ReferenceValidator: completed
+      SkillTester: completed
+      WebhookConfig: completed
     phase: completed
     started_at: '2026-02-10T17:00:00'
     status: completed
@@ -261,7 +261,7 @@ v2.2.7:
     agent1_signoff_at: '2026-02-10T19:00:00'
     blackbox_tests: 7 passed
     bugs:
-    - description: "Agent跳过提交流程直接发布"
+    - description: "Agent\u8DF3\u8FC7\u63D0\u4EA4\u6D41\u7A0B\u76F4\u63A5\u53D1\u5E03"
       id: BUG-20260210-003
       severity: P1
       status: acknowledged
@@ -274,6 +274,11 @@ v2.2.7:
   version: 2.2.7
   workload: 21h
 v2.2.8:
+  bugs:
+  - description: CLI commands (rules init/status) not implemented
+    id: BUG-20260213-004
+    severity: P1
+    status: closed
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-13'
@@ -283,14 +288,15 @@ v2.2.8:
     outline_doc: docs/02-design/OUTLINE_v2.2.8.md
     status: APPROVED
   development:
-    phase: pending
-    status: pending
+    completed_at: '2026-02-13'
+    phase: completed
+    status: completed
   features:
-    - "F-WEB-003: EventDispatcher"
-    - "F-WEB-004: StateNotifier"
-    - "F-WEB-005: HMACValidator"
-    - "F-INIT-001: RulesInitializer"
-  phase: development
+  - 'F-WEB-003: EventDispatcher'
+  - 'F-WEB-004: StateNotifier'
+  - 'F-WEB-005: HMACValidator'
+  - 'F-INIT-001: RulesInitializer'
+  phase: testing
   requirements:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-13'
@@ -298,9 +304,14 @@ v2.2.8:
     agent2_signoff_at: '2026-02-13'
     requirements_doc: docs/01-requirements/requirements_v2.2.8.md
     status: APPROVED
-  status: development
+  status: completed
   testing:
-    phase: pending
-    status: pending
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-13'
+    blackbox_tests: 9 passed
+    completed_at: '2026-02-13T18:00:00'
+    phase: completed
+    status: APPROVED
+    unit_tests_passed: 31
   version: 2.2.8
   workload: 26h
