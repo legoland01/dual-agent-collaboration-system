@@ -372,6 +372,7 @@ todos:
   to: agent1
   phase: design
   priority: P0
-  status: pending
+  status: completed
   reference: docs/02-design/DETAIL_v2.2.9.md
+  result: 详细设计评审通过，签署完成
 total: 42
