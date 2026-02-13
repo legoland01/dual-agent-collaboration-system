@@ -376,109 +376,42 @@ todos:
   reference: docs/02-design/DETAIL_v2.2.9.md
   result: 详细设计评审通过，完成3项检查：1)实现方案可行；2)测试用例完整；3)技术选型合理
 - id: TODO-340
-  content: 实现v2.2.9功能：StateNotifier集成todowrite
+  content: 实现v2.2.9全部功能（8个模块）
   from: agent1
   to: agent2
   phase: development
   priority: P0
   status: pending
   created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (TodoWebhookNotifier)'
+  reference: 'docs/02-design/DETAIL_v2.2.9.md'
   requirements:
-  - "src/core/todo_webhook_notifier.py"
-  - "集成到todowrite命令"
-  - "单元测试 + E2E测试"
+  - "8个功能模块：StateNotifier集成(3个)+自动Bug检测+Agent合规+规则加载+部署同步+Webhook增强"
+  - "总工时：33h"
+  - "参考：详细设计文档，按模块分解实现"
+  - "测试：单元测试+E2E测试"
 - id: TODO-341
-  content: 实现v2.2.9功能：StateNotifier集成signoff
-  from: agent1
-  to: agent2
+  content: v2.2.9开发完成，提交代码并推送
+  from: agent2
+  to: agent1
   phase: development
   priority: P0
   status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (SignoffWebhookNotifier)'
+  created_at: '2026-02-14T01:05:00'
   requirements:
-  - "src/core/signoff_webhook_notifier.py"
-  - "集成到signoff命令"
-  - "单元测试 + E2E测试"
+  - "8个模块代码实现完成"
+  - "所有测试通过"
+  - "代码推送到main分支"
 - id: TODO-342
-  content: 实现v2.2.9功能：StateNotifier集成phase_advance
-  from: agent1
-  to: agent2
-  phase: development
+  content: v2.2.9测试验收
+  from: agent2
+  to: agent1
+  phase: testing
   priority: P0
   status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (PhaseWebhookNotifier)'
+  created_at: '2026-02-14T01:05:00'
   requirements:
-  - "src/core/phase_webhook_notifier.py"
-  - "集成到phase_advance命令"
-  - "单元测试 + E2E测试"
-- id: TODO-343
-  content: 实现v2.2.9功能：自动Bug检测机制
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P0
-  status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (AutoBugDetector)'
-  requirements:
-  - "src/core/auto_bug_detector.py"
-  - "自动检测TODO完成/评审完成/命令执行"
-  - "单元测试 + E2E测试"
-- id: TODO-344
-  content: 实现v2.2.9功能：Agent Compliance CLI准入
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P0
-  status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (ComplianceEnforcer)'
-  requirements:
-  - "src/core/compliance_enforcer.py"
-  - "Agent1禁用todowrite/todoedit"
-  - "compliance check/report命令"
-  - "单元测试 + E2E测试"
-- id: TODO-345
-  content: 实现v2.2.9功能：规则自动加载
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P1
-  status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (RulesAutoLoader)'
-  requirements:
-  - "src/core/rules_auto_loader.py"
-  - "rules init命令"
-  - "单元测试"
-- id: TODO-346
-  content: 实现v2.2.9功能：部署文档同步自动化
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P1
-  status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (DeployDocSync)'
-  requirements:
-  - "src/core/deploy_doc_sync.py"
-  - "deploy check-docs命令"
-  - "单元测试"
-- id: TODO-347
-  content: 实现v2.2.9功能：Webhook状态通知增强
-  from: agent1
-  to: agent2
-  phase: development
-  priority: P2
-  status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md (WebhookEnhancer)'
-  requirements:
-  - "src/core/webhook_enhancer.py"
-  - "重试机制 + 状态追踪"
-  - "webhook status命令"
-  - "单元测试"
-total: 50
+  - "单元测试：8个模块各至少1个测试"
+  - "E2E测试：覆盖核心场景"
+  - "Agent1黑盒测试"
+  - "签署验收"
+total: 45
