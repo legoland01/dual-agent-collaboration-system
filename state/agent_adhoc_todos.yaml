@@ -221,4 +221,15 @@ todos:
   clarification: "完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
   requirements_doc: docs/01-requirements/requirements_v2.2.8.md
   result: v2.2.8需求已APPROVED
-total: 15
+- id: TODO-295
+  content: 创建 v2.2.8 概要设计 (docs/02-design/OUTLINE_v2.2.8.md)
+  from: agent2
+  to: agent1
+  phase: design
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T11:25:00'
+  description: v2.2.8需求已APPROVED，需创建概要设计后进入设计评审。参照DETAIL-2026-02-v2.2.7.md的概要设计章节结构
+  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+  output: docs/02-design/OUTLINE_v2.2.8.md
+total: 16
