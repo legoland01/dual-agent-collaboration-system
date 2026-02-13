@@ -33,6 +33,7 @@ from .skill_commands import skill_group
 from .webhook_commands import webhook_group
 from .rules_commands import rules_group
 from .compliance_commands import compliance_group
+from .deploy_commands import deploy_group
 
 
 console = Console()
@@ -1661,6 +1662,7 @@ main.add_command(skill_group, "skill")
 main.add_command(webhook_group, "webhook")
 main.add_command(rules_group, "rules")
 main.add_command(compliance_group, "compliance")
+main.add_command(deploy_group, "deploy")
 
 
 if __name__ == "__main__":
