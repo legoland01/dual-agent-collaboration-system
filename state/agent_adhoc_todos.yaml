@@ -308,9 +308,11 @@ todos:
   to: agent1
   phase: testing
   priority: P0
-  status: pending
+  status: completed
   created_at: '2026-02-13T13:35:00'
+  updated_at: '2026-02-13T18:00:00'
   description: 31个单元测试通过，需Agent1执行黑盒测试验证功能完整性
+  result: 黑盒测试已通过
   design_doc: docs/02-design/DETAIL_v2.2.8.md
   test_cases:
     - "oc-collab rules init 执行"
@@ -438,8 +440,10 @@ todos:
   to: agent1
   phase: testing
   priority: P0
-  status: pending
+  status: completed
   created_at: '2026-02-13T22:50:00'
+  updated_at: '2026-02-13T23:30:00'
   bug_id: BUG-20260213-006
   description: 'Agent2已完成E2E测试修复(148/148通过)，请Agent1验收。'
+  result: '148/148 E2E测试通过，验收通过。'
 total: 35
