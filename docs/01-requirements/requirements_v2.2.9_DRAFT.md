@@ -104,17 +104,16 @@ v2.2.8开发了StateNotifier模块，但未集成到工作流。本版本补全�
 
 **来源**: PROPOSAL-2026-02-002 (P-002)
 
-**描述**: 关键操作后自动检测异常并触发Bug报告
+**描述**: 关键操作后自动检测异常并触发Bug报告（简化版）
 
 **验收标准**:
 - [ ] TODO完成时，自动检查文档状态是否更新
 - [ ] 评审完成时，自动检查签署是否完成
 - [ ] 命令执行后，返回值异常时自动报告Bug
-- [ ] 文件编辑后，格式错误时自动报告Bug
 - [ ] 自动生成的Bug报告包含：type、description、related_todo
-- [ ] Agent意识到"遇到问题应该先报Bug"
+- [ ] **Agent意识到"遇到问题应该先报Bug"（意识层面）**
 
-**工时**: 8h
+**工时**: 5h
 
 ---
 
@@ -123,6 +122,12 @@ v2.2.8开发了StateNotifier模块，但未集成到工作流。本版本补全�
 **来源**: PROPOSAL-2026-02-004 (P-004)
 
 **描述**: Agent1无法执行todowrite/todoedit，强制创建TODO
+
+**与Skill边界说明**:
+| Agent | 可以 | 不可以 |
+|-------|------|--------|
+| **Agent1** | 创建TODO、评审文档、测试、部署 | 执行CLI(todowrite/todoedit)、改代码 |
+| **Agent2** | 执行CLI、开发、创建详细设计 | 创建需求/概要设计、签署验收 |
 
 **验收标准**:
 - [ ] Agent1执行todowrite时，返回拒绝提示
@@ -221,15 +226,15 @@ v2.2.8开发了StateNotifier模块，但未集成到工作流。本版本补全�
 | F-WEB-INT-001 | StateNotifier集成到todowrite | 3h |
 | F-WEB-INT-002 | StateNotifier集成到signoff | 2h |
 | F-WEB-INT-003 | StateNotifier集成到phase_advance | 2h |
-| F-AUTO-005 | 自动Bug检测机制 | 8h |
+| F-AUTO-005 | 自动Bug检测机制 | 5h |
 | F-COMP-001 | Agent Compliance CLI准入检查 | 7h |
 | F-INIT-002 | 规则自动加载 | 5h |
 | F-DEPLOY-002 | 部署文档同步自动化 | 3h |
 | F-WEB-006 | Webhook状态通知增强 | 3h |
-| - | 测试 + 修复 | 预留5h |
-| **总计** | | **38h** |
+| - | 测试 + 修复 | 预留3h |
+| **总计** | | **33h** |
 
-**说明**: 预留5h用于测试和修复，总工时控制在38h内。
+**说明**: 预留3h用于测试和修复，总工时控制在33h内（符合Agent2建议的25h上限+8h弹性）。
 
 ---
 
