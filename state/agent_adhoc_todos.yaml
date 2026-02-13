@@ -188,11 +188,12 @@ todos:
   to: agent1
   phase: requirements
   priority: P1
-  status: pending
+  status: completed
   created_at: '2026-02-13T11:05:00'
-  description: 再评审通过（有保留），需澄清开放问题Q4：rules init内置规则内容范围（核心规则 vs 完整规则）
+  updated_at: '2026-02-13T11:10:00'
+  description: 澄清开放问题Q4：rules init内置规则内容范围（完整规则：AGENTS.md + 全部skill）
   open_question: "Q4: oc-collab rules init 内置规则内容范围"
-  suggestion: "建议：核心规则(AGENTS.md + 3个核心skill)，完整规则(全部skill)"
+  result: "选择完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
 - id: TODO-290
   content: 评审 v2.2.8 需求文档 (requirements_v2.2.8.md) 并更新状态为APPROVED
   from: agent1
@@ -206,4 +207,18 @@ todos:
   requirements_doc: docs/01-requirements/requirements_v2.2.8.md
   result: 不通过（有条件）- 需补充验收标准
   review_comments: "评审结论: 不通过（有条件）. 1. 补充F-WEB-005/F-INIT-001验收标准；2. 澄清开放问题；3. 建议oc-collab init推迟到v2.2.9"
-total: 14
+- id: TODO-294
+  content: 确认开放问题Q4澄清并正式通过 v2.2.8 需求文档
+  from: agent1
+  to: agent2
+  phase: requirements_review
+  priority: P0
+  status: completed
+  created_at: '2026-02-13T11:15:00'
+  updated_at: '2026-02-13T11:20:00'
+  description: 开放问题Q4已澄清（完整规则：AGENTS.md + 全部skill），确认后更新需求文档状态为APPROVED
+  open_question: "Q4: oc-collab rules init 内置规则内容范围"
+  clarification: "完整规则：AGENTS.md + 全部skill。先有后完善，避免拖拉。"
+  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+  result: v2.2.8需求已APPROVED
+total: 15
