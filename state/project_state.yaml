@@ -332,3 +332,35 @@ v2.2.8:
     unit_tests_passed: 31
   version: 2.2.8
   workload: 26h
+v2.2.9:
+  requirements:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-14'
+    requirements_doc: docs/01-requirements/requirements_v2.2.9_DRAFT.md
+    status: APPROVED
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-14'
+    design_doc: docs/02-design/DETAIL_v2.2.9.md
+    outline_doc: docs/02-design/OUTLINE_v2.2.9.md
+    status: APPROVED
+  development:
+    phase: in_progress
+    status: in_progress
+  features:
+  - 'StateNotifier集成todowrite (P0)'
+  - 'StateNotifier集成signoff (P0)'
+  - 'StateNotifier集成phase_advance (P0)'
+  - '自动Bug检测机制 (P0)'
+  - 'Agent Compliance CLI准入 (P0)'
+  - '规则自动加载 (P1)'
+  - '部署文档同步自动化 (P1)'
+  - 'Webhook状态通知增强 (P2)'
+  phase: development
+  status: in_progress
+  version: 2.2.9
+  workload: 33h
