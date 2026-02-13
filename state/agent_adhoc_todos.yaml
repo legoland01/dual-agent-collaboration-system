@@ -312,4 +312,13 @@ todos:
   - F-COMP-001禁用规则与现有Skill冲突需确认
   - F-AUTO-005验收标准需更具体
   result: 已处理：1)F-AUTO-005从8h减到5h，总工时38h→33h；2)F-COMP-001添加与Skill边界说明；3)F-AUTO-005删除"文件编辑后"验收项
+- id: TODO-328
+  content: 复审v2.2.9需求文档并签署（Agent1已处理保留意见）
+  from: agent1
+  to: agent2
+  phase: requirements
+  priority: P0
+  status: pending
+  created_at: '2026-02-14T00:10:00'
+  description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
 total: 42
