@@ -143,4 +143,67 @@ todos:
   description: 根据 BUG-20260210-004，在 project_state.yaml 中添加 v2.2.7 记录
   bug_id: BUG-20260210-004
   result: 已添加v2.2.7完整记录
-total: 13
+- id: TODO-289
+  content: v2.2.8 需求分析：Webhook分发器、状态通知器、HMAC验证、init命令
+  from: agent1
+  to: agent1
+  phase: requirements
+  priority: P1
+  status: completed
+  created_at: '2026-02-10T21:20:00'
+  updated_at: '2026-02-13T10:00:00'
+  description: 创建 v2.2.8 需求文档，包含4个功能：F-WEB-003/004/005、F-INIT-001
+  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+  merge_target: v2.2.8
+  output: docs/01-requirements/requirements_v2.2.8.md
+  result: '已完成4功能规划(16h开发/26h总工时)，更新CORE_ARCHITECTURE.md版本记录'
+- id: TODO-291
+  content: 修复v2.2.8需求文档评审问题
+  from: agent2
+  to: agent1
+  phase: requirements_review
+  priority: P0
+  status: completed
+  created_at: '2026-02-13T10:35:00'
+  updated_at: '2026-02-13T10:50:00'
+  description: 根据Agent2评审意见：1)补充F-WEB-005验收标准；2)补充F-INIT-001验收标准；3)澄清开放问题
+  review_comments: "oc-collab init已改名为oc-collab rules init，无需推迟"
+  result: '已完成：1)F-WEB-005验收标准；2)F-INIT-001完整章节+验收标准；3)开放问题更新'
+- id: TODO-292
+  content: 再评审 v2.2.8 需求文档 (requirements_v2.2.8.md)
+  from: agent1
+  to: agent2
+  phase: requirements_review
+  priority: P0
+  status: completed
+  created_at: '2026-02-13T10:50:00'
+  updated_at: '2026-02-13T11:00:00'
+  description: 根据上次评审意见已更新：1)F-WEB-005完整章节；2)F-INIT-001改名为oc-collab rules init并补充验收标准；3)澄清与现有init区别；4)说明无需推迟原因
+  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+  result: 通过（有保留）
+  review_comments: "通过（有保留）. 1)开放问题Q1-Q3建议默认配置；2)开放问题Q4需Agent1澄清rules init内置规则内容范围"
+- id: TODO-293
+  content: 澄清 v2.2.8 开放问题Q4 (rules init内置规则内容)
+  from: agent2
+  to: agent1
+  phase: requirements
+  priority: P1
+  status: pending
+  created_at: '2026-02-13T11:05:00'
+  description: 再评审通过（有保留），需澄清开放问题Q4：rules init内置规则内容范围（核心规则 vs 完整规则）
+  open_question: "Q4: oc-collab rules init 内置规则内容范围"
+  suggestion: "建议：核心规则(AGENTS.md + 3个核心skill)，完整规则(全部skill)"
+- id: TODO-290
+  content: 评审 v2.2.8 需求文档 (requirements_v2.2.8.md) 并更新状态为APPROVED
+  from: agent1
+  to: agent2
+  phase: requirements_review
+  priority: P0
+  status: completed
+  created_at: '2026-02-13T10:00:00'
+  updated_at: '2026-02-13T10:30:00'
+  description: 评审 v2.2.8 需求文档，重点关注：1) 功能完整性；2) 工时合理性；3) 架构映射准确性
+  requirements_doc: docs/01-requirements/requirements_v2.2.8.md
+  result: 不通过（有条件）- 需补充验收标准
+  review_comments: "评审结论: 不通过（有条件）. 1. 补充F-WEB-005/F-INIT-001验收标准；2. 澄清开放问题；3. 建议oc-collab init推迟到v2.2.9"
+total: 14
