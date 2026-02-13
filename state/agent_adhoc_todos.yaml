@@ -302,6 +302,36 @@ todos:
     - F-INIT-001: RulesInitializer (3h)
   estimated_hours: 16
   result: 4个模块全部实现完成，31个单元测试通过
+- id: TODO-311
+  content: v2.2.8 黑盒测试
+  from: agent2
+  to: agent1
+  phase: testing
+  priority: P0
+  status: pending
+  created_at: '2026-02-13T13:35:00'
+  description: 31个单元测试通过，需Agent1执行黑盒测试验证功能完整性
+  design_doc: docs/02-design/DETAIL_v2.2.8.md
+  test_cases:
+    - "oc-collab rules init 执行"
+    - "oc-collab rules status 检查"
+    - "EventDispatcher 回调注册和分发"
+    - "HMACValidator GitHub签名验证"
+    - "HMACValidator Gitee Token验证"
+- id: TODO-310
+  content: 下一轮需求分析：将自动报Bug功能纳入优先开发
+  from: agent1
+  to: agent1
+  phase: requirements
+  priority: P0
+  status: pending
+  created_at: "2026-02-13T18:00:00"
+  description: "BUG-20260213-002/003调查完成，已创建PROPOSAL-2026-02-002。v2.2.8完成后，需将自动报Bug功能纳入v2.2.9优先开发。"
+  proposal: PROPOSAL-2026-02-002_auto_bug_detection.md
+  related_bugs:
+    - BUG-20260213-002
+    - BUG-20260213-003
+  note: "自动报Bug是非常重要的feature，用户要求高优先级"
 - id: TODO-303
   content: 实现 EventDispatcher (F-WEB-003)
   from: agent2
@@ -374,4 +404,19 @@ todos:
     - F-WEB-005: HMACValidator (3h)
     - F-INIT-001: RulesInitializer (3h)
   estimated_hours: 16
-total: 17
+  result: 4个模块全部实现完成，31个单元测试通过
+- id: TODO-310
+  content: 下一轮需求分析：将自动报Bug功能纳入优先开发
+  from: agent1
+  to: agent1
+  phase: requirements
+  priority: P0
+  status: pending
+  created_at: "2026-02-13T18:00:00"
+  description: "BUG-20260213-002/003调查完成，已创建PROPOSAL-2026-02-002。v2.2.8完成后，需将自动报Bug功能纳入v2.2.9优先开发。"
+  proposal: PROPOSAL-2026-02-002_auto_bug_detection.md
+  related_bugs:
+    - BUG-20260213-002
+    - BUG-20260213-003
+  note: "自动报Bug是非常重要的feature，用户要求高优先级"
+total: 32
