@@ -284,10 +284,14 @@ oc-collab 核心功能架构
 
 | 版本 | 功能 | 架构模块 | 状态 | 计划日期 |
 |------|------|----------|------|----------|
-| v2.2.8 | EventDispatcher | 10.3 | PLANNED | 2026-02-13 |
-| v2.2.8 | StateNotifier | 10.3 | PLANNED | 2026-02-13 |
-| v2.2.8 | Webhook HMAC验证 | 10.3 | PLANNED | 2026-02-13 |
-| v2.2.8 | oc-collab init | 5.1 | PLANNED | 2026-02-13 |
+| v2.2.9 | StateNotifier集成todowrite | 10.3 | PLANNED | 2026-02-14 |
+| v2.2.9 | StateNotifier集成signoff | 10.3 | PLANNED | 2026-02-14 |
+| v2.2.9 | StateNotifier集成phase_advance | 10.3 | PLANNED | 2026-02-14 |
+| v2.2.9 | 自动Bug检测机制 | 6.2 | PLANNED | 2026-02-14 |
+| v2.2.9 | Agent Compliance CLI准入 | 6.1 | PLANNED | 2026-02-14 |
+| v2.2.9 | 规则自动加载 | 9.1 | PLANNED | 2026-02-14 |
+| v2.2.9 | 部署文档同步自动化 | 5.1 | PLANNED | 2026-02-14 |
+| v2.2.9 | Webhook状态通知增强 | 10.3 | PLANNED | 2026-02-14 |
 
 ---
 
@@ -302,5 +306,5 @@ oc-collab 核心功能架构
 ---
 
 **维护者**: Agent 1
-**更新日期**: 2026-02-10
+**更新日期**: 2026-02-14
 **状态**: ACTIVE
