@@ -279,6 +279,10 @@ oc-collab 核心功能架构
 | v2.2.7 | Skill行为测试框架 | 9.2 | COMPLETED | 2026-02-10 |
 | v2.2.7 | WebhookConfig | 10.3 | COMPLETED | 2026-02-10 |
 | v2.2.7 | EventListener | 10.3 | COMPLETED | 2026-02-10 |
+| v2.2.8 | EventDispatcher | 10.3 | COMPLETED | 2026-02-14 |
+| v2.2.8 | StateNotifier | 10.3 | COMPLETED | 2026-02-14 |
+| v2.2.8 | Webhook HMAC验证 | 10.3 | COMPLETED | 2026-02-14 |
+| v2.2.8 | RulesInitializer | 5.1 | COMPLETED | 2026-02-14 |
 
 ### 4.2 版本规划记录
 
