@@ -112,6 +112,9 @@ myproject/
 
 | 版本 | 日期 | 功能 |
 |------|------|------|
+| v2.2.9 | 2026-02-14 | StateNotifier集成（todowrite/signoff/phase_advance）、自动Bug检测、Agent Compliance CLI准入、规则自动加载 |
+| v2.2.8 | 2026-02-13 | Webhook基础架构：EventDispatcher、StateNotifier骨架、HMAC验证 |
+| v2.2.7 | 2026-02-10 | Skill内容准确性测试、覆盖率统计、事件监听与崩溃恢复 |
 | v2.2.6 | 2026-02-09 | 智能辅助：todowrite自动检查、TODO上下文携带、冲突检测；Skill关键词检索、切片查看、强制查找 |
 | v2.2.5 | 2026-02-09 | 文件Owner机制、signoff修复、版本结束后需求分析流程、评审机制优化 |
 | v2.2.4 | 2026-02-08 | Skill强制加载检查、Git提交前签署验证、需求文档完整性检查 |
