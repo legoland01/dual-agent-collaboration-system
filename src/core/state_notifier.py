@@ -17,17 +17,19 @@ class StateChangeEvent:
 
 
 class StateNotifier:
-    """状态通知器"""
+    """状态通知器（增强版，支持队列写入）"""
 
-    def __init__(self, webhook_config=None, dispatcher=None):
+    def __init__(self, webhook_config=None, dispatcher=None, queue_manager=None):
         """初始化状态通知器
 
         Args:
             webhook_config: WebhookConfig实例
             dispatcher: EventDispatcher实例（可选）
+            queue_manager: TodoQueueManager实例（可选）
         """
         self.config = webhook_config
         self.dispatcher = dispatcher
+        self.queue_manager = queue_manager
         self._default_webhook_url: Optional[str] = None
         self._use_enhancer: bool = True
 
@@ -132,23 +134,56 @@ class StateNotifier:
             "ref": f"refs/heads/state-{event.event_type.replace('.', '-')}"
         }
 
-    def notify_todo_created(self, todo_id: str, content: str, agent_id: str) -> bool:
-        """通知TODO创建"""
+    def notify_todo_created(self, todo_id: str, content: str, agent_id: str, to_agent: str = None) -> bool:
+        """通知TODO创建（增强版，支持写入队列）"""
         event = StateChangeEvent(
             event_type="todo.created",
             agent_id=agent_id,
             details={"todo_id": todo_id, "content": content}
         )
-        return self.notify(event)
+        
+        webhook_result = self.notify(event)
+        
+        if self.queue_manager and to_agent:
+            try:
+                from .todo_queue_manager import TodoQueueItem
+                queue_item = TodoQueueItem(
+                    id=todo_id,
+                    content=content,
+                    from_agent=agent_id,
+                    to_agent=to_agent,
+                    priority="medium",
+                    created_at=datetime.now().isoformat(),
+                    read=False
+                )
+                queue_result = self.queue_manager.add(queue_item)
+                logger.info(f"TODO已写入队列: {todo_id}")
+            except Exception as e:
+                logger.error(f"写入队列失败: {e}")
+                queue_result = False
+        else:
+            queue_result = None
 
-    def notify_todo_completed(self, todo_id: str, content: str, agent_id: str) -> bool:
-        """通知TODO完成"""
+        return webhook_result or (queue_result if queue_result is not None else False)
+
+    def notify_todo_completed(self, todo_id: str, content: str, agent_id: str, to_agent: str = None) -> bool:
+        """通知TODO完成（增强版，支持标记队列）"""
         event = StateChangeEvent(
             event_type="todo.completed",
             agent_id=agent_id,
             details={"todo_id": todo_id, "content": content}
         )
-        return self.notify(event)
+        
+        webhook_result = self.notify(event)
+        
+        if self.queue_manager and to_agent:
+            try:
+                self.queue_manager.mark_read(todo_id, to_agent)
+                logger.info(f"TODO已标记为已读: {todo_id}")
+            except Exception as e:
+                logger.error(f"标记队列失败: {e}")
+
+        return webhook_result
 
     def notify_signoff_completed(self, stage: str, agent_id: str) -> bool:
         """通知签署完成"""

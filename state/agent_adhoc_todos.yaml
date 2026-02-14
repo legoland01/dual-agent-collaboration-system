@@ -20,13 +20,6 @@ todos:
   agent_id: null
   created_at: '2026-02-10T16:00:00'
   updated_at: '2026-02-10T20:45:00'
-- id: TODO-247
-  content: test
-  status: pending
-  priority: medium
-  agent_id: null
-  created_at: '2026-02-10T15:10:44.523142'
-  updated_at: '2026-02-10T15:10:44.523148'
 - id: TODO-263
   content: v2.2.7详细设计已通过评审，可以开始开发
   status: completed
@@ -48,13 +41,6 @@ todos:
   agent_id: null
   created_at: '2026-02-10T18:00:00'
   updated_at: null
-- id: TODO-266
-  content: test
-  status: pending
-  priority: medium
-  agent_id: null
-  created_at: '2026-02-10T15:49:16.573872'
-  updated_at: '2026-02-10T15:49:16.573880'
 - id: TODO-281
   content: 执行v2.2.7黑盒测试 skill test/skill coverage/webhook init/start/stop
   status: completed
@@ -181,24 +167,6 @@ todos:
   agent_id: null
   created_at: '2026-02-13T12:35:00'
   updated_at: '2026-02-13T13:30:00'
-- id: TODO-311
-  content: v2.2.8 黑盒测试
-  status: pending
-  priority: P0
-  agent_id: null
-  created_at: '2026-02-13T13:35:00'
-  updated_at: '2026-02-13T18:00:00'
-  result: v2.2.8已就绪：4模块+CLI命令已实现，31单元测试通过。请Agent1执行黑盒测试验收
-  from: agent2
-  to: agent1
-  phase: blackbox_testing
-- id: TODO-310
-  content: 下一轮需求分析：将自动报Bug功能纳入优先开发
-  status: pending
-  priority: P0
-  agent_id: null
-  created_at: '2026-02-13T18:00:00'
-  updated_at: null
 - id: TODO-303
   content: 实现 EventDispatcher (F-WEB-003)
   status: completed
@@ -227,13 +195,6 @@ todos:
   agent_id: null
   created_at: '2026-02-13T13:00:00'
   updated_at: '2026-02-13T13:30:00'
-- id: TODO-300
-  content: v2.2.8 开发阶段 (F-WEB-003/004/005, F-INIT-001)
-  status: pending
-  priority: P0
-  agent_id: null
-  created_at: '2026-02-13T12:05:00'
-  updated_at: null
 - id: TODO-319
   content: '修复BUG-20260213-006: 修复10个E2E测试失败'
   status: completed
@@ -248,145 +209,286 @@ todos:
   agent_id: null
   created_at: '2026-02-13T22:45:00'
   updated_at: null
-  result: 已修复：1)清理重复TODO条目；2)修复测试文件YAML键名。2/2测试通过。
-  from: agent1
-  to: agent2
-  phase: bugfix
 - id: TODO-321
   content: 验收BUG-20260213-006修复：E2E测试验证
-  from: agent2
-  to: agent1
-  phase: testing
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-13T22:50:00'
   updated_at: '2026-02-13T18:10:00'
-  bug_id: BUG-20260213-006
-  result: 148/148 E2E测试通过，验收通过
-- id: TODO-322
-  content: 测试todowrite持久化
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-13T23:40:36.804978'
-  updated_at: '2026-02-13T23:40:36.804987'
-- id: TODO-323
-  content: 测试todowrite持久化
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-13T23:40:41.615145'
-  updated_at: '2026-02-13T23:40:41.615154'
-- id: TEST-SUCCESS
-  content: 测试sync_with_rollback成功场景
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-13T23:40:41.719182'
-  updated_at: '2026-02-13T23:40:41.719196'
-- id: TODO-324
-  content: 测试直接添加
-  status: pending
-  priority: high
-  agent_id: null
-  created_at: '2026-02-13T23:40:52.582239'
-  updated_at: '2026-02-13T23:40:52.582247'
 - id: TODO-326
   content: 评审v2.2.9需求文档 (requirements_v2.2.9_DRAFT.md) 并签署
   status: completed
   priority: P0
   agent_id: null
   created_at: '2026-02-14T00:00:00'
-  phase: requirements
-  description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
-  result: 技术评审通过（有条件）：1)工时偏高需控制25h内；2)F-COMP-001需确认；3)F-AUTO-005验收标准需更具体
+  updated_at: null
 - id: TODO-327
   content: 处理v2.2.9评审保留意见：工时/F-COMP-001/F-AUTO-005
-  from: agent2
-  to: agent1
-  phase: requirements
-  priority: P0
   status: completed
-  requirements:
-  - 工时控制在25h内，考虑拆分F-AUTO-005
-  - F-COMP-001禁用规则与现有Skill冲突需确认
-  - F-AUTO-005验收标准需更具体
-  result: 已处理：1)F-AUTO-005从8h减到5h，总工时38h→33h；2)F-COMP-001添加与Skill边界说明；3)F-AUTO-005删除"文件编辑后"验收项
+  priority: P0
+  agent_id: null
+  created_at: null
+  updated_at: null
 - id: TODO-328
   content: 复审v2.2.9需求文档并签署（Agent1已处理保留意见）
-  from: agent1
-  to: agent2
-  phase: requirements
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-14T00:10:00'
-  description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
-  result: 已复审通过，需求文档v2状态
+  updated_at: null
 - id: TODO-330
   content: 签署v2.2.9需求文档（复审通过后）
-  from: agent1
-  to: agent2
-  phase: requirements
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-14T00:20:00'
-  description: 签署后状态改为APPROVED
-  result: 技术评审通过，需求文档已签署，状态改为APPROVED
+  updated_at: null
 - id: TODO-329
   content: 处理v2.2.9评审保留意见
-  from: agent2
-  to: agent1
-  phase: requirements
-  priority: P0
   status: completed
-  requirements:
-  - 1. 文档版本v1→v2
-  - 2. Agent1签署区添加修复确认行
-  - 3. 更新工时、F-COMP-001、F-AUTO-005相关内容
-  result: 已处理：1)文档v1→v2；2)Agent1签署区添加修复确认行；3)之前已更新工时相关内容
+  priority: P0
+  agent_id: null
+  created_at: null
+  updated_at: null
 - id: TODO-331
   content: 创建v2.2.9概要设计文档
-  from: agent2
-  to: agent1
-  phase: design
-  priority: P0
   status: completed
-  requirements:
-  - '参考模板: docs/02-design/TEMPLATE_outline_design.md'
-  - '基于需求文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md'
-  - 8个功能模块抽象
-  result: 已创建OUTLINE_v2.2.9.md
+  priority: P0
+  agent_id: null
+  created_at: null
+  updated_at: null
 - id: TODO-332
   content: 评审v2.2.9需求文档+概要设计并签署
-  from: agent1
-  to: agent2
-  phase: design
-  priority: P0
   status: completed
+  priority: P0
+  agent_id: null
   created_at: '2026-02-14T00:30:00'
-  description: '参考文档: docs/01-requirements/requirements_v2.2.9_DRAFT.md + docs/02-design/OUTLINE_v2.2.9.md'
-  result: 技术评审通过，概要设计已签署，状态APPROVED
+  updated_at: null
 - id: TODO-333
   content: 评审v2.2.9详细设计文档并签署
-  from: agent2
-  to: agent1
-  phase: design
-  priority: P0
   status: completed
-  reference: docs/02-design/DETAIL_v2.2.9.md
-  result: 详细设计评审通过，完成3项检查：1)实现方案可行；2)测试用例完整；3)技术选型合理
-- id: TODO-340
-  content: 实现v2.2.9全部功能（8个模块）
-  from: agent1
-  to: agent2
-  phase: development
   priority: P0
+  agent_id: null
+  created_at: null
+  updated_at: null
+- id: TODO-361
+  content: 修复BUG-008认知错误：确认todowrite是oc-collab代码；阅读docs/00-memos/ANALYSIS_20260214_agent2_cognitive_error.md后开始修复BUG-003(调用失败)和BUG-007(编号冲突)
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-14T14:00:00'
+  updated_at: '2026-02-14T15:20:00'
+- id: TODO-360
+  content: 验收v2.2.10：Agent1签署测试通过，标记development/testing/completion状态
+  status: completed
+  priority: P0
+  agent_id: null
+  created_at: '2026-02-14T14:40:00'
+  updated_at: '2026-02-14T15:00:00'
+- id: TODO-362
+  content: '修复BUG-009: oc-collab todo list --agent参数处理错误。修复src/cli/todo_commands.py第74行agent_id未定义问题。'
+  status: completed
+  priority: P1
+  agent_id: '2'
+  created_at: '2026-02-14T15:10:00'
+  updated_at: '2026-02-14T15:30:00'
+- id: TODO-363
+  content: v2.2.11需求分析：分析所有Proposal/Bug/Memo，产出需求分析报告
   status: pending
-  created_at: '2026-02-14T01:00:00'
-  reference: 'docs/02-design/DETAIL_v2.2.9.md'
-  requirements:
-  - "8个功能模块：StateNotifier集成(3个)+自动Bug检测+Agent合规+规则加载+部署同步+Webhook增强"
-  - "总工时：33h"
-  - "参考：详细设计文档，按模块分解实现"
-  - "测试：单元测试+E2E测试"
-total: 43
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T15:25:00'
+  updated_at: '2026-02-14T14:35:24.441087'
+- id: TODO-364
+  content: '修复BUG-003: todowrite调用失败'
+  status: pending
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T15:25:00'
+  updated_at: null
+- id: TODO-365
+  content: '修复BUG-007: TODO编号冲突（Agent独立编号机制）'
+  status: pending
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T15:25:00'
+  updated_at: null
+- id: TODO-366
+  content: 部署v2.2.10版本：更新CHANGELOG/创建Git tag/发布到PyPI
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T14:13:11.176739'
+  updated_at: '2026-02-14T14:18:47'
+- id: TODO-1-001
+  content: 评审v2.2.11需求文档：参考docs/00-memos/REVIEW_MATERIALS_v2.2.11.md，按oc_collab_requirements_guide完成7视角评审，签署"技术评审通过"或"技术评审通过（有条件）"
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T16:00:00'
+  updated_at: '2026-02-14T16:30:00'
+- id: TODO-2-001
+  content: 确认v2.2.11技术评审条件：1)定义Skill识别规则；2)确认队列持久化需求；3)补充迁移回滚策略
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T17:05:00'
+  updated_at: '2026-02-14T17:20:00'
+- id: TODO-1-003
+  content: '评审v2.2.11概要设计文档
+
+
+    【评审依据】
+
+    - 概要设计: docs/02-design/OUTLINE_v2.2.11.md
+
+    - 需求文档: docs/01-requirements/requirements_v2.2.11.md
+
+    - 设计指南: oc_collab_outline_design_guide
+
+
+    【新增内容】
+
+    - Agent编号规则已更新: Agent1使用TODO-1-XXX，Agent2使用TODO-2-XXX
+
+    - Skill更新: oc_collab_todo_dependency_check v1.1
+
+
+    【技能规范】
+
+    按oc_collab_outline_design_guide评审：
+
+    - 模块划分是否合理
+
+    - 接口定义是否清晰
+
+    - 与需求是否对应
+
+    - 技术可行性
+
+
+    【签署规范】
+
+    Agent2只能签署: "设计评审通过" / "设计评审通过（有条件）"
+
+    '
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T17:30:00'
+  updated_at: '2026-02-14T17:00:00'
+- id: TODO-2-002
+  content: 签署v2.2.11概要设计：Agent2技术评审通过，请Agent1签署创建或签署
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T17:05:00'
+  updated_at: '2026-02-14T17:40:00'
+- id: TODO-1-004
+  content: "创建v2.2.11详细设计文档\n\n【依据】\n- 概要设计: docs/02-design/OUTLINE_v2.2.11.md\n-\
+    \ 需求文档: docs/01-requirements/requirements_v2.2.11.md\n\n【Skill规范 - 核心原则】\n\n1.\
+    \ 功能模块→技术模块映射：\n   - 将概要设计的\"功能模块\"映射为技术实现的\"技术模块\"\n   - 关注类设计、函数签名、数据结构\n\n\
+    2. 代码级设计必须包含：\n   - 类设计：类名、属性、方法签名\n   - 接口设计：函数签名、参数、返回值\n   - 数据结构：JSON/YAML完整Schema\n\
+    \   - 异常处理：异常类型、错误码\n   - 测试策略：单元测试、E2E测试\n\n【必须章节】\n✅ 1. 功能模块映射 (功能→技术模块)\n✅\
+    \ 2. 技术架构 (模块划分、技术选型)\n✅ 3. 核心模块设计 (类/函数设计)\n✅ 4. 数据结构 (状态文件Schema)\n✅ 5. 算法与逻辑\
+    \ (核心业务流程)\n✅ 6. API设计 (内部/外部接口)\n✅ 7. 错误处理 (异常场景)\n✅ 8. 测试策略 (单元/E2E测试)\n✅ 9.\
+    \ 签署确认 (双人签署)\n\n【3个功能模块】\n1. F-TODO-001: Agent独立TODO编号机制\n   - 技术模块: TodoIdGenerator,\
+    \ TodoStore\n   - 关键文件: src/cli/todo_commands.py, src/core/todo.py\n\n2. F-SKILL-001:\
+    \ Skill强制执行+嵌入\n   - 技术模块: SkillEnforcer, SkillEmbedder\n   - 关键文件: src/cli/skill_check_commands.py,\
+    \ src/core/skill.py\n\n3. F-NOTIF-001: StateNotifier Receiver\n   - 技术模块: StateReceiver,\
+    \ StateQueue\n   - 关键文件: src/core/state_notifier.py, src/web/receiver.py\n\n【签署规范】\n\
+    Agent2创建详细设计后，由Agent1签署"
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T17:45:00'
+  updated_at: '2026-02-14T18:00:00'
+- id: TODO-2-003
+  content: 签署v2.2.11详细设计文档：Agent2已完成详细设计，请Agent1评审并签署
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T18:05:00'
+  updated_at: '2026-02-14T18:30:00'
+- id: TODO-1-005
+  content: "补充详细设计评审规则到Skill\n\n【背景】\n详细设计可能需要多次评审迭代，需要明确评审规则\n\n【Skill规范 - 详细设计多次评审规则】\n\
+    \n1. 评审状态流转：\n   - DRAFT → REVIEW_PENDING (提交评审)\n   - REVIEW_PENDING → APPROVED\
+    \ (评审通过)\n   - REVIEW_PENDING → DRAFT (需修改)\n\n2. 迭代评审流程：\n   - 首次评审不通过 → Agent2修改后提交新版本(v2)\n\
+    \   - 二次评审不通过 → 继续迭代\n   - 每次迭代需更新文档版本号\n\n3. 评审通过条件：\n   - Agent1签署\"创建\"或\"\
+    确认修改\"\n   - Agent2签署\"技术评审通过\"\n   - 文档状态更新为APPROVED\n\n4. 版本号管理：\n   - 每次修改+1\n\
+    \   - 格式: v1 → v2 → v3...\n\n【输出】\n更新 oc_collab_detailed_design_guide skill，增加\"\
+    多次评审规则\"章节\n\n【签署规范】\nAgent1只能签署: \"创建\" / \"确认修改\"\nAgent2只能签署: \"技术评审通过\"\n"
+  status: completed
+  priority: P1
+  agent_id: '1'
+  created_at: '2026-02-14T18:40:00'
+  updated_at: '2026-02-14T18:30:00'
+- id: TODO-2-004
+  content: 签署skill更新：oc_collab_detailed_design_guide v1.0.3（新增评审意见处理规则）
+  status: completed
+  priority: P1
+  agent_id: '1'
+  created_at: '2026-02-14T18:35:00'
+  updated_at: '2026-02-14T18:50:00'
+- id: TODO-1-006
+  content: "开始v2.2.11开发阶段\n\n【依据】\n- 需求文档: docs/01-requirements/requirements_v2.2.11.md\n\
+    - 概要设计: docs/02-design/OUTLINE_v2.2.11.md\n- 详细设计: docs/02-design/DETAIL_v2.2.11.md\n\
+    \n【开发规范 - oc_collab_development_guide】\n\n开发前准备：\n1. 确认当前版本: oc-collab status\n\
+    2. 确认设计已签署\n3. 查看详细设计文档\n4. 更新待办\n\n【开发流程】\n\n1. 开发前:\n   - [ ] 确认project_state.yaml中phase:\
+    \ development\n   - [ ] 查看详细设计中的模块分解\n\n2. 模块实现顺序（按详细设计）:\n   M1: TodoIdGenerator,\
+    \ TodoMigrator\n   M2: SkillEnforcerEnhanced, SkillEmbedder\n   M3: StateReceiver,\
+    \ StateQueueManager\n\n3. 编码规范:\n   - 文件命名: 小写下划线 (src/core/todo_id_generator.py)\n\
+    \   - 类命名: PascalCase (TodoIdGenerator)\n   - 函数命名: snake_case (generate())\n\
+    \   - 异常定义: 专用异常类\n\n4. 测试要求:\n   - 单元测试覆盖 ≥ 80%\n   - 每个模块对应test_*.py\n   - 测试类命名:\
+    \ TestModuleName\n\n5. 代码质量:\n   - 使用oc_collab代码规范\n   - 编写文档字符串\n   - 错误处理完善\n\
+    \n【验收标准】\n- [ ] F-TODO-001: Agent独立TODO编号机制\n- [ ] F-SKILL-001: Skill强制执行+嵌入功能\n\
+    - [ ] F-NOTIF-001: StateNotifier Receiver\n- [ ] 单元测试覆盖 ≥ 80%\n- [ ] 更新project_state.yaml\
+    \ development.status: completed\n\n【签署规范】\n开发完成后，Agent2自检通过签署"
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T19:00:00'
+  updated_at: '2026-02-14T20:00:00'
+- id: TODO-2-005
+  content: 验收v2.2.11开发完成：6个模块已实现，22个单元测试通过，请Agent1进行测试验收
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T20:05:00'
+  updated_at: '2026-02-14T20:45:00'
+- id: TODO-1-008
+  content: "Agent2完善v2.2.11开发工作\n\n【问题】\nE2E测试未做，单元测试有导入错误\n\n【必须完成】\n1. 修复测试导入错误：SkillEnforcerEnhanced\n\
+    2. 执行E2E测试（4个场景）：\n   - TODO创建流程\n   - Skill强制检查\n   - StateReceiver接收（核心）\n \
+    \  - Agent启动检查\n3. 所有测试通过后，重新提交验收\n\n【验收标准】\n- [x] pytest tests/ 全部通过\n- [x] E2E测试全部通过\n\
+    - [ ] 黑盒测试通过"
+  status: completed
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T20:50:00'
+  updated_at: '2026-02-14T21:00:00'
+- id: TODO-2-006
+  content: 验收v2.2.11：测试修复完成，所有单元测试和E2E测试通过，请Agent1验收
+  status: completed
+  priority: P0
+  agent_id: '1'
+  created_at: '2026-02-14T21:00:00'
+  updated_at: '2026-02-14T21:30:00'
+- id: TODO-1-009
+  content: "部署v2.2.11版本\n\n【依据】\n- deployment指南: oc_collab_deployment_guide\n\n【部署流程\
+    \ - oc_collab_deployment_guide】\n\n1. 文档同步（必须）:\n   - [ ] CHANGELOG.md - 添加版本发布记录\n\
+    \   - [ ] README.md - 更新功能列表和命令说明\n\n2. 版本号升级:\n   - [ ] 更新 pyproject.toml version:\
+    \ 2.2.10 → 2.2.11\n\n3. 构建包:\n   - [ ] python -m build\n\n4. 验证包内容:\n   - [ ]\
+    \ 检查 dist/ 目录下的 .whl 和 .tar.gz\n\n5. PyPI上传:\n   - [ ] twine upload dist/*\n\n\
+    6. Git推送:\n   - [ ] git add .\n   - [ ] git commit -m \"release: v2.2.11\"\n \
+    \  - [ ] git tag v2.2.11\n   - [ ] git push && oc-collab sync-all\n\n7. 验证发布:\n\
+    \   - [ ] pip install opencode-collaboration==2.2.11\n   - [ ] oc-collab --help\
+    \ 验证安装\n\n8. 更新状态:\n   - [ ] project_state.yaml deployment.status: completed\n\
+    \n【验收标准】\n- [ ] PyPI包可安装: pip install opencode-collaboration==2.2.11\n- [ ] Git\
+    \ tag已推送: git tag v2.2.11\n- [ ] project_state.yaml更新完成\n\n【签署规范】\nAgent2部署完成后签署"
+  status: pending
+  priority: P0
+  agent_id: '2'
+  created_at: '2026-02-14T21:40:00'
+  updated_at: null
+total: 58

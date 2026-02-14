@@ -65,7 +65,22 @@ oc-collab advance -p design
 | `oc-collab git sync` | Git同步 (v2.2.2) |
 | `oc-collab rules init [--force]` | 初始化框架规则 (v2.2.8) |
 | `oc-collab rules status` | 检查规则初始化状态 (v2.2.8) |
+| `oc-collab rules init --auto-load` | 自动加载默认规则 (v2.2.9) |
+| `oc-collab compliance check` | 合规检查 (v2.2.2) |
+| `oc-collab compliance report` | 生成合规报告 (v2.2.9) |
+| `oc-collab compliance violations` | 查看违规记录 (v2.2.9) |
+| `oc-collab deploy check-docs` | 检查部署文档同步 (v2.2.9) |
+| `oc-collab deploy sync-docs` | 同步部署文档 (v2.2.9) |
 | `oc-collab webhook notify test` | 测试Webhook通知功能 (v2.2.8) |
+| `oc-collab startup check` | 启动时检查未读TODO (v2.2.10) |
+| `oc-collab todo list` | 显示TODO列表 (v2.2.10) |
+| `oc-collab todo list --unread` | 仅显示未读TODO (v2.2.10) |
+| `oc-collab todo list --agent <1|2>` | 按Agent筛选TODO (v2.2.10) |
+| `oc-collab todo mark-read <id>` | 标记TODO为已读 (v2.2.10) |
+| `oc-collab todo stats` | TODO统计信息 (v2.2.10) |
+| `oc-collab skill check` | 检查Skill加载状态 (v2.2.10) |
+| `oc-collab skill status` | 显示Skill合规状态 (v2.2.10) |
+| `oc-collab skill verify <action>` | 验证操作前Skill (v2.2.10) |
 
 ---
 
@@ -112,6 +127,8 @@ myproject/
 
 | 版本 | 日期 | 功能 |
 |------|------|------|
+| v2.2.11 | 2026-02-14 | Agent独立TODO编号、Skill强制执行增强、StateReceiver状态接收器 |
+| v2.2.10 | 2026-02-14 | TodoQueueManager + Agent Startup Checker + CLI Enhancements |
 | v2.2.9 | 2026-02-14 | StateNotifier集成（todowrite/signoff/phase_advance）、自动Bug检测、Agent Compliance CLI准入、规则自动加载 |
 | v2.2.8 | 2026-02-13 | Webhook基础架构：EventDispatcher、StateNotifier骨架、HMAC验证 |
 | v2.2.7 | 2026-02-10 | Skill内容准确性测试、覆盖率统计、事件监听与崩溃恢复 |

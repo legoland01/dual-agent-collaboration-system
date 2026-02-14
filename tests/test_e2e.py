@@ -121,8 +121,8 @@ class TestPermissionChecker:
     def test_invalid_path(self):
         """测试无效路径。"""
         checker = PermissionChecker()
-        with pytest.raises((FileNotFoundError, PermissionError)):
-            checker.check_read("/nonexistent/path/file.txt")
+        result = checker.check_read("/nonexistent/path/file.txt")
+        assert result is False
 
 
 class TestRetryDecorator:

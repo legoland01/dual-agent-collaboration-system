@@ -9,6 +9,15 @@
 
 ---
 
+## Skill管理规则
+
+| 管理项 | 负责人 | 说明 |
+|--------|--------|------|
+| **Skill创建/更新** | Agent1 | 负责编写和维护所有Skill |
+| **Skill技术实现** | Agent2 | 负责Skill依赖的代码实现 |
+| **Skill评审** | Agent2 | Agent1创建Skill后，由Agent2评审技术可行性 |
+
+---
 
 ## 关键规则（Compaction 后必须遵守）
 

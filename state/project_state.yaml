@@ -23,25 +23,22 @@ development:
 history:
 - action: signoff
   agent_id: agent1
-  details: "\u7B7E\u7F72test\u9636\u6BB5: \u771F\u6B63\u6D4B\u8BD5sign\u6D41\u7A0B"
+  details: '签署test阶段: 真正测试sign流程'
   id: 8ab5f8a6
   timestamp: '2026-02-08T22:00:22.323942'
 - action: signoff
   agent_id: agent1
-  details: "\u7B7E\u7F72test\u9636\u6BB5: v2.2.4\u9A8C\u6536\u901A\u8FC7\uFF08\u7B2C\
-    \u4E8C\u6B21\u5C1D\u8BD5\uFF09\uFF1Asignoff.py\u4FEE\u590Dsave\u903B\u8F91"
+  details: '签署test阶段: v2.2.4验收通过（第二次尝试）：signoff.py修复save逻辑'
   id: 46d262eb
   timestamp: '2026-02-08T21:35:56.245796'
 - action: signoff
   agent_id: agent1
-  details: "\u7B7E\u7F72test\u9636\u6BB5: v2.2.4\u9A8C\u6536\u901A\u8FC7\uFF1A45\u4E2A\
-    \u6D4B\u8BD5\u5168\u90E8\u901A\u8FC7\uFF08\u542BBUG-20260208-003/004/006\u4FEE\
-    \u590D\u9A8C\u8BC1\uFF09"
+  details: '签署test阶段: v2.2.4验收通过：45个测试全部通过（含BUG-20260208-003/004/006修复验证）'
   id: 024a55dc
   timestamp: '2026-02-08T21:34:36.843066'
 - action: deployment
   agent_id: agent2
-  details: "v2.2.4\u90E8\u7F72\u5B8C\u6210\uFF1APyPI\u53D1\u5E03 + Git tag"
+  details: v2.2.4部署完成：PyPI发布 + Git tag
   id: deployment
   timestamp: '2026-02-08T22:42:45.345471'
 requirements:
@@ -59,7 +56,40 @@ testing:
   e2e_tests: 32 passed
   phase: completed
   total_tests: 87 passed
-updated_at: '2026-02-13T23:37:28.832191'
+updated_at: '2026-02-14T16:32:55.415791'
+v2.2.11:
+  bugs: []
+  deployment:
+    status: pending
+  design:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-14'
+    design_doc: docs/02-design/DETAIL_v2.2.11.md
+    status: APPROVED
+  development:
+    modules:
+      M1_TodoIdGenerator: completed
+      M1_TodoMigrator: completed
+      M2_SkillEmbedder: completed
+      M2_SkillEnforcerEnhanced: completed
+      M3_StateQueueManager: completed
+      M3_StateReceiver: completed
+    started_at: '2026-02-14'
+    status: completed
+  requirements:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-14'
+    requirements_doc: docs/01-requirements/requirements_v2.2.11.md
+    status: APPROVED
+  testing:
+    status: APPROVED
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14T21:30:00'
+  version: 2.2.11
 v2.2.2:
   acceptance:
     agent1_signoff: true
@@ -79,7 +109,7 @@ v2.2.3:
     agent2_signoff: true
     agent2_signoff_at: '2026-02-08 16:06:32'
     bugs:
-    - description: "CLI \u547D\u4EE4\u672A\u5B8C\u5168\u5B9E\u73B0"
+    - description: CLI 命令未完全实现
       id: BUG-20260208-001
       severity: P0
       status: closed
@@ -99,9 +129,9 @@ v2.2.3:
     status: completed
     tests: 42 passed
   features:
-  - "F-CONTEXT-001: .a \u6587\u4EF6\u673A\u5236"
-  - "F-TASK-001: \u4EFB\u52A1\u72B6\u6001\u540C\u6B65"
-  - "F-UI-001: \u72B6\u6001\u589E\u5F3A\u663E\u793A"
+  - 'F-CONTEXT-001: .a 文件机制'
+  - 'F-TASK-001: 任务状态同步'
+  - 'F-UI-001: 状态增强显示'
   phase: completed
   status: APPROVED
   testing:
@@ -125,10 +155,10 @@ v2.2.4:
     completed_at: '2026-02-08T20:30:00'
     coverage: 85%
     features:
-    - "FR-SKILL-001: Skill\u5F3A\u5236\u52A0\u8F7D\u68C0\u67E5"
-    - "FR-GIT-002: Git\u63D0\u4EA4\u524D\u7B7E\u7F72\u9A8C\u8BC1"
-    - "FR-AUTO-001: \u9700\u6C42\u6587\u6863\u5B8C\u6574\u6027\u68C0\u67E5"
-    - "FR-AUTO-002: \u9636\u6BB5\u63A8\u8FDB\u95E8\u69DB\u68C0\u67E5"
+    - 'FR-SKILL-001: Skill强制加载检查'
+    - 'FR-GIT-002: Git提交前签署验证'
+    - 'FR-AUTO-001: 需求文档完整性检查'
+    - 'FR-AUTO-002: 阶段推进门槛检查'
     modules:
       PhaseAdvance: completed
       RequirementsChecker: completed
@@ -161,11 +191,11 @@ v2.2.5:
   development:
     completed_at: '2026-02-09T12:00:00'
     features:
-    - "FR-OWNER-001: \u6587\u4EF6Owner\u673A\u5236"
-    - "FR-STATE-001: \u72B6\u6001\u8BC6\u522B\u4FEE\u590D"
-    - "FR-SIGN-001: signoff\u4FEE\u590D"
-    - "FR-PROC-001: \u7248\u672C\u7ED3\u675F\u540E\u9700\u6C42\u5206\u6790\u6D41\u7A0B"
-    - "FR-PROC-002: \u8BC4\u5BA1\u673A\u5236\u4F18\u5316"
+    - 'FR-OWNER-001: 文件Owner机制'
+    - 'FR-STATE-001: 状态识别修复'
+    - 'FR-SIGN-001: signoff修复'
+    - 'FR-PROC-001: 版本结束后需求分析流程'
+    - 'FR-PROC-002: 评审机制优化'
     phase: completed
     started_at: '2026-02-09T10:36:18.061052'
     status: completed
@@ -201,19 +231,18 @@ v2.2.6:
     started_at: '2026-02-09T20:15:00'
     status: completed
   features:
-  - "F-AI-001: todowrite\u53C2\u6570\u81EA\u52A8\u68C0\u67E5"
-  - "F-AI-002: TODO\u4E0A\u4E0B\u6587\u643A\u5E26"
-  - "F-AI-003: \u51B2\u7A81\u68C0\u6D4B"
-  - "F-SKILL-001: Skill\u5173\u952E\u8BCD\u68C0\u7D22"
-  - "F-SKILL-002: Skill\u5207\u7247\u673A\u5236"
-  - "F-SKILL-003: Skill\u5F3A\u5236\u67E5\u627E\u589E\u5F3A"
+  - 'F-AI-001: todowrite参数自动检查'
+  - 'F-AI-002: TODO上下文携带'
+  - 'F-AI-003: 冲突检测'
+  - 'F-SKILL-001: Skill关键词检索'
+  - 'F-SKILL-002: Skill切片机制'
+  - 'F-SKILL-003: Skill强制查找增强'
   testing:
     acceptance_report: docs/03-test/user_scenario_acceptance_v2.2.6.md
     agent1_signoff: true
     agent1_signoff_at: '2026-02-09T21:30:00'
     bugs:
-    - description: "CLI\u547D\u4EE4\u672A\u5B8C\u6574\u5B9E\u73B0\uFF08todowrite --auto-check,\
-        \ skill search/slice/enforce\uFF09"
+    - description: CLI命令未完整实现（todowrite --auto-check, skill search/slice/enforce）
       id: BUG-20260209-003
       severity: P0
       status: closed
@@ -242,10 +271,10 @@ v2.2.7:
   development:
     completed_at: '2026-02-10T18:30:00'
     features:
-    - "F-TEST-001: Skill\u5185\u5BB9\u51C6\u786E\u6027\u6D4B\u8BD5"
-    - "F-TEST-002: Skill\u8986\u76D6\u7387\u7EDF\u8BA1"
-    - "F-WEB-001: Webhook\u914D\u7F6E\u7BA1\u7406"
-    - "F-WEB-002: \u4E8B\u4EF6\u76D1\u542C\u4E0E\u5D29\u6E83\u6062\u590D"
+    - 'F-TEST-001: Skill内容准确性测试'
+    - 'F-TEST-002: Skill覆盖率统计'
+    - 'F-WEB-001: Webhook配置管理'
+    - 'F-WEB-002: 事件监听与崩溃恢复'
     modules:
       CLIActionValidator: completed
       CoverageCalculator: completed
@@ -261,7 +290,7 @@ v2.2.7:
     agent1_signoff_at: '2026-02-10T19:00:00'
     blackbox_tests: 7 passed
     bugs:
-    - description: "Agent\u8DF3\u8FC7\u63D0\u4EA4\u6D41\u7A0B\u76F4\u63A5\u53D1\u5E03"
+    - description: Agent跳过提交流程直接发布
       id: BUG-20260210-003
       severity: P1
       status: acknowledged
@@ -279,12 +308,12 @@ v2.2.8:
     id: BUG-20260213-004
     severity: P1
     status: closed
-  - description: todowrite工具持久化失效
+  - agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    description: todowrite工具持久化失效
     id: BUG-20260213-007
     severity: P0
     status: closed
-    agent1_signoff: true
-    agent1_signoff_at: '2026-02-14'
   deployment:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-14T18:30:00'
@@ -333,13 +362,6 @@ v2.2.8:
   version: 2.2.8
   workload: 26h
 v2.2.9:
-  requirements:
-    agent1_signoff: true
-    agent1_signoff_at: '2026-02-14'
-    agent2_signoff: true
-    agent2_signoff_at: '2026-02-14'
-    requirements_doc: docs/01-requirements/requirements_v2.2.9_DRAFT.md
-    status: APPROVED
   design:
     agent1_signoff: true
     agent1_signoff_at: '2026-02-14'
@@ -352,15 +374,22 @@ v2.2.9:
     phase: in_progress
     status: in_progress
   features:
-  - 'StateNotifier集成todowrite (P0)'
-  - 'StateNotifier集成signoff (P0)'
-  - 'StateNotifier集成phase_advance (P0)'
-  - '自动Bug检测机制 (P0)'
-  - 'Agent Compliance CLI准入 (P0)'
-  - '规则自动加载 (P1)'
-  - '部署文档同步自动化 (P1)'
-  - 'Webhook状态通知增强 (P2)'
+  - StateNotifier集成todowrite (P0)
+  - StateNotifier集成signoff (P0)
+  - StateNotifier集成phase_advance (P0)
+  - 自动Bug检测机制 (P0)
+  - Agent Compliance CLI准入 (P0)
+  - 规则自动加载 (P1)
+  - 部署文档同步自动化 (P1)
+  - Webhook状态通知增强 (P2)
   phase: development
+  requirements:
+    agent1_signoff: true
+    agent1_signoff_at: '2026-02-14'
+    agent2_signoff: true
+    agent2_signoff_at: '2026-02-14'
+    requirements_doc: docs/01-requirements/requirements_v2.2.9_DRAFT.md
+    status: APPROVED
   status: in_progress
   version: 2.2.9
   workload: 33h

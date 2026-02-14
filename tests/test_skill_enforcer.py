@@ -81,11 +81,13 @@ class TestSkillEnforcer:
     def test_list_missing_skills_all_missing(self, enforcer):
         """TC-SKILL-008: 列出所有缺失的Skill"""
         missing = enforcer.list_missing_skills()
-        assert len(missing) == 4
+        assert len(missing) == 6  # v2.2.6新增2个: requirements_guide, design_guide
         assert "oc_collab_requirements_review_guide" in missing
         assert "oc_collab_development_guide" in missing
         assert "oc_collab_test_acceptance_guide" in missing
         assert "oc_collab_deployment_guide" in missing
+        assert "oc_collab_requirements_guide" in missing  # v2.2.6新增
+        assert "oc_collab_design_guide" in missing  # v2.2.6新增
 
     def test_list_missing_skills_all_present(self, temp_skills_dir, enforcer):
         """TC-SKILL-009: 列出所有存在的Skill"""

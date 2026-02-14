@@ -30,10 +30,13 @@ from .enhanced_commands import (
     status_command,
 )
 from .skill_commands import skill_group
+from .skill_check_commands import skill_check_group
 from .webhook_commands import webhook_group
 from .rules_commands import rules_group
 from .compliance_commands import compliance_group
 from .deploy_commands import deploy_group
+from .todo_commands import todo_group
+from .startup_commands import startup_check_command
 
 
 console = Console()
@@ -1659,10 +1662,13 @@ def owner_check_command(target: str, agent: str):
 
 main.add_command(owner_group, "owner")
 main.add_command(skill_group, "skill")
+main.add_command(skill_check_group, "skill-check")
 main.add_command(webhook_group, "webhook")
 main.add_command(rules_group, "rules")
 main.add_command(compliance_group, "compliance")
 main.add_command(deploy_group, "deploy")
+main.add_command(todo_group, "todo")
+main.add_command(startup_check_command, "startup-check")
 
 
 if __name__ == "__main__":

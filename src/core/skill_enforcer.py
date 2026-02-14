@@ -3,7 +3,7 @@
 FR-SKILL-001: 在CLI命令执行前，强制检查相关Skill是否已加载
 """
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 import yaml
 
 
@@ -123,9 +123,7 @@ class SkillEnforcer:
         Returns:
             检查结果字典
         """
-        from typing import Dict, Any
-
-        result: Dict[str, Any] = {
+        result = {
             "action": action,
             "required_skills": [],
             "optional_skills": [],
@@ -160,3 +158,99 @@ class SkillEnforcer:
             )
 
         return result
+
+
+# v2.2.11 新增：增强版Skill强制执行器
+# ============================================
+
+class SkillCheckResult:
+    """Skill检查结果"""
+    def __init__(self, passed: bool, message: str, checked_skills: Optional[List[str]] = None, loaded_skills: Optional[List[str]] = None):
+        self.passed = passed
+        self.message = message
+        self.checked_skills = checked_skills if checked_skills is not None else []
+        self.loaded_skills = loaded_skills if loaded_skills is not None else []
+
+
+class SkillRequiredError(Exception):
+    """必需的Skill未遵循异常"""
+    def __init__(self, message: str, missing_skills: List[str], required_for: str):
+        super().__init__(message)
+        self.missing_skills = missing_skills
+        self.required_for = required_for
+
+
+class SkillEnforcerEnhanced:
+    """增强版Skill强制执行器 - v2.2.11"""
+
+    def __init__(self, skill_loader: Optional[Any] = None):
+        """
+        Args:
+            skill_loader: Skill加载器
+        """
+        self.skill_loader = skill_loader
+        self.required_skills = self._load_required_skills()
+
+    def _load_required_skills(self) -> Dict[str, List[str]]:
+        """加载必需Skill规则"""
+        return {
+            "todowrite": ["oc_collab_todo_execution"],
+            "signoff": ["oc_collab_signoff_guide"],
+            "commit": ["oc_collab_git_commit_guide"],
+            "skill_slice": ["oc_collab_skill_management_guide"],
+            "skill_enforce": ["oc_collab_skill_management_guide"]
+        }
+
+    def check(self, command: str) -> SkillCheckResult:
+        """
+        检查命令是否遵循Skill规范
+
+        Args:
+            command: 命令类型 (todowrite/signoff/commit等)
+
+        Returns:
+            SkillCheckResult: 检查结果
+
+        Raises:
+            SkillRequiredError: 必需的Skill未遵循
+        """
+        required = self.required_skills.get(command, [])
+
+        if not required:
+            return SkillCheckResult(True, f"命令{command}无需Skill检查")
+
+        # 加载当前已加载的Skill
+        loaded_skills = self._get_loaded_skills()
+
+        # 检查是否有所需的Skill
+        missing = []
+        for skill in required:
+            if skill not in loaded_skills:
+                missing.append(skill)
+
+        if missing:
+            raise SkillRequiredError(
+                f"执行{command}前必须先加载以下Skill: {', '.join(missing)}",
+                missing_skills=missing,
+                required_for=command
+            )
+
+        return SkillCheckResult(True, "Skill检查通过", required, list(loaded_skills.keys()))
+
+    def _get_loaded_skills(self) -> Dict[str, Any]:
+        """获取已加载的Skill"""
+        if self.skill_loader:
+            return self.skill_loader.get_loaded_skills()
+        return {}
+
+    def add_required_skill(self, command: str, skill: str):
+        """添加必需Skill规则"""
+        if command not in self.required_skills:
+            self.required_skills[command] = []
+        if skill not in self.required_skills[command]:
+            self.required_skills[command].append(skill)
+
+    def remove_required_skill(self, command: str, skill: str):
+        """移除必需Skill规则"""
+        if command in self.required_skills and skill in self.required_skills[command]:
+            self.required_skills[command].remove(skill)

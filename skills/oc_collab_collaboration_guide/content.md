@@ -1,4 +1,4 @@
-# OC-Collab 协作指南 (v2.2.2)
+# OC-Collab 协作指南 (v2.2.15)
 
 ---
 
@@ -369,6 +369,16 @@ cat pyproject.toml | grep version
 | **不提前创建** | 只有当某项工作明确需要做时才创建TODO | ❌ Bug还没发现就创建"修复Bug的TODO" |
 | **不代他人创建** | 即使TODO指向自己，也不要替别人创建 | ❌ Agent1 不要创建"Agent2修复Bug"的TODO |
 | **不自创TODO** | 不要为了"可能有需要"而预先创建TODO | ❌ "以后可能需要测试" → 实际需要时再创建 |
+| **Agent1不能直接执行开发TODO** | Agent1只能创建TODO，由Agent2执行开发工作 | ❌ Agent1不要自己写代码修复Bug |
+
+### Agent1 vs Agent2 TODO权限边界
+
+| 角色 | 可以创建 | 不可以创建 |
+|------|----------|------------|
+| **Agent1** | 需求TODO、设计TODO、测试TODO、Bug报告 | **开发TODO（代码修复）** |
+| **Agent2** | 开发TODO、代码修复、技术设计 | 需求实质性变更（需Agent1确认） |
+
+**v2.2.10新增**：Agent1发现开发问题时，创建TODO给Agent2，由Agent2执行开发。Agent1不直接执行CLI开发命令。
 
 ### 为什么不应该提前创建TODO？
 
@@ -466,6 +476,110 @@ todos:
 | **执行** | todoedit --status in_progress | 开始执行 |
 | **完成** | todoedit --status completed | 执行完成 |
 | **确认** | 签署/关闭 | 任务闭环 |
+
+### TODO 退回标准流程 ⭐
+
+**场景**：收到TODO后发现不符合要求，需要退回给发起者
+
+#### 标准做法
+
+| 步骤 | 操作 | 说明 |
+|------|------|------|
+| 1 | 完成当前TODO | status: completed，result记录退回原因 |
+| 2 | 创建新TODO | 明确新要求，status: pending |
+| 3 | 等待处理 | 新TODO是下一步行动的唯一来源 |
+
+#### 模板
+
+```yaml
+# 旧TODO - 标记退回
+- id: TODO-311
+  content: v2.2.8 黑盒测试
+  status: completed
+  result: "退回 - 未达到提测门槛：1) development.status仍为pending；2) rules_commands.py缺失"
+
+# 新TODO - 明确要求
+- id: TODO-312
+  content: v2.2.8 黑盒测试（提测门槛修正版）
+  from: agent2
+  to: agent1
+  requirements:
+    - "rules_commands.py 必须存在"
+    - "development.status 必须为completed"
+  status: pending
+```
+
+#### 禁止做法
+
+| ❌ 错误做法 | ✅ 正确做法 |
+|-------------|-------------|
+| 不完成旧TODO | 完成旧TODO，result记录原因 |
+| 只更新description | 创建新TODO，包含新要求 |
+| 不创建新TODO | 新TODO是下一步行动来源 |
+| 依赖额外字段识别 | 新TODO状态明确 |
+
+#### 多Agent场景
+
+| 场景 | 行为 |
+|------|------|
+| Agent启动 | 检查自己所有pending TODO |
+| 收到新TODO | 执行新TODO（明确下一步） |
+| 追溯历史 | 旧TODO.result记录完整历史 |
+
+---
+
+### TODO 状态与result字段标准化 ⭐ (v2.2.15新增)
+
+#### 问题背景
+
+**混乱案例**：TODO-321
+| 操作 | 结果 |
+|------|------|
+| Agent1创建TODO-321（验收E2E测试） | pending |
+| Agent2误以为已测试，填result为"退回" | ❌ 错误 |
+| Agent1纠正：还没测试 | result应为空 |
+
+#### result字段规范
+
+| 场景 | result值 | 示例 |
+|------|----------|------|
+| 任务成功 | "通过：xxx" | "E2E测试通过，10/10通过" |
+| 任务失败 | "失败：原因" | "代码逻辑错误，测试用例x失败" |
+| 任务退回 | "退回：要求" | "缺少xxx，需补充" |
+| **还没做** | **(空)** | 等实际执行后再填 |
+
+#### completed定义
+
+**completed = 任务已执行（不代表成功）**
+
+| 状态 | 含义 | result |
+|------|------|--------|
+| pending | 等待执行 | (空) |
+| completed | 已执行 | "通过"/"失败"/"退回" |
+
+#### 退回流程修正
+
+**适用场景**：任务已做但不符合要求
+
+```
+收到任务 → 执行 → 不符合要求
+                        ↓
+                  completed
+                  result: "退回：原因"
+                        ↓
+                  创建新TODO
+```
+
+**不适用**：任务还没做
+
+```
+收到任务 → 还没做
+                ↓
+          pending（保持）
+          result: (空)
+```
+
+---
 
 ### 常见错误与正确做法
 
@@ -601,6 +715,9 @@ oc-collab todo
 | v2.2.11 | 2026-02-08 | 新增环境更新规则（pip install -e.），修复BUG-20260208-009教训 |
 | v2.2.12 | 2026-02-08 | 新增"需求文档+概要设计一起评审"规则 |
 | v2.2.13 | 2026-02-09 | 新增"评审优先级规则"（Critical Review > Technical Review） |
+| v2.2.14 | 2026-02-13 | 新增"TODO退回标准流程" |
+| v2.2.15 | 2026-02-14 | 新增"TODO状态与result字段标准化" |
+| v2.2.15 | 2026-02-14 | 新增"TODO状态与result字段标准化"（通过/失败/退回/空四种场景） |
 
 ---
 
@@ -739,8 +856,8 @@ oc-collab todo
 ---
 
 **维护者**: Agent 1
-**版本**: v2.2.11
-**更新日期**: 2026-02-08
+**版本**: v2.2.15
+**更新日期**: 2026-02-14
 
 ---
 

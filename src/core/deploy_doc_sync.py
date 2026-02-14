@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 class DeployDocSync:
     """部署文档同步器"""
 
+    REQUIRED_DOCS = [
+        "CHANGELOG.md",
+        "README.md",
+        "skills/*/content.md",
+        "docs/00-architecture/*.md",
+    ]
+
     def __init__(self, project_path: Optional[str] = None):
         """
         初始化部署文档同步器
@@ -25,6 +32,43 @@ class DeployDocSync:
         self.changelog_path = self.project_path / "CHANGELOG.md"
         self.readme_path = self.project_path / "README.md"
         self.pyproject_path = self.project_path / "pyproject.toml"
+        self.docs_path = self.project_path / "docs"
+        self.skills_path = self.project_path / "skills"
+
+    def check_completeness(self) -> Dict:
+        """
+        检查文档完整性（v2.2.10增强）
+
+        Returns:
+            {"complete": bool, "missing": list, "present": list}
+        """
+        missing = []
+        present = []
+
+        for pattern in self.REQUIRED_DOCS:
+            if pattern.endswith("/*.md"):
+                base_dir = pattern.replace("/*.md", "")
+                check_path = self.project_path / base_dir
+                if check_path.exists():
+                    md_files = list(check_path.glob("*.md"))
+                    if md_files:
+                        present.append(f"{base_dir}/*.md ({len(md_files)} files)")
+                    else:
+                        missing.append(pattern)
+                else:
+                    missing.append(pattern)
+            else:
+                doc_path = self.project_path / pattern
+                if doc_path.exists():
+                    present.append(pattern)
+                else:
+                    missing.append(pattern)
+
+        return {
+            "complete": len(missing) == 0,
+            "missing": missing,
+            "present": present
+        }
 
     def check_docs_sync(self, version: str) -> Dict:
         """

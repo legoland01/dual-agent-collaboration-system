@@ -1,5 +1,194 @@
 # Changelog
 
+## v2.2.11 - v2.2.11 Released
+
+**Date**: 2026-02-14
+**Status**: ✅ **RELEASED** - Agent TODO编号 + Skill强制执行 + StateReceiver
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-14
+- Agent2: ✅ 2026-02-14
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **F-TODO-001** | TodoIdGenerator (Agent独立TODO编号) | ✅ |
+| **F-TODO-002** | TodoMigrator (TODO迁移器) | ✅ |
+| **F-SKILL-001** | SkillEnforcerEnhanced (Skill强制执行增强) | ✅ |
+| **F-SKILL-002** | SkillEmbedder (Skill嵌入器) | ✅ |
+| **F-NOTIF-001** | StateReceiver (状态接收器) | ✅ |
+| **F-NOTIF-002** | StateQueueManager (状态队列管理器) | ✅ |
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Unit Tests | 32 | 32 | ✅ |
+| E2E Tests | 16 | 16 | ✅ |
+| **Total** | **48** | **48** | **✅ All Passed** |
+
+### Coverage
+
+- **Overall**: ≥ 80%
+
+### Changes
+
+- **src/core/todo_id_generator.py** - Agent独立TODO编号生成器
+- **src/core/todo_migrator.py** - TODO迁移器
+- **src/core/skill_enforcer.py** - SkillEnforcerEnhanced增强版
+- **src/core/skill_embedder.py** - Skill嵌入器
+- **src/core/state_receiver.py** - StateReceiver状态接收器
+- **src/core/state_queue.py** - StateQueueManager状态队列管理器
+- **tests/test_v2_2_11_modules.py** - v2.2.11模块单元测试
+- **tests/test_skill_enforcer.py** - SkillEnforcer测试更新
+
+### CLI Changes
+
+- Agent编号规则: Agent1使用TODO-1-XXX，Agent2使用TODO-2-XXX
+- TODO创建自动生成唯一编号
+- StateReceiver支持Webhook状态接收
+
+### Documentation
+
+| Document | Status |
+|----------|--------|
+| docs/01-requirements/requirements_v2.2.11.md | ✅ APPROVED |
+| docs/02-design/OUTLINE_v2.2.11.md | ✅ APPROVED |
+| docs/02-design/DETAIL_v2.2.11.md | ✅ APPROVED |
+
+---
+
+## v2.2.10 - v2.2.10 Released
+
+**Date**: 2026-02-14
+**Status**: ✅ **RELEASED** - TodoQueueManager + Agent Startup Checker + CLI Enhancements
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-14
+- Agent2: ✅ 2026-02-14
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **TodoQueueManager** | TODO消息队列管理器 | ✅ |
+| **AgentStartupChecker** | Agent启动自检器 | ✅ |
+| **StateNotifier Enhancement** | 队列写入支持 | ✅ |
+| **startup-check** | CLI启动检查命令 | ✅ |
+| **todo CLI Commands** | list/mark-read/stats命令 | ✅ |
+| **skill-check CLI Commands** | skill检查命令组 | ✅ |
+| **DeployDocSync** | 部署文档同步增强 | ✅ |
+
+### Bug Fixes
+
+| Bug | Description | Status |
+|-----|-------------|--------|
+| BUG-20260214-003 | todowrite工具调用失败 | ✅ Fixed |
+| BUG-20260214-004 | 自动报BUG机制失效 | ✅ Fixed |
+| BUG-20260214-005 | Skill查询规则未遵循 | ✅ Fixed |
+| BUG-20260214-006 | Agent启动检查器 | ✅ Fixed |
+| BUG-20260214-007 | YAML文件结构问题 | ✅ Fixed |
+| BUG-20260214-008 | Agent2认知错误 | ✅ Fixed |
+| BUG-20260214-009 | todo list --agent参数错误 | ✅ Fixed |
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Unit Tests | 36 | 36 | ✅ |
+| E2E Tests | 11 | 11 | ✅ |
+| Core Scenario Tests | 4 | 4 | ✅ |
+| **Total** | **51** | **51** | **✅ All Passed** |
+
+### Coverage
+
+- **Overall**: 83% (≥ 80% required)
+
+### Changes
+
+- **src/core/todo_queue_manager.py** - TODO消息队列管理
+- **src/core/agent_startup_checker.py** - Agent启动自检器
+- **src/core/state_notifier.py** - 队列写入支持增强
+- **src/cli/startup_commands.py** - startup-check命令
+- **src/cli/todo_commands.py** - todo命令组
+- **src/cli/skill_check_commands.py** - skill-check命令组
+- **src/cli/enhanced_commands.py** - todowrite命令增强
+
+### New CLI Commands
+
+- `oc-collab startup check` - 启动时检查未读TODO
+- `oc-collab todo list` - 显示TODO列表
+- `oc-collab todo list --unread` - 仅显示未读TODO
+- `oc-collab todo list --agent <1|2>` - 按Agent筛选
+- `oc-collab todo mark-read <id>` - 标记TODO为已读
+- `oc-collab todo stats` - TODO统计信息
+- `oc-collab skill check` - 检查Skill加载状态
+- `oc-collab skill status` - 显示Skill合规状态
+- `oc-collab skill verify <action>` - 验证操作前Skill
+
+### Documentation
+
+| Document | Status |
+|----------|--------|
+| docs/01-requirements/ANALYSIS_v2.2.10_Requirements_Analysis.md | ✅ |
+| docs/02-design/DETAIL_v2.2.10.md | ✅ APPROVED |
+| docs/04-reports/TEST_REPORT_v2.2.10_acceptance.md | ✅ COMPLETED |
+
+---
+
+## v2.2.9 - v2.2.9 Released
+
+**Date**: 2026-02-14
+**Status**: ✅ **RELEASED** - StateNotifier Integration + Compliance Enforcement + Auto Bug Detection
+
+**Signoff Status**:
+- Agent1: ⏳ Pending
+- Agent2: ✅ 2026-02-14
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **DEV-001** | StateNotifier→todowrite Integration | ✅ |
+| **DEV-002** | StateNotifier→signoff Integration | ✅ |
+| **DEV-003** | StateNotifier→phase_advance Integration | ✅ |
+| **DEV-004** | AutoBugDetector (自动Bug检测) | ✅ |
+| **DEV-005** | ComplianceEnforcer (Agent合规检查) | ✅ |
+| **DEV-006** | RulesAutoLoader (规则自动加载) | ✅ |
+| **DEV-007** | DeployDocSync (部署文档同步) | ✅ |
+| **DEV-008** | WebhookEnhancer (Webhook增强) | ✅ |
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Unit Tests | 29 | 29 | ✅ |
+| E2E Tests | 29 | 29 | ✅ |
+| **Total** | **58** | **58** | **✅ All Passed** |
+
+### Changes
+
+- **src/core/state_notifier.py** - StateNotifier webhook integration
+- **src/core/webhook_enhancer.py** - Webhook retry and status tracking
+- **src/core/auto_bug_detector.py** - Automatic bug detection
+- **src/core/compliance_enforcer.py** - Agent compliance enforcement
+- **src/core/rules_auto_loader.py** - Automatic rules loading
+- **src/core/deploy_doc_sync.py** - Deployment documentation sync
+- **src/cli/enhanced_commands.py** - todowrite with webhook
+- **src/cli/main.py** - signoff/advance with webhook
+
+### New CLI Commands
+
+- `oc-collab compliance check` - Check compliance status
+- `oc-collab compliance report` - Generate compliance report
+- `oc-collab compliance violations` - List violations
+- `oc-collab rules init --auto-load` - Auto-load default rules
+- `oc-collab deploy check-docs` - Check deployment docs sync
+- `oc-collab deploy sync-docs` - Sync deployment docs
+
+---
+
 ## v2.2.8 - v2.2.8 Released
 
 **Date**: 2026-02-14

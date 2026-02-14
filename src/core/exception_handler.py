@@ -198,6 +198,25 @@ class ExceptionHandler:
     def add_notification_config(self, config: NotificationConfig) -> None:
         """添加通知配置。"""
         self._notification_configs.append(config)
+
+    def configure_notifications(
+        self,
+        webhook_url: str = None,
+        email: str = None,
+        enabled: bool = True
+    ) -> None:
+        """配置通知。"""
+        email_recipients = [email] if email else []
+        channel = NotificationChannel.WEBHOOK if webhook_url else (NotificationChannel.EMAIL if email else NotificationChannel.LOG)
+        config = NotificationConfig(
+            channel=channel,
+            enabled=enabled,
+            webhook_url=webhook_url,
+            email_recipients=email_recipients,
+            min_severity=ExceptionSeverity.MEDIUM
+        )
+        self._notification_configs = [config]
+        self._notification_config = config
     
     def classify_exception(self, exception: Exception) -> Tuple[ExceptionType, ExceptionSeverity]:
         """分类异常。"""
@@ -614,6 +633,9 @@ class PermissionChecker:
     def check_read(self, path: str) -> bool:
         """检查读权限。"""
         try:
+            if not os.path.exists(path):
+                self.checked_paths[path] = ("read", False)
+                return False
             if os.path.isfile(path):
                 with open(path, 'r'):
                     pass
@@ -621,15 +643,24 @@ class PermissionChecker:
                 os.listdir(path)
             self.checked_paths[path] = ("read", True)
             return True
-        except PermissionError as e:
+        except (PermissionError, OSError) as e:
             logger.error(f"无读权限: {path} - {e}")
             self.checked_paths[path] = ("read", False)
             return False
-    
+
     def check_write(self, path: str) -> bool:
         """检查写权限。"""
         try:
-            test_file = os.path.join(path, ".write_test")
+            if os.path.isfile(path):
+                parent_dir = os.path.dirname(path)
+            elif os.path.isdir(path):
+                parent_dir = path
+            else:
+                parent_dir = os.path.dirname(path)
+            if not parent_dir or not os.path.exists(parent_dir):
+                self.checked_paths[path] = ("write", False)
+                return False
+            test_file = os.path.join(parent_dir, ".write_test")
             with open(test_file, 'w') as f:
                 f.write("")
             os.remove(test_file)

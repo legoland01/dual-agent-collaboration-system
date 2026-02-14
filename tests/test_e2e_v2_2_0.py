@@ -141,41 +141,44 @@ class TestRetryDecorator:
 
     def test_retry_success(self):
         """测试重试成功。"""
+        from src.core.exception_handler import RetryConfig
         call_count = [0]
-        
-        @with_retry(max_retries=3, delay=0.01)
+
+        @with_retry(RetryConfig(max_retries=3, initial_delay=0.01))
         def succeed_after_second():
             call_count[0] += 1
             if call_count[0] < 2:
                 raise NetworkError("temp", "test")
             return "success"
-        
+
         result = succeed_after_second()
         assert result == "success"
         assert call_count[0] == 2
 
     def test_retry_exhausted(self):
         """测试重试耗尽。"""
+        from src.core.exception_handler import RetryConfig
         call_count = [0]
-        
-        @with_retry(max_retries=2, delay=0.01)
+
+        @with_retry(RetryConfig(max_retries=2, initial_delay=0.01))
         def always_fail():
             call_count[0] += 1
             raise NetworkError("temp", "test")
-        
+
         with pytest.raises(NetworkError):
             always_fail()
         assert call_count[0] == 3  # 2 retries + 1 original
 
     def test_no_retry_on_other_exceptions(self):
         """测试非重试异常不重试。"""
+        from src.core.exception_handler import RetryConfig
         call_count = [0]
-        
-        @with_retry(max_retries=3, delay=0.01)
+
+        @with_retry(RetryConfig(max_retries=3, initial_delay=0.01))
         def fatal_error():
             call_count[0] += 1
             raise DiskSpaceError(0, 0, "/")
-        
+
         with pytest.raises(DiskSpaceError):
             fatal_error()
         assert call_count[0] == 1  # No retry for fatal exceptions
@@ -556,14 +559,14 @@ class TestIssueTracking:
 
     def test_issue_regression_check(self):
         """测试问题复发检测。"""
+        import re
         known_issues = [
             {"id": "ISSUE-001", "pattern": "API Key.*missing"},
             {"id": "ISSUE-002", "pattern": "Mock.*Real.*混淆"}
         ]
         
-        # 模拟检测到已知问题模式
         current_error = "API Key is missing"
-        matched_issues = [i for i in known_issues if i["pattern"] in current_error]
+        matched_issues = [i for i in known_issues if re.search(i["pattern"], current_error)]
         
         assert len(matched_issues) >= 1
 
@@ -992,12 +995,12 @@ class TestFullWorkflow:
             raise NetworkError("Connection lost", "git operation")
         
         # 应该能处理
-        handled = handler.handle_exception(
+        result = handler.handle_exception(
             NetworkError("Connection lost", "git operation"),
             workflow_step
         )
         
-        assert handled is True
+        assert result[0] is True
 
     def test_disk_check_before_write(self, tmp_path):
         """测试写操作前磁盘检查。"""

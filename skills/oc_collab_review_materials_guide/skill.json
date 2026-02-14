@@ -1,0 +1,67 @@
+{
+  "id": "oc_collab_review_materials_guide",
+  "name": "OC-Collab 评审资料准备指南",
+  "version": "v1",
+  "description": "Agent1为Agent2准备评审资料的标准流程 - 包含摘要、关联文档、技术问题清单、工时分析",
+  "author": "Agent 1",
+  "created_at": "2026-02-14",
+  "tags": ["review", "materials", "guide", "handoff", "v2.2.11"],
+  "version_info": {
+    "current": "v1.0.0"
+  },
+  "triggers": [
+    {
+      "condition": "agent1_preparing_review_materials",
+      "priority": "high",
+      "description": "Agent1准备将需求文档交给Agent2评审前触发"
+    },
+    {
+      "condition": "before_agent2_review",
+      "priority": "high",
+      "description": "Agent2评审前，确保Agent1已准备好评审资料"
+    },
+    {
+      "condition": "requirements_handoff",
+      "priority": "high",
+      "description": "需求文档移交评审时触发"
+    }
+  ],
+  "role_responsibility": {
+    "agent1": {
+      "role": "产品经理",
+      "must_do": ["准备评审资料摘要", "整理关联文档清单", "列出技术问题清单", "分析工时分配合理性"],
+      "must_not_do": ["跳过资料准备直接移交", "提供不完整的关联文档"]
+    },
+    "agent2": {
+      "role": "开发",
+      "must_do": ["评审时参考提供的资料", "验证技术可行性"],
+      "must_not_do": ["要求Agent1做开发工作"]
+    }
+  },
+  "review_materials_components": {
+    "summary": {
+      "name": "需求文档摘要",
+      "description": "3个核心功能的关键点提炼",
+      "required_fields": ["功能列表", "核心验收标准", "主要风险"]
+    },
+    "associated_documents": {
+      "name": "关联文档清单",
+      "description": "便于Agent2深入了解背景",
+      "required_fields": ["分析文档", "提案文档", "历史版本", "相关Bug"]
+    },
+    "technical_questions": {
+      "name": "技术可行性问题清单",
+      "description": "需要Agent2确认的技术点",
+      "required_fields": ["架构可行性", "依赖关系", "实现复杂度"]
+    },
+    "work_analysis": {
+      "name": "工时分配合理性分析",
+      "description": "为什么这样分配",
+      "required_fields": ["功能工时分解", "风险缓冲", "历史对比"]
+    }
+  },
+  "outputs": {
+    "documents": ["docs/01-requirements/", "docs/00-memos/", "docs/04-proposals/"],
+    "artifacts": ["评审资料摘要.md"]
+  }
+}

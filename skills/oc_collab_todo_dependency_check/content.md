@@ -239,15 +239,61 @@ log:
 
 ---
 
-## 7. 版本历史
+## 9. Agent独立编号规则 ⭐ (v2.2.11起生效)
+
+### 9.1 编号格式
+
+| Agent | 编号格式 | 示例 |
+|-------|----------|------|
+| Agent 1 | TODO-1-XXX | TODO-1-001, TODO-1-002 |
+| Agent 2 | TODO-2-XXX | TODO-2-001, TODO-2-002 |
+
+### 9.2 编号规则
+
+| 规则 | 说明 | 违反后果 |
+|------|------|----------|
+| **Agent1只能创建TODO-1-XXX** | Agent1创建的TODO必须使用TODO-1前缀 | YAML结构损坏 |
+| **Agent2只能创建TODO-2-XXX** | Agent2创建的TODO必须使用TODO-2前缀 | YAML结构损坏 |
+| **禁止手动指定ID** | 编号由todowrite自动生成，禁止手动指定 | 编号冲突 |
+| **历史TODO保持兼容** | v2.2.10之前的TODO无需强制迁移 | 兼容旧版本 |
+
+### 9.3 依赖检查增强
+
+```yaml
+# 检查TODO编号格式是否正确
+def validate_todo_id(todo):
+    agent_id = get_current_agent_id()  # 从环境变量读取
+    expected_prefix = f"TODO-{agent_id}-"
+
+    if not todo.id.startswith(expected_prefix):
+        return {
+            "valid": False,
+            "reason": f"TODO编号格式错误：预期{expected_prefix}前缀，实际为{todo.id}"
+        }
+
+    return {"valid": True}
+```
+
+### 9.4 违反场景
+
+| 场景 | 错误做法 | 正确做法 |
+|------|----------|----------|
+| Agent1创建TODO | 手动指定 TODO-2-001 | 使用todowrite自动生成 TODO-1-001 |
+| Agent2创建TODO | 手动指定 TODO-1-003 | 使用todowrite自动生成 TODO-2-003 |
+| 跨Agent创建 | Agent1创建TODO给Agent2 | Agent1创建 TODO-1-XXX，Agent2创建自己的 TODO-2-XXX |
+
+---
+
+## 10. 版本历史
 
 | 版本 | 日期 | 变更 | 作者 |
 |------|------|------|------|
+| 1.1 | 2026-02-14 | 新增"Agent独立编号规则"章节 | Agent 1 |
 | 1.0 | 2026-02-13 | 初始版本 | Agent 1 |
 
 ---
 
-## 8. 关联文档
+## 11. 关联文档
 
 | 文档 | 说明 |
 |------|------|
@@ -255,8 +301,9 @@ log:
 | `docs/00-memos/BUG-20260213-005_todo_dependency_check.md` | Bug报告（问题背景） |
 | `skills/oc_collab_requirements_guide/content.md` | 需求阶段参考 |
 | `skills/oc_collab_requirements_review_guide/content.md` | 评审阶段参考 |
+| `docs/01-requirements/requirements_v2.2.11.md` | v2.2.11需求文档 |
 
 ---
 
-**维护者**: Agent 1  
-**更新日期**: 2026-02-13
+**维护者**: Agent 1
+**更新日期**: 2026-02-14

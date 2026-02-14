@@ -9,6 +9,111 @@ import shutil
 class TestEventDispatcher:
     """EventDispatcher 测试类"""
 
+    def test_register_multiple_event_types(self):
+        from src.core.event_dispatcher import EventDispatcher
+
+        dispatcher = EventDispatcher()
+
+        def callback1(event):
+            return True
+
+        def callback2(event):
+            return True
+
+        dispatcher.register_callback(callback1, ["push", "pull_request"], "multi")
+        assert "push" in dispatcher._callbacks
+        assert "pull_request" in dispatcher._callbacks
+        assert callback1 in dispatcher._callbacks["push"]
+        assert callback1 in dispatcher._callbacks["pull_request"]
+
+    def test_register_callback_with_default_name(self):
+        from src.core.event_dispatcher import EventDispatcher
+
+        dispatcher = EventDispatcher()
+
+        def my_test_callback(event):
+            return True
+
+        callback_id = dispatcher.register_callback(my_test_callback)
+        assert callback_id == "my_test_callback"
+
+    def test_dispatch_to_wildcard_callbacks(self):
+        from src.core.event_dispatcher import EventDispatcher, DispatchEvent
+
+        dispatcher = EventDispatcher()
+        results = []
+
+        def wildcard_callback(event):
+            results.append("wildcard")
+            return True
+
+        dispatcher.register_callback(wildcard_callback, None, "wildcard")
+
+        event = DispatchEvent(event_type="push", source="github", payload={})
+        result = dispatcher.dispatch(event)
+
+        assert len(result.callbacks_results) == 1
+        assert result.callbacks_results[0]["callback_name"] == "wildcard"
+
+    def test_dispatch_multiple_callbacks_same_event(self):
+        from src.core.event_dispatcher import EventDispatcher, DispatchEvent
+
+        dispatcher = EventDispatcher()
+        call_order = []
+
+        def callback1(event):
+            call_order.append("callback1")
+            return True
+
+        def callback2(event):
+            call_order.append("callback2")
+            return True
+
+        dispatcher.register_callback(callback1, ["push"], "cb1")
+        dispatcher.register_callback(callback2, ["push"], "cb2")
+
+        event = DispatchEvent(event_type="push", source="github", payload={})
+        result = dispatcher.dispatch(event)
+
+        assert len(result.callbacks_results) == 2
+        assert call_order == ["callback1", "callback2"]
+
+    def test_dispatch_event_without_callbacks(self):
+        from src.core.event_dispatcher import EventDispatcher, DispatchEvent
+
+        dispatcher = EventDispatcher()
+
+        event = DispatchEvent(event_type="push", source="github", payload={})
+        result = dispatcher.dispatch(event)
+
+        assert len(result.callbacks_results) == 0
+
+    def test_unregister_nonexistent(self):
+        from src.core.event_dispatcher import EventDispatcher
+
+        dispatcher = EventDispatcher()
+
+        result = dispatcher.unregister_callback("nonexistent")
+        assert result is False
+
+    def test_callback_duration_recorded(self):
+        from src.core.event_dispatcher import EventDispatcher, DispatchEvent
+        import time
+
+        dispatcher = EventDispatcher()
+
+        def slow_callback(event):
+            time.sleep(0.01)
+            return True
+
+        dispatcher.register_callback(slow_callback, ["push"], "slow")
+
+        event = DispatchEvent(event_type="push", source="github", payload={})
+        result = dispatcher.dispatch(event)
+
+        assert len(result.callbacks_results) == 1
+        assert result.callbacks_results[0]["duration_ms"] > 0
+
     def test_register_callback(self):
         from src.core.event_dispatcher import EventDispatcher, DispatchEvent
 
@@ -143,52 +248,107 @@ class TestEventDispatcher:
 class TestStateNotifier:
     """StateNotifier 测试类"""
 
-    def test_notify_without_url(self):
+    def test_notify_with_dispatcher_integration(self):
         from src.core.state_notifier import StateNotifier, StateChangeEvent
+        from src.core.event_dispatcher import EventDispatcher
+        import unittest.mock as mock
+
+        dispatcher = EventDispatcher()
+        notifier = StateNotifier(dispatcher=dispatcher)
+
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.status_code = 200
+            event = StateChangeEvent(
+                event_type="todo.created",
+                agent_id="agent1",
+                details={"todo_id": "TODO-001"}
+            )
+            notifier.set_default_webhook_url("http://localhost:8080/webhook")
+            result = notifier.notify(event)
+
+        assert result is True
+        mock_post.assert_called_once()
+
+    def test_notify_with_http_failure(self):
+        from src.core.state_notifier import StateNotifier, StateChangeEvent
+        import unittest.mock as mock
 
         notifier = StateNotifier()
-        event = StateChangeEvent(
-            event_type="todo.created",
-            agent_id="agent1",
-            details={"todo_id": "TODO-001"}
-        )
+        notifier.set_default_webhook_url("http://localhost:8080/webhook")
 
-        result = notifier.notify(event)
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.status_code = 500
+            event = StateChangeEvent(
+                event_type="todo.created",
+                agent_id="agent1",
+                details={"todo_id": "TODO-001"}
+            )
+            result = notifier.notify(event)
+
         assert result is False
 
-    def test_format_payload(self):
+    def test_notify_with_connection_error(self):
+        from src.core.state_notifier import StateNotifier, StateChangeEvent
+        import requests
+        import unittest.mock as mock
+
+        notifier = StateNotifier()
+        notifier.set_default_webhook_url("http://localhost:8080/webhook")
+
+        with mock.patch('requests.post') as mock_post:
+            mock_post.side_effect = requests.ConnectionError("Connection failed")
+            event = StateChangeEvent(
+                event_type="todo.created",
+                agent_id="agent1",
+                details={"todo_id": "TODO-001"}
+            )
+            result = notifier.notify(event)
+
+        assert result is False
+
+    def test_format_payload_with_special_chars(self):
         from src.core.state_notifier import StateNotifier, StateChangeEvent
 
         notifier = StateNotifier()
         event = StateChangeEvent(
-            event_type="todo.created",
+            event_type="phase.advanced",
             agent_id="agent1",
-            details={"todo_id": "TODO-001", "content": "Test"}
+            details={"from": "requirements", "to": "design"}
         )
 
         payload = notifier._format_payload(event)
 
-        assert payload["action"] == "todo.created"
-        assert payload["sender"]["login"] == "agent1"
-        assert payload["oc_collab"]["event_type"] == "todo.created"
-        assert payload["oc_collab"]["details"]["todo_id"] == "TODO-001"
+        assert payload["action"] == "phase.advanced"
+        assert payload["ref"] == "refs/heads/state-phase-advanced"
+        assert payload["oc_collab"]["details"]["from"] == "requirements"
+        assert payload["oc_collab"]["details"]["to"] == "design"
 
     def test_notify_todo_created(self):
         from src.core.state_notifier import StateNotifier
+        import unittest.mock as mock
 
         notifier = StateNotifier()
-        notifier.set_default_webhook_url("http://localhost:8080/test")
+        notifier.set_default_webhook_url("http://localhost:8080/webhook")
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            pass
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.status_code = 200
+            result = notifier.notify_todo_created("TODO-001", "Test task", "agent1")
+
+        assert result is True
+        mock_post.assert_called_once()
 
     def test_notify_todo_completed(self):
         from src.core.state_notifier import StateNotifier
+        import unittest.mock as mock
 
         notifier = StateNotifier()
+        notifier.set_default_webhook_url("http://localhost:8080/webhook")
 
-        result = notifier.notify_todo_completed("TODO-001", "Test task", "agent1")
-        assert result is False
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.status_code = 201
+            result = notifier.notify_todo_completed("TODO-001", "Test task", "agent1")
+
+        assert result is True
 
     def test_notify_signoff_completed(self):
         from src.core.state_notifier import StateNotifier
@@ -217,6 +377,71 @@ class TestStateNotifier:
 
 class TestHMACValidator:
     """HMACValidator 测试类"""
+
+    def test_validate_github_invalid_signature_format(self):
+        from src.core.hmac_validator import HMACValidator
+
+        validator = HMACValidator("secret")
+
+        result = validator.validate_github(b"data", "sha1=wrong_format")
+
+        assert result.is_valid is False
+        assert "sha256=" in result.error
+
+    def test_validate_github_signature_mismatch(self):
+        import hmac
+        import hashlib
+        from src.core.hmac_validator import HMACValidator
+
+        secret = "test_secret"
+        validator = HMACValidator(secret)
+
+        wrong_sig = "sha256=" + hmac.new(
+            b"wrong_secret",
+            b"data",
+            hashlib.sha256
+        ).hexdigest()
+
+        result = validator.validate_github(b"data", wrong_sig)
+
+        assert result.is_valid is False
+        assert "mismatch" in result.error.lower()
+
+    def test_validate_gitee_missing_token(self):
+        from src.core.hmac_validator import HMACValidator
+
+        validator = HMACValidator("secret")
+
+        result = validator.validate_gitee(b"data", "")
+
+        assert result.is_valid is False
+        assert "Missing" in result.error
+
+    def test_validate_gitee_token_mismatch(self):
+        from src.core.hmac_validator import HMACValidator
+
+        validator = HMACValidator("correct_token")
+
+        result = validator.validate_gitee(b"data", "wrong_token")
+
+        assert result.is_valid is False
+        assert "mismatch" in result.error.lower()
+
+    def test_skip_verification_via_env(self):
+        import os
+        from src.core.hmac_validator import HMACValidator
+
+        os.environ["OC_COLLAB_WEBHOOK_SKIP_VERIFY"] = "true"
+        try:
+            validator = HMACValidator("any_secret")
+
+            result = validator.validate_github(b"data", "invalid_sig")
+            assert result.is_valid is True
+
+            result = validator.validate_gitee(b"data", "wrong_token")
+            assert result.is_valid is True
+        finally:
+            del os.environ["OC_COLLAB_WEBHOOK_SKIP_VERIFY"]
 
     def test_validate_github_valid(self):
         import hmac
@@ -338,6 +563,32 @@ class TestHMACValidator:
 
 class TestRulesInitializer:
     """RulesInitializer 测试类"""
+
+    def test_init_nested_dirs(self):
+        from src.core.rules_initializer import RulesInitializer
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            Path(tmpdir, "nested").mkdir()
+            initializer = RulesInitializer(tmpdir)
+
+            Path(tmpdir, "AGENTS.md").write_text("test")
+
+            result = initializer.init()
+
+            assert result.success is True
+
+    def test_init_multiple_times_idempotent(self):
+        from src.core.rules_initializer import RulesInitializer
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            initializer = RulesInitializer(tmpdir)
+
+            result1 = initializer.init()
+            result2 = initializer.init()
+
+            assert result1.success is True
+            assert result2.success is True
+            assert len(result2.created_files) < len(result1.created_files)
 
     def test_init_creates_dirs(self):
         from src.core.rules_initializer import RulesInitializer

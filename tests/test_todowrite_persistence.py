@@ -28,7 +28,7 @@ class TestTodoWritePersistence:
         # 获取执行前的状态
         with open(TODO_FILE) as f:
             data_before = yaml.safe_load(f)
-        todos_before = len(data_before.get("adhoc_todos", []))
+        todos_before = len(data_before.get("todos", []))
 
         # 执行 todowrite
         result = subprocess.run(
@@ -49,12 +49,12 @@ class TestTodoWritePersistence:
         # 验证2：文件被修改
         with open(TODO_FILE) as f:
             data_after = yaml.safe_load(f)
-        todos_after = len(data_after.get("adhoc_todos", []))
+        todos_after = len(data_after.get("todos", []))
         assert todos_after > todos_before, \
             f"文件未变化: 执行前={todos_before}, 执行后={todos_after}"
 
         # 验证3：TODO存在于文件中
-        todo_contents = [t.get("content", "") for t in data_after.get("adhoc_todos", [])]
+        todo_contents = [t.get("content", "") for t in data_after.get("todos", [])]
         assert any("测试todowrite持久化" in str(c) for c in todo_contents), \
             f"TODO不存在于文件中: {todo_contents}"
 
@@ -80,7 +80,7 @@ class TestTodoWritePersistence:
         # 获取初始状态
         with open(TODO_FILE) as f:
             data_before = yaml.safe_load(f)
-        todos_before = len(data_before.get("adhoc_todos", []))
+        todos_before = len(data_before.get("todos", []))
 
         # 成功操作
         def success_operation():
@@ -101,7 +101,7 @@ class TestTodoWritePersistence:
         # 验证：文件已更新
         with open(TODO_FILE) as f:
             data_after = yaml.safe_load(f)
-        todos_after = len(data_after.get("adhoc_todos", []))
+        todos_after = len(data_after.get("todos", []))
         assert todos_after > todos_before, \
             f"成功操作后文件应该被修改: {todos_before} -> {todos_after}"
 
