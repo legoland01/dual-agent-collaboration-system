@@ -1,5 +1,68 @@
 # Changelog
 
+## v2.2.12 - v2.2.12 Released
+
+**Date**: 2026-02-15
+**Status**: ✅ **RELEASED** - 部署自动化CLI
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-15
+- Agent2: ✅ 2026-02-15
+
+### Features
+
+| Module | Feature | Status |
+|--------|---------|--------|
+| **F-DEPLOY-001** | DeploymentOrchestrator (部署编排器) | ✅ |
+| **F-DEPLOY-002** | VersionManager (版本号管理器) | ✅ |
+| **F-DEPLOY-003** | PackageBuilder (包构建器) | ✅ |
+| **F-DEPLOY-004** | PyPIUploader (PyPI上传器) | ✅ |
+| **F-DEPLOY-005** | GitPusher (Git推送器) | ✅ |
+| **F-DEPLOY-006** | DeployVerifier (部署验证器) | ✅ |
+| **F-DEPLOY-007** | StateUpdater (状态更新器) | ✅ |
+
+### Test Results
+
+| Test Suite | Passed | Total | Status |
+|------------|--------|-------|--------|
+| Unit Tests | 16 | 16 | ✅ |
+| E2E Tests | 5 | 5 | ✅ |
+| **Total** | **21** | **21** | **✅ All Passed** |
+
+### Coverage
+
+- **Overall**: ≥ 80%
+
+### Changes
+
+- **src/core/deployment_orchestrator.py** - 部署编排器
+- **src/core/version_manager.py** - 版本号管理器
+- **src/core/package_builder.py** - 包构建器
+- **src/core/pypi_uploader.py** - PyPI上传器
+- **src/core/git_pusher.py** - Git推送器
+- **src/core/deploy_verifier.py** - 部署验证器
+- **src/core/state_updater.py** - 状态更新器
+- **src/cli/deploy_full_commands.py** - 完整部署CLI命令
+- **tests/test_deployment_modules.py** - 部署模块单元测试
+
+### CLI Changes
+
+- `oc-collab deploy full` - 执行完整部署流程
+- `oc-collab deploy full --dry-run` - 预览模式
+- `oc-collab deploy full --version <ver>` - 指定版本号
+- `oc-collab deploy full --skip-git` - 跳过Git推送
+- `oc-collab deploy full --skip-pypi` - 跳过PyPI上传
+
+### Documentation
+
+| Document | Status |
+|----------|--------|
+| docs/01-requirements/requirements_v2.2.12.md | ✅ APPROVED |
+| docs/02-design/OUTLINE_v2.2.12.md | ✅ APPROVED |
+| docs/02-design/DETAIL_v2.2.12.md | ✅ APPROVED |
+
+---
+
 ## v2.2.11 - v2.2.11 Released
 
 **Date**: 2026-02-14

@@ -35,6 +35,7 @@ from .webhook_commands import webhook_group
 from .rules_commands import rules_group
 from .compliance_commands import compliance_group
 from .deploy_commands import deploy_group
+from .deploy_full_commands import deploy_full
 from .todo_commands import todo_group
 from .startup_commands import startup_check_command
 

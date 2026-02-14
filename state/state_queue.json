@@ -1,0 +1,17 @@
+{
+  "queue_id": "8331d312-6154-41fc-b5cf-ad24ebc40bad",
+  "notifications": [
+    {
+      "id": "9511acac",
+      "event_type": "todo.created",
+      "source_agent": "agent1",
+      "target_agent": "agent2",
+      "payload": {},
+      "timestamp": "2026-02-14T08:43:15.870700",
+      "status": "pending",
+      "retry_count": 0,
+      "max_retries": 3
+    }
+  ],
+  "last_updated": "2026-02-14T08:43:15.870709"
+}

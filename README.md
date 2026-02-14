@@ -127,6 +127,7 @@ myproject/
 
 | 版本 | 日期 | 功能 |
 |------|------|------|
+| v2.2.12 | 2026-02-15 | 部署自动化CLI：完整部署流程、预览模式、版本管理、PyPI/Git推送、发布验证 |
 | v2.2.11 | 2026-02-14 | Agent独立TODO编号、Skill强制执行增强、StateReceiver状态接收器 |
 | v2.2.10 | 2026-02-14 | TodoQueueManager + Agent Startup Checker + CLI Enhancements |
 | v2.2.9 | 2026-02-14 | StateNotifier集成（todowrite/signoff/phase_advance）、自动Bug检测、Agent Compliance CLI准入、规则自动加载 |

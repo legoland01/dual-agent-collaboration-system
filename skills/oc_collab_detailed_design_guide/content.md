@@ -93,6 +93,7 @@ cp docs/02-design/TEMPLATE_detailed_design.md docs/02-design/DETAIL_vX.X.X.md
 |------|---------|------|
 | 1. 功能模块映射 | ✅ | 功能→技术模块映射 |
 | 2. 技术架构 | ✅ | 模块划分、技术选型 |
+| 2.5 数据流图 | ✅ | 状态存储关系、数据同步路径 |
 | 3. 核心模块设计 | ✅ | 类/函数设计、接口定义 |
 | 4. 数据结构 | ✅ | 状态文件、数据库Schema |
 | 5. 算法与逻辑 | ✅ | 核心业务流程实现 |
@@ -142,6 +143,47 @@ cp docs/02-design/TEMPLATE_detailed_design.md docs/02-design/DETAIL_vX.X.X.md
 |------|---------|------|----------|
 | CLI框架 | Click | >=8.0 | 现有技术栈 |
 | 配置解析 | PyYAML | >=6.0 | 现有依赖 |
+```
+
+### 2.5 数据流图 ⭐
+
+```markdown
+## 2.5 数据流图
+
+### 2.5.1 数据存储位置
+
+| 数据类型 | 存储文件 | 格式 | 读取方 | 写入方 |
+|----------|----------|------|--------|--------|
+| 项目状态 | state/project_state.yaml | YAML | Agent1, Agent2 | 双方 |
+| TODO队列 | state/todo_queue.yaml | YAML | Agent1, Agent2 | 双方 |
+| 状态通知 | state/state_queue.json | JSON | Agent1, Agent2 | StateReceiver |
+
+### 2.5.2 数据流图
+
+```
+[数据流图 - 用ASCII图表示数据流向]
+
+示例：
+┌─────────────┐     webhook      ┌──────────────┐     同步      ┌─────────────┐
+│   Agent1    │ ──────────────▶ │ StateReceiver │ ───────────▶ │ CLI Queue   │
+│  (sender)   │                 │  (:8081)     │              │(todo_queue) │
+└─────────────┘                 └──────────────┘              └─────────────┘
+```
+
+### 2.5.3 状态同步路径
+
+| 场景 | 源 | 目标 | 同步方式 | 验证方法 |
+|------|-----|------|----------|----------|
+| TODO创建 | todowrite | todo_queue.yaml | 直接写入 | oc-collab todo list |
+| StateReceiver | webhook | state_queue.json | HTTP写入 | curl health |
+| StateReceiver→CLI | state_queue.json | todo_queue.yaml | 同步方法 | TODO list 显示 |
+
+### 2.5.4 风险点
+
+| 风险 | 影响 | 缓解措施 |
+|------|------|----------|
+| 队列不一致 | 数据丢失 | 同步验证测试 |
+| 双写冲突 | 数据覆盖 | 事务控制 |
 ```
 
 ### 3. 核心模块设计
@@ -541,6 +583,7 @@ oc-collab sync-all -m "sync: 更新todo状态 - 进入开发阶段"
 | v1.0.2 | 2026-02-09 | 添加SOP四要素结构（Phase2） | Agent 2 |
 | v1.0.3 | 2026-02-14 | 新增"评审意见处理规则"章节 | Agent 1 |
 | v1.0.4 | 2026-02-14 | 新增"多次评审规则"章节 | Agent 1 |
+| v1.0.5 | 2026-02-14 | 新增"数据流图"章节(2.5) | Agent 2 |
 
 ### 签署记录
 

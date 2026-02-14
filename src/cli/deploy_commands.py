@@ -102,5 +102,8 @@ def deploy_sync_docs(version: str, changes: tuple):
             console.print("  • README.md同步失败")
 
 
+from .deploy_full_commands import deploy_full
+
 deploy_group.add_command(deploy_check_docs, "check-docs")
 deploy_group.add_command(deploy_sync_docs, "sync-docs")
+deploy_group.add_command(deploy_full, "full")
