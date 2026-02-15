@@ -5,6 +5,12 @@
 **提案人**: Agent 1
 **优先级**: P0
 **来源**: BUG-20260215-001, BUG-20260215-002
+**状态**: ✅ 已转换为 Skill
+
+---
+
+> **⚠️ 此Proposal已转换为Skill，不再使用。**
+> **请使用**: `skills/oc_collab_patch_release_guide/`
 
 ---
 

@@ -1,5 +1,39 @@
 # Changelog
 
+## v2.2.12.2 - v2.2.12.2 Released
+
+**Date**: 2026-02-15
+**Status**: ✅ **RELEASED** - Auto-Upgrade Feature
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-15
+- Agent2: ✅ 2026-02-15
+
+### Features
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **F-UPGRADE-001** | 启动时自动检测并升级到最新版本 | ✅ |
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260215-009 | 缺少启动时自动检测并升级机制 | ✅ Fixed |
+
+### Changes
+
+- **src/cli/auto_upgrade.py** - 自动升级机制
+- **src/cli/main.py** - 集成启动时自动升级
+
+### Behavior
+
+- 启动时自动检测 PyPI 最新版本
+- 发现新版本时自动升级
+- 升级后提示"请新开一个终端窗口使用"
+
+---
+
 ## v2.2.12.1 - v2.2.12.1 Released
 
 **Date**: 2026-02-15

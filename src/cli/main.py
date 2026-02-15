@@ -1675,4 +1675,8 @@ main.add_command(state_group, "state")
 
 
 if __name__ == "__main__":
+    # 启动时自动检测并升级
+    from .auto_upgrade import check_and_upgrade
+    check_and_upgrade()
+
     main()

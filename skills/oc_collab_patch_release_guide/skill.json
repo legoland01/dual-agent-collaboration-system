@@ -1,0 +1,13 @@
+{
+  "id": "oc_collab_patch_release_guide",
+  "name": "Patch发布指南",
+  "version": "1.0.0",
+  "description": "指导Agent如何识别、审批和发布Patch版本",
+  "author": "Agent 1",
+  "created_at": "2026-02-15",
+  "updated_at": "2026-02-15",
+  "tags": ["patch", "release", "hotfix", "version"],
+  "trigger_keywords": ["patch", "紧急修复", "hotfix", "当前版本修复"],
+  "phases": ["patch"],
+  "priority": "high"
+}
