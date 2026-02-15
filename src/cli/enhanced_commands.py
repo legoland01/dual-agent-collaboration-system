@@ -128,7 +128,18 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
 
     def _do_todowrite():
         if content:
-            agent_id = int(agent) if agent else None
+            current_agent_id = None
+            if agent:
+                current_agent_id = int(agent)
+            else:
+                try:
+                    context = ContextManager().load_context()
+                    if context.agent:
+                        current_agent_id = int(context.agent.replace("agent", ""))
+                except Exception:
+                    pass
+
+            agent_id = current_agent_id
             todo = sync_manager.add_todo(content, agent_id=agent_id, priority=priority)
             click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
             click.echo(f"   优先级: {todo.priority}")
@@ -146,6 +157,29 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
                     click.echo("   ℹ️ Webhook未配置（静默跳过）")
             except (ContextNotFoundError, Exception):
                 click.echo("   ℹ️ Webhook通知跳过（上下文不存在）")
+
+            # v2.2.15: AutoBugDetector集成 - 任务后自检
+            if agent_id:
+                from ..core.auto_bug_detector import AutoBugDetector
+                try:
+                    detector = AutoBugDetector()
+                    bugs = detector.self_review(todo.id, agent_id)
+                    if bugs:
+                        click.echo(f"\n⚠️  自检发现问题:")
+                        for bug in bugs:
+                            file_path = detector.generate_bug_report(bug)
+                            click.echo(f"   📄 Bug报告: {bug.bug_id}")
+                            click.echo(f"      {bug.description}")
+                            click.echo(f"      📄 {file_path}")
+                            click.echo(f"      ✅ 自动创建修复TODO: {bug.bug_id}")
+                            fix_todo = sync_manager.add_todo(
+                                f"修复{bug.bug_id}: {bug.description[:50]}...",
+                                agent_id=2,
+                                priority="high"
+                            )
+                            click.echo(f"      📋 {fix_todo.id} 已创建")
+                except Exception as e:
+                    click.echo(f"   ℹ️ 自检跳过: {e}")
 
             # v2.2.6: 上下文摘要
             if auto_check:

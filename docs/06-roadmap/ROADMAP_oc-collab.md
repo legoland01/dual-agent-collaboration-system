@@ -77,6 +77,7 @@ v2目标：实现稳定可靠的双Agent协作框架
 | Skill强制执行CLI钩子 | BUG-005, P-004, P-007 | 10h | pending |
 | StateNotifier Receiver | P-005 | 8h | pending |
 | 部署自动化 | F-AUTO-001 | 8h | pending |
+| AutoBugDetector修复 | BUG-20260215-002, P-015 | 4h | pending |
 
 **v2.2 预计工时**: ~35h
 

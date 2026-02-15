@@ -38,6 +38,7 @@ from .deploy_commands import deploy_group
 from .deploy_full_commands import deploy_full
 from .todo_commands import todo_group
 from .startup_commands import startup_check_command
+from .state_commands import state_group
 
 
 console = Console()
@@ -1670,6 +1671,7 @@ main.add_command(compliance_group, "compliance")
 main.add_command(deploy_group, "deploy")
 main.add_command(todo_group, "todo")
 main.add_command(startup_check_command, "startup-check")
+main.add_command(state_group, "state")
 
 
 if __name__ == "__main__":

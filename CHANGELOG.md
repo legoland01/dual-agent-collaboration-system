@@ -1,6 +1,34 @@
 # Changelog
 
-## v2.2.12 - v2.2.12 Released
+## v2.2.12.1 - v2.2.12.1 Released
+
+**Date**: 2026-02-15
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-15
+- Agent2: ✅ 2026-02-15
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260215-001 | todowrite --agent 参数未正确传递 | ✅ Fixed |
+| BUG-20260215-002 | AutoBugDetector CLI 集成缺失 | ✅ Fixed |
+
+### Changes
+
+- **src/cli/enhanced_commands.py** - 修复 todowrite 参数传递
+- **src/core/auto_bug_detector.py** - 新增 self_review() 方法
+- **src/cli/state_commands.py** - StateReceiver CLI 命令
+- **src/cli/main.py** - 注册 state 子命令
+
+### CLI Changes
+
+- `oc-collab state start` - 启动 StateReceiver 服务
+- `oc-collab state stop` - 停止 StateReceiver 服务
+- `oc-collab state status` - 查看服务状态
+- `oc-collab state queue` - 查看通知队列
 
 **Date**: 2026-02-15
 **Status**: ✅ **RELEASED** - 部署自动化CLI

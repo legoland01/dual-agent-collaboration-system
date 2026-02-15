@@ -79,12 +79,17 @@ class TodoSyncManager:
 
             todos = []
             for item in data.get("adhoc_todos", data.get("todos", [])):
+                # 解析 agent_id：优先取 agent_id，其次从 to.agent_id 取
+                agent_id_val = item.get("agent_id")
+                if agent_id_val is None and isinstance(item.get("to"), dict):
+                    agent_id_val = item.get("to", {}).get("agent_id")
+                
                 todo = TodoItem(
                     id=item.get("id"),
                     content=item.get("content"),
                     status=item.get("status", "pending"),
                     priority=item.get("priority", "medium"),
-                    agent_id=item.get("agent_id") or item.get("to", {}).get("agent_id") if isinstance(item.get("to"), dict) else None,
+                    agent_id=agent_id_val,
                     created_at=item.get("created_at"),
                     updated_at=item.get("updated_at"),
                 )
@@ -164,7 +169,7 @@ class TodoSyncManager:
 
         Args:
             content: 待办内容
-            agent_id: Agent 编号
+            agent_id: Agent 编号 (1 或 2)
             priority: 优先级
 
         Returns:
@@ -179,12 +184,21 @@ class TodoSyncManager:
         for todo in state.todos:
             if todo.id.startswith("TODO-"):
                 try:
-                    num = int(todo.id.split("-")[1])
-                    max_id = max(max_id, num)
+                    parts = todo.id.split("-")
+                    if len(parts) >= 3 and parts[1] in ("1", "2"):
+                        if agent_id and parts[1] == str(agent_id):
+                            num = int(parts[2])
+                            max_id = max(max_id, num)
+                    else:
+                        num = int(parts[1])
+                        max_id = max(max_id, num)
                 except (ValueError, IndexError):
                     pass
 
-        new_id = f"TODO-{max_id + 1:03d}"
+        if agent_id:
+            new_id = f"TODO-{agent_id}-{max_id + 1:03d}"
+        else:
+            new_id = f"TODO-{max_id + 1:03d}"
 
         todo = TodoItem(
             id=new_id,

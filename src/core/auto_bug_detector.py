@@ -369,3 +369,84 @@ class AutoBugDetector:
             files.append(file_path)
 
         return files
+
+    def self_review(self, completed_todo_id: str, agent_id: int) -> List[BugReport]:
+        """
+        任务后自检 - 每次任务完成后自动检查
+
+        Args:
+            completed_todo_id: 刚完成的TODO ID
+            agent_id: 执行任务的Agent编号
+
+        Returns:
+            检测到的Bug报告列表
+        """
+        bugs = []
+
+        try:
+            from ..core.todo_sync_manager import TodoSyncManager
+            sync_manager = TodoSyncManager()
+            state = sync_manager.load_todos()
+
+            completed_todo = None
+            for todo in state.todos:
+                if todo.id == completed_todo_id:
+                    completed_todo = todo
+                    break
+
+            if not completed_todo:
+                return bugs
+
+            checklist = [
+                ("任务目标明确", completed_todo.content and len(completed_todo.content) > 5),
+                ("执行步骤记录", True),
+                ("发现问题记录", False),
+                ("用户反馈确认", False),
+            ]
+
+            missing_checks = [check[0] for check in checklist if not check[1]]
+
+            if missing_checks:
+                bug = BugReport(
+                    bug_id=self._generate_bug_id(),
+                    bug_type=BugType.COMMAND_FAILED,
+                    description=f"任务自检不完整: {', '.join(missing_checks)}",
+                    related_todo=completed_todo_id,
+                    detected_by=f"AutoBugDetector(Agent{agent_id})"
+                )
+                bugs.append(bug)
+                logger.warning(f"自检发现问题: {bug.bug_id}")
+
+        except Exception as e:
+            logger.error(f"自检时出错: {e}")
+
+        return bugs
+
+    def check_todo_id_format(self, todo_id: str, agent_id: int) -> Optional[BugReport]:
+        """
+        检查TODO编号格式是否符合Agent独立编号规则
+
+        Args:
+            todo_id: TODO ID
+            agent_id: 预期的Agent编号
+
+        Returns:
+            Bug报告，如果格式正确返回None
+        """
+        try:
+            expected_prefix = f"TODO-{agent_id}-"
+            if not todo_id.startswith(expected_prefix):
+                if todo_id.startswith("TODO-"):
+                    parts = todo_id.split("-")
+                    if len(parts) >= 2 and parts[1].isdigit():
+                        return BugReport(
+                            bug_id=self._generate_bug_id(),
+                            bug_type=BugType.COMMAND_FAILED,
+                            description=f"TODO编号违反Agent独立规则: {todo_id} (应为 {expected_prefix}xxx)",
+                            related_todo=todo_id,
+                            detected_by="AutoBugDetector"
+                        )
+        except Exception as e:
+            logger.error(f"检查TODO编号格式时出错: {e}")
+
+        return None
