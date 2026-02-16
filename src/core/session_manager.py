@@ -148,21 +148,43 @@ class SessionManager:
         if not self.config.show_todo:
             return ""
 
+        todo_lines = []
+
+        try:
+            import yaml
+            adhoc_file = Path(self.project_path) / "state" / "agent_adhoc_todos.yaml"
+            if adhoc_file.exists():
+                with open(adhoc_file) as f:
+                    data = yaml.safe_load(f) or {}
+                    todos = data.get("todos", [])
+                    pending_todos = [t for t in todos if t.get("status") == "pending"]
+                    if pending_todos:
+                        todo_lines.append("待办事项 (agent_adhoc_todos.yaml):")
+                        for item in pending_todos[:5]:
+                            task = item.get("content", "")
+                            todo_id = item.get("id", "")
+                            todo_lines.append(f"  [{todo_id}] {task}")
+        except Exception:
+            pass
+
         try:
             from .auto_engine import TodoCommandExecutor
             executor = TodoCommandExecutor(self.project_path)
             todo_list = executor.get_todo_list()
 
-            if not todo_list:
-                return "待办事项:\n  暂无待办事项"
-
-            lines = ["待办事项:"]
-            for item in todo_list[:5]:
-                task = item.get("task", "")
-                lines.append(f"  [ ] {task}")
-            return "\n".join(lines)
+            if todo_list:
+                if not todo_lines:
+                    todo_lines.append("待办事项:")
+                for item in todo_list[:5]:
+                    task = item.get("task", "")
+                    todo_lines.append(f"  [ ] {task}")
         except Exception:
+            pass
+
+        if not todo_lines:
             return "待办事项:\n  暂无待办事项"
+
+        return "\n".join(todo_lines)
 
     def get_pending_issues(self) -> str:
         if not self.config.show_pending:
@@ -187,6 +209,62 @@ class SessionManager:
             return "\n".join(lines)
         except Exception:
             return "上次会话遗留:\n  无遗留问题"
+
+    def auto_discover_tasks(self) -> List[str]:
+        """自动发现需要Agent2处理的任务并创建TODO。"""
+        discovered = []
+        state = self.state_manager.load_state()
+
+        try:
+            import yaml
+            from .todo_sync_manager import TodoSyncManager
+            todo_manager = TodoSyncManager(self.project_path)
+
+            adhoc_file = Path(self.project_path) / "state" / "agent_adhoc_todos.yaml"
+            if adhoc_file.exists():
+                with open(adhoc_file) as f:
+                    data = yaml.safe_load(f) or {}
+                    existing_todos = data.get("todos", [])
+                    pending_ids = [t.get("id") for t in existing_todos if t.get("status") == "pending"]
+            else:
+                pending_ids = []
+
+            phase = state.get("phase", "")
+            if phase in ["requirements_review", "requirements_approved"]:
+                if "requirements" in pending_ids:
+                    pass
+                else:
+                    todo_manager.add_todo(
+                        content="评审需求文档",
+                        agent_id=2,
+                        priority="P0"
+                    )
+                    discovered.append("评审需求文档")
+
+            if phase in ["design_review", "design_approved"]:
+                if "design_review" in str(pending_ids):
+                    pass
+                else:
+                    todo_manager.add_todo(
+                        content="评审设计文档",
+                        agent_id=2,
+                        priority="P0"
+                    )
+                    discovered.append("评审设计文档")
+
+            if phase == "development":
+                if "development" not in str(pending_ids):
+                    todo_manager.add_todo(
+                        content="开发实现功能模块",
+                        agent_id=2,
+                        priority="P0"
+                    )
+                    discovered.append("开发实现功能模块")
+
+        except Exception as e:
+            pass
+
+        return discovered
 
     def get_common_commands(self) -> str:
         lines = ["常用命令:"]

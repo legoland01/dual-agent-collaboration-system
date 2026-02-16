@@ -37,7 +37,7 @@ def get_latest_version_from_pypi() -> Optional[str]:
         return None
 
 
-def should_upgrade() -> tuple[bool, str]:
+def should_upgrade() -> tuple[bool, str, str]:
     """
     检查是否需要升级
 

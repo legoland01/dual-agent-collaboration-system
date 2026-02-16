@@ -121,7 +121,7 @@ class TestSkillEnforcerIntegration:
                 mock_check.assert_called_with("todowrite")
 
     def test_signoff_auto_check_skill(self):
-        """验证 signoff 命令自动检查Skill"""
+        """验证 signoff 命令自动检查Skill（v2.2.11移除--auto-check，检查始终启用）"""
         from src.cli.main import main as cli_main
         from src.core.skill_enforcer import SkillEnforcer
         from click.testing import CliRunner
@@ -140,14 +140,13 @@ class TestSkillEnforcerIntegration:
 
                 runner = CliRunner()
                 result = runner.invoke(cli_main, [
-                    'signoff', 'requirements',
-                    '--auto-check'
+                    'signoff', 'requirements'
                 ])
 
                 mock_check.assert_called_with("signoff")
 
     def test_advance_auto_check_skill(self):
-        """验证 advance 命令自动检查Skill"""
+        """验证 advance 命令自动检查Skill（v2.2.11移除--auto-check，检查始终启用）"""
         from src.cli.main import main as cli_main
         from src.core.skill_enforcer import SkillEnforcer
         from click.testing import CliRunner
@@ -169,8 +168,7 @@ class TestSkillEnforcerIntegration:
 
                 runner = CliRunner()
                 result = runner.invoke(cli_main, [
-                    'advance', '--check',
-                    '--auto-check'
+                    'advance', '--check'
                 ])
 
                 mock_check.assert_called_with("phase_advance")

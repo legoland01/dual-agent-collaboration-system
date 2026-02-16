@@ -1,0 +1,168 @@
+version: "1.0"
+last_updated: "2026-02-15"
+
+mappings:
+  # F-QUAL-001: Skill快速检索系统 (10个验收标准)
+  - requirement_id: F-QUAL-001-01
+    test_files:
+      - tests/test_v230_skill_index.py
+    description: 创建skill_index.yaml索引文件，包含≥10个Skill关键词映射
+  
+  - requirement_id: F-QUAL-001-02
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 实现oc-collab skill search命令，返回匹配Skill列表
+  
+  - requirement_id: F-QUAL-001-03
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 搜索结果按置信度排序
+  
+  - requirement_id: F-QUAL-001-04
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 支持slice参数，搜索后进入slice界面
+  
+  - requirement_id: F-QUAL-001-05
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 支持verbose参数，显示匹配关键词详情
+  
+  - requirement_id: F-QUAL-001-06
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 常见查询场景命中率≥90%
+  
+  - requirement_id: F-QUAL-001-07
+    test_files:
+      - tests/test_v230_skill_index.py
+    description: 索引文件加载时间<100ms
+  
+  - requirement_id: F-QUAL-001-08
+    test_files:
+      - tests/test_v230_skill_index.py
+    description: 索引自动更新机制（Skill新增更新时自动同步）
+  
+  - requirement_id: F-QUAL-001-09
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 自动触发提示（Agent行动时自动提示相关Skill）
+  
+  - requirement_id: F-QUAL-001-10
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: 异常流程处理（无匹配结果、索引文件缺失等）
+
+  # F-QUAL-002: BUG自动关联测试系统 (8个验收标准)
+  - requirement_id: F-QUAL-002-01
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 定义BUG到测试用例的关联数据结构
+  
+  - requirement_id: F-QUAL-002-02
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 每个BUG修复时自动记录关联的测试用例
+  
+  - requirement_id: F-QUAL-002-03
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 支持oc-collab bug link命令
+  
+  - requirement_id: F-QUAL-002-04
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 支持oc-collab bug list --unlinked命令
+  
+  - requirement_id: F-QUAL-002-05
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 验收时检查每个P0 BUG至少关联1个测试用例
+  
+  - requirement_id: F-QUAL-002-06
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: 文档规范化：创建BUG时自动创建测试用例模板
+  
+  - requirement_id: F-QUAL-002-07
+    test_files:
+      - tests/test_v230_test_suggestion.py
+    description: 创建BUG时自动建议可能关联的测试用例
+  
+  - requirement_id: F-QUAL-002-08
+    test_files:
+      - tests/test_v230_coverage_checker.py
+    description: signoff时检查BUG-测试关联完整性
+
+  # F-QUAL-003: 需求覆盖率分析系统 (7个验收标准)
+  - requirement_id: F-QUAL-003-01
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: 提供oc-collab requirements coverage命令
+  
+  - requirement_id: F-QUAL-003-02
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: 自动分析需求文档和测试代码
+  
+  - requirement_id: F-QUAL-003-03
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: 输出需求覆盖率报告
+  
+  - requirement_id: F-QUAL-003-04
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: 列出未覆盖的需求
+  
+  - requirement_id: F-QUAL-003-05
+    test_files:
+      - tests/test_v230_coverage_checker.py
+    description: 集成到signoff流程
+  
+  - requirement_id: F-QUAL-003-06
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: 创建测试时自动建议关联的需求
+  
+  - requirement_id: F-QUAL-003-07
+    test_files:
+      - tests/test_v230_coverage_checker.py
+    description: signoff时检查需求覆盖完整性
+
+  # CLI命令清单 (3.1 新增命令)
+  - requirement_id: CLI-001
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: oc-collab skill search <query> - 关键词搜索Skill
+  
+  - requirement_id: CLI-002
+    test_files:
+      - tests/test_v230_skill_search.py
+    description: oc-collab skill search --slice - 搜索后进入slice界面
+  
+  - requirement_id: CLI-003
+    test_files:
+      - tests/test_v230_skill_index.py
+    description: oc-collab skill index --sync - 同步更新Skill索引
+  
+  - requirement_id: CLI-004
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: oc-collab bug link <bug_id> <test> - 关联BUG与测试用例
+  
+  - requirement_id: CLI-005
+    test_files:
+      - tests/test_v230_bug_linker.py
+    description: oc-collab bug list --unlinked - 查看未关联测试的BUG
+  
+  - requirement_id: CLI-006
+    test_files:
+      - tests/test_v230_requirements_coverage.py
+    description: oc-collab requirements coverage - 检查需求覆盖率
+
+  # CLI命令清单 (3.2 变更命令)
+  - requirement_id: CLI-007
+    test_files:
+      - tests/test_v230_coverage_checker.py
+    description: oc-collab signoff - 增加BUG-测试关联完整性检查和需求覆盖完整性检查

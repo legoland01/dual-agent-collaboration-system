@@ -415,8 +415,176 @@ notifications:
   sent_at: '2026-02-14T16:29:30.797448'
   failed_at: null
   error_message: null
-total: 52
-sent: 51
-failed: 1
+- webhook_id: ad41d2e7-061d-46fa-ad0c-80e5baf5f901
+  event_type: test.event
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-15T23:52:54.154626'
+  sent_at: '2026-02-15T23:52:54.154647'
+  failed_at: null
+  error_message: null
+- webhook_id: 7751eb5c-716f-40d6-9b31-1e5599eccc7d
+  event_type: test.event
+  status: failed
+  retry_count: 1
+  created_at: '2026-02-15T23:52:54.201321'
+  sent_at: null
+  failed_at: '2026-02-15T23:52:55.203318'
+  error_message: Connection failed
+- webhook_id: 45f927ba-3766-4943-95cc-c86ed017a307
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-15T23:52:55.291419'
+  sent_at: '2026-02-15T23:52:55.291434'
+  failed_at: null
+  error_message: null
+- webhook_id: 4f84e7e3-5bc9-493e-bed2-5924a09d2be5
+  event_type: signoff.completed
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-15T23:52:55.332403'
+  sent_at: '2026-02-15T23:52:55.332420'
+  failed_at: null
+  error_message: null
+- webhook_id: 8f944721-edef-40c3-af2d-1f38cfe31e6b
+  event_type: phase.advanced
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-15T23:52:55.372662'
+  sent_at: '2026-02-15T23:52:55.372695'
+  failed_at: null
+  error_message: null
+- webhook_id: 3ce0008c-262a-47a1-b644-5dc553b792bf
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:54:53.710615'
+  sent_at: '2026-02-16T01:54:53.710634'
+  failed_at: null
+  error_message: null
+- webhook_id: 49a867d6-b06a-4b03-b5bc-159113649463
+  event_type: todo.created
+  status: failed
+  retry_count: 0
+  created_at: '2026-02-16T01:54:53.755311'
+  sent_at: null
+  failed_at: '2026-02-16T01:54:53.755326'
+  error_message: HTTP 500
+- webhook_id: ba00d90c-fb2f-4c45-974a-4e5ffd67d4fd
+  event_type: todo.created
+  status: failed
+  retry_count: 1
+  created_at: '2026-02-16T01:54:53.798312'
+  sent_at: null
+  failed_at: '2026-02-16T01:54:54.802188'
+  error_message: Connection failed
+- webhook_id: bfdf2ec1-849a-4048-9ca0-edd9bbe41d3a
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:54:54.847074'
+  sent_at: '2026-02-16T01:54:54.847088'
+  failed_at: null
+  error_message: null
+- webhook_id: 38a103e9-b615-40aa-8192-c6f51ed6670c
+  event_type: todo.completed
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:54:54.891032'
+  sent_at: '2026-02-16T01:54:54.891049'
+  failed_at: null
+  error_message: null
+- webhook_id: 64adcf1b-3d62-417f-aef8-b3b421324bd9
+  event_type: test.event
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:55:17.932075'
+  sent_at: '2026-02-16T01:55:17.932095'
+  failed_at: null
+  error_message: null
+- webhook_id: 9a9a93da-ebd6-4920-8754-15a62e21571f
+  event_type: test.event
+  status: failed
+  retry_count: 1
+  created_at: '2026-02-16T01:55:17.984014'
+  sent_at: null
+  failed_at: '2026-02-16T01:55:18.989354'
+  error_message: Connection failed
+- webhook_id: 47218122-3f30-4259-a028-c9a381a15291
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:55:19.102718'
+  sent_at: '2026-02-16T01:55:19.102732'
+  failed_at: null
+  error_message: null
+- webhook_id: 869ec6a5-362d-42ac-be73-73e174917e3c
+  event_type: signoff.completed
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:55:19.149242'
+  sent_at: '2026-02-16T01:55:19.149255'
+  failed_at: null
+  error_message: null
+- webhook_id: 2f2905b1-280d-4bf9-a701-348a806cc745
+  event_type: phase.advanced
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:55:19.195815'
+  sent_at: '2026-02-16T01:55:19.195830'
+  failed_at: null
+  error_message: null
+- webhook_id: 6aa28c35-8729-4013-83e9-22a15549c2c8
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T01:55:58.865170'
+  sent_at: '2026-02-16T01:55:58.865183'
+  failed_at: null
+  error_message: null
+- webhook_id: ff2a0d5b-1821-41ef-8bff-41b6f6d9091f
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T09:31:39.552304'
+  sent_at: '2026-02-16T09:31:39.552323'
+  failed_at: null
+  error_message: null
+- webhook_id: 70cf8699-cb4b-4bc5-b9af-0ce8d2674350
+  event_type: todo.created
+  status: failed
+  retry_count: 0
+  created_at: '2026-02-16T09:31:39.609884'
+  sent_at: null
+  failed_at: '2026-02-16T09:31:39.609899'
+  error_message: HTTP 500
+- webhook_id: 775bb5f0-d6b8-4912-8006-6cf501be714c
+  event_type: todo.created
+  status: failed
+  retry_count: 1
+  created_at: '2026-02-16T09:31:39.660320'
+  sent_at: null
+  failed_at: '2026-02-16T09:31:40.665393'
+  error_message: Connection failed
+- webhook_id: 9ac25d81-a3f5-44d1-ae2d-a407caf86502
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T09:31:40.716996'
+  sent_at: '2026-02-16T09:31:40.717014'
+  failed_at: null
+  error_message: null
+- webhook_id: f0e40fdb-a9f8-4917-ad59-8946cf24d412
+  event_type: todo.completed
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-16T09:31:40.769307'
+  sent_at: '2026-02-16T09:31:40.769322'
+  failed_at: null
+  error_message: null
+total: 73
+sent: 66
+failed: 7
 retried: 0
-last_updated: '2026-02-14T16:29:30.836742'
+last_updated: '2026-02-16T09:31:40.801926'

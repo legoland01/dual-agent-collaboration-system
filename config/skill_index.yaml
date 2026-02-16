@@ -1,0 +1,81 @@
+version: '1.0'
+last_updated: '2026-02-15'
+index:
+- keywords:
+  - 版本
+  - 发布
+  - version
+  - release
+  skill: oc_collab_version_management_guide
+  description: 版本号管理、发布流程指南
+- keywords:
+  - Bug
+  - bug
+  - 缺陷
+  - 报错
+  skill: oc_collab_bug_management_guide
+  description: Bug报告、处理流程指南
+- keywords:
+  - 需求
+  - requirements
+  - PRD
+  skill: oc_collab_requirements_guide
+  description: 需求编写、评审流程指南
+- keywords:
+  - 详细设计
+  - detailed design
+  - DETAIL
+  skill: oc_collab_detailed_design_guide
+  description: 详细设计编写指南
+- keywords:
+  - 概要设计
+  - outline design
+  - OUTLINE
+  skill: oc_collab_outline_design_guide
+  description: 概要设计编写指南
+- keywords:
+  - 部署
+  - deploy
+  - 发布
+  - pypi
+  - test
+  - 测试
+  skill: oc_collab_deployment_guide
+  description: 部署发布流程指南
+- keywords:
+  - 开发
+  - development
+  - 实现
+  skill: oc_collab_development_guide
+  description: 开发流程指南
+- keywords:
+  - 测试
+  - test
+  - 验收
+  skill: oc_collab_test_acceptance_guide
+  description: 测试验收流程指南
+- keywords:
+  - 评审
+  - review
+  - 审查
+  skill: oc_collab_requirements_review_guide
+  description: 需求评审指南
+- keywords:
+  - 问题
+  - issue
+  - 追踪
+  skill: oc_collab_issue_tracker
+  description: 问题追踪系统指南
+- keywords:
+  - '2'
+  - 实际案例
+  - 维护者
+  - type
+  - v2
+  - 问自己
+  - 版本历史
+  - draft
+  - 禁止做法
+  - 文档状态阶段绑定
+  skill: content
+  description: oc-collab compliance check [role|state|completeness]

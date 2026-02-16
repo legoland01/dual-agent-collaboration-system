@@ -74,8 +74,11 @@ class PackageBuilder:
         try:
             logger.info("开始构建包...")
 
+            import sys
+            python_cmd = sys.executable
+
             result = subprocess.run(
-                ["python", "-m", "build"],
+                [python_cmd, "-m", "build"],
                 capture_output=True,
                 text=True
             )

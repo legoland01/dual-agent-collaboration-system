@@ -58,7 +58,7 @@ def deploy_full(version: Optional[str],
     if not dry_run and not verify_only:
         rprint(f"📦 版本: [cyan]{version}[/cyan]")
 
-    _setup_deployment_steps(orchestrator, version, dry_run, verbose)
+    _setup_deployment_steps(orchestrator, version, dry_run, verbose, skip_git, skip_pypi)
 
     try:
         result = orchestrator.run(
@@ -94,7 +94,9 @@ def _get_current_version() -> str:
 def _setup_deployment_steps(orchestrator: DeploymentOrchestrator,
                            version: str,
                            dry_run: bool,
-                           verbose: bool):
+                           verbose: bool,
+                           skip_git: bool = False,
+                           skip_pypi: bool = False):
     """设置部署步骤"""
 
     def doc_check_step():

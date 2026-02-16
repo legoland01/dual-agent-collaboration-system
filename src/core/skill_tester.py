@@ -84,8 +84,10 @@ class SkillTester:
 
     SKILLS_DIR = "skills"
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False, auto_fix: bool = False):
         self.verbose = verbose
+        self.auto_fix = auto_fix
+        self.fixed_count = 0
 
     def _load_skill(self, skill_id: str) -> Tuple[Optional[dict], Optional[str]]:
         skill_path = Path(self.SKILLS_DIR) / skill_id
@@ -138,7 +140,37 @@ class SkillTester:
             return result
 
         skill_path = Path(self.SKILLS_DIR) / skill_id
-        for output in outputs:
+        
+        # 处理outputs可能是dict、list of dicts或simple list的情况
+        output_files = []
+        if isinstance(outputs, dict):
+            # 格式3: {"documents": [...], "artifacts": [...]} 或 {"path1": {...}}
+            for key in outputs:
+                value = outputs[key]
+                if isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, dict) and 'path' in item:
+                            output_files.append(item['path'])
+                        elif isinstance(item, str):
+                            output_files.append(item)
+                elif isinstance(value, dict):
+                    if 'path' in value:
+                        output_files.append(value['path'])
+                elif isinstance(value, str):
+                    output_files.append(value)
+        elif isinstance(outputs, list):
+            # 格式2: [{"type": "file", "path": "xxx"}, ...] 或 格式1: ["file1", "file2"]
+            for item in outputs:
+                if isinstance(item, dict):
+                    if 'path' in item:
+                        output_files.append(item['path'])
+                elif isinstance(item, str):
+                    output_files.append(item)
+        elif isinstance(outputs, str):
+            # 单个值
+            output_files = [outputs]
+        
+        for output in output_files:
             output_path = skill_path / output
             if not output_path.exists():
                 result.add_item(ValidationItem(

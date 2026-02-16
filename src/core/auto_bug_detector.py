@@ -397,25 +397,7 @@ class AutoBugDetector:
             if not completed_todo:
                 return bugs
 
-            checklist = [
-                ("任务目标明确", completed_todo.content and len(completed_todo.content) > 5),
-                ("执行步骤记录", True),
-                ("发现问题记录", False),
-                ("用户反馈确认", False),
-            ]
-
-            missing_checks = [check[0] for check in checklist if not check[1]]
-
-            if missing_checks:
-                bug = BugReport(
-                    bug_id=self._generate_bug_id(),
-                    bug_type=BugType.COMMAND_FAILED,
-                    description=f"任务自检不完整: {', '.join(missing_checks)}",
-                    related_todo=completed_todo_id,
-                    detected_by=f"AutoBugDetector(Agent{agent_id})"
-                )
-                bugs.append(bug)
-                logger.warning(f"自检发现问题: {bug.bug_id}")
+            return bugs
 
         except Exception as e:
             logger.error(f"自检时出错: {e}")

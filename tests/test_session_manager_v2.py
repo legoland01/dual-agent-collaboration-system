@@ -221,8 +221,8 @@ class TestTodoWritePersistence:
             with open("state/agent_adhoc_todos.yaml") as f:
                 data = yaml.safe_load(f)
             
-            todo_ids = [t['id'] for t in data['adhoc_todos']]
-            assert any("测试TODO" in str(t) for t in data['adhoc_todos']), \
+            todo_ids = [t['id'] for t in data['todos']]
+            assert any("测试TODO" in str(t) for t in data['todos']), \
                 "新TODO不存在于文件中"
 
         finally:

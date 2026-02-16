@@ -112,7 +112,4 @@ class AutoChecker:
 
         result["priority"] = self.validate_priority(priority)
 
-        if agent_id is None:
-            result["warnings"].append("未指定 --agent，将无法分配执行人")
-
         return result

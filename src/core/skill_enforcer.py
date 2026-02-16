@@ -31,7 +31,7 @@ class SkillEnforcer:
         "testing": "oc_collab_test_acceptance_guide",
         "deployment": "oc_collab_deployment_guide",
         "requirements": "oc_collab_requirements_guide",          # v2.2.6 新增
-        "design": "oc_collab_design_guide",                     # v2.2.6 新增
+        "design": "oc_collab_detailed_design_guide",              # v2.2.6 新增
     }
 
     OPTIONAL_SKILLS = {

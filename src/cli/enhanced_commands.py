@@ -1,5 +1,6 @@
 """增强的 CLI 命令：项目上下文和待办管理"""
 import click
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -54,16 +55,13 @@ def show_context_command():
 @click.argument("todos", nargs=-1)
 @click.option("--content", help="待办内容")
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), default="medium")
-@click.option("--agent", type=click.Choice(["1", "2"]), help="Agent 编号")
-@click.option("--auto-check/--no-auto-check", default=True,
-              help="是否自动检查参数和Skill (默认启用)")
 @click.option("--test-mode", is_flag=True, help="测试模式（不创建正式TODO，仅验证参数）")
-def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent: Optional[str], auto_check: bool, test_mode: bool):
+def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_mode: bool):
     """
     创建待办任务。
 
     示例:
-      oc-collab todowrite --content "完成设计" --priority high --agent 2
+      oc-collab todowrite --content "完成设计" --priority high
       oc-collab todowrite --content "测试" --test-mode  # 测试模式，不创建正式TODO
     """
     from ..core.auto_checker import AutoChecker, ValidationError
@@ -72,29 +70,28 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
     # v2.2.6: 参数验证
     checker = AutoChecker()
     
-    # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
-    if auto_check:
-        skill_enforcer = SkillEnforcer()
-        skill_result = skill_enforcer.check_before_action("todowrite")
-        
-        if skill_result["missing"]:
-            click.echo(f"\n⚠️  缺少相关Skill (todowrite):")
-            for skill in skill_result["missing"]:
-                click.echo(f"   • {skill}")
-            if skill_result["suggestions"]:
-                click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
-            click.echo("")
+    # v2.2.7: BUG-20260210-001 修复 - Skill强制检查（v2.2.11要求移除--auto-check）
+    skill_enforcer = SkillEnforcer()
+    skill_result = skill_enforcer.check_before_action("todowrite")
+    
+    if skill_result["missing"]:
+        click.echo(f"\n⚠️  缺少相关Skill (todowrite):")
+        for skill in skill_result["missing"]:
+            click.echo(f"   • {skill}")
+        if skill_result["suggestions"]:
+            click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+        click.echo("")
 
-        result = checker.check_all(content, agent, priority)
-        
-        if result["warnings"]:
-            for warning in result["warnings"]:
-                click.echo(f"⚠️  {warning}")
-        
-        if not result["valid"]:
-            for error in result["errors"]:
-                click.echo(f"❌ {error}")
-            raise click.ClickException("参数验证失败")
+    result = checker.check_all(content, None, priority)
+    
+    if result["warnings"]:
+        for warning in result["warnings"]:
+            click.echo(f"⚠️  {warning}")
+    
+    if not result["valid"]:
+        for error in result["errors"]:
+            click.echo(f"❌ {error}")
+        sys.exit(1)
 
     # v2.2.9: ComplianceEnforcer集成 - Agent1禁止执行todowrite
     from ..core.compliance_enforcer import ComplianceEnforcer
@@ -107,35 +104,41 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
         if not compliance_result.allowed:
             click.echo(f"\n{compliance_result.message}\n")
             enforcer.record_violation(compliance_result)
-            raise click.Abort()
+            sys.exit(3)
     except ContextNotFoundError:
-        pass
+        click.echo("⚠️ 无法获取Agent上下文，建议先运行 'oc-collab switch 1' 或 'oc-collab switch 2' 切换Agent")
+        click.echo("   为确保角色合规，请明确指定当前Agent身份")
     except Exception as e:
-        click.echo(f"⚠️ 合规检查跳过: {e}")
+        click.echo(f"⚠️ 合规检查降级: {e}")
     
     # 检查是否有内容可创建
     if not content and not todos:
-        raise click.ClickException("请提供 --content 或导入 TODO 文件")
+        click.echo("❌ 请提供 --content 或导入 TODO 文件")
+        sys.exit(1)
 
     # 测试模式：只验证，不创建正式TODO
     if test_mode:
         click.echo(f"[TEST] 待办内容验证通过: {content}")
-        click.echo(f"[TEST] Agent: {agent}, Priority: {priority}")
+        click.echo(f"[TEST] Priority: {priority}")
         click.echo(f"[TEST] 测试模式下未创建正式TODO")
-        return
+        sys.exit(0)
 
     sync_manager = TodoSyncManager()
 
     def _do_todowrite():
         if content:
             current_agent_id = None
-            if agent:
-                current_agent_id = int(agent)
-            else:
+            # 从ContextManager获取当前Agent上下文
+            if not current_agent_id:
                 try:
+                    from ..core.context_manager import ContextManager, ContextNotFoundError
                     context = ContextManager().load_context()
                     if context.agent:
-                        current_agent_id = int(context.agent.replace("agent", ""))
+                        agent_str = str(context.agent)
+                        if "agent" in agent_str:
+                            current_agent_id = int(agent_str.replace("agent", ""))
+                        else:
+                            current_agent_id = int(agent_str)
                 except Exception:
                     pass
 
@@ -151,14 +154,20 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
                 context = ContextManager().load_context()
                 current_agent = context.agent
                 notifier = StateNotifier()
-                if notifier.notify_todo_created(todo.id, todo.content, f"agent{current_agent}"):
+                result = notifier.notify_todo_created(todo.id, todo.content, f"agent{current_agent}")
+                if result:
                     click.echo("   🔔 Webhook通知已发送")
                 else:
-                    click.echo("   ℹ️ Webhook未配置（静默跳过）")
-            except (ContextNotFoundError, Exception):
-                click.echo("   ℹ️ Webhook通知跳过（上下文不存在）")
+                    click.echo("   ⚠️ Webhook未配置，通知功能不可用")
+                    click.echo("      如需启用通知，请配置 config/webhook.yaml")
+            except Exception as e:
+                click.echo(f"   ⚠️ Webhook通知失败: {e}")
 
             # v2.2.15: AutoBugDetector集成 - 任务后自检
+            # 注意：不再自动从StateManager获取Agent，必须显式switch
+            agent_detected = False
+
+            # 执行自检
             if agent_id:
                 from ..core.auto_bug_detector import AutoBugDetector
                 try:
@@ -179,15 +188,20 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
                             )
                             click.echo(f"      📋 {fix_todo.id} 已创建")
                 except Exception as e:
-                    click.echo(f"   ℹ️ 自检跳过: {e}")
+                    click.echo(f"   ⚠️ 自检执行失败: {e}")
+            else:
+                # 明确提示跳过原因
+                if agent_detected:
+                    click.echo("   ℹ️ 无活跃Agent，跳过自检")
+                else:
+                    click.echo("   ℹ️ 无法确定Agent，跳过自检（可使用 --agent 指定）")
 
-            # v2.2.6: 上下文摘要
-            if auto_check:
-                from ..core.context_carrier import ContextCarrier
-                carrier = ContextCarrier()
-                summary = carrier.generate_context_summary(content)
-                if summary:
-                    click.echo(f"\n{summary}")
+            # v2.2.6: 上下文摘要（始终启用）
+            from ..core.context_carrier import ContextCarrier
+            carrier = ContextCarrier()
+            summary = carrier.generate_context_summary(content)
+            if summary:
+                click.echo(f"\n{summary}")
 
         for todo_file in todos:
             path = Path(todo_file)
@@ -198,9 +212,10 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, agent
         click.echo(f"\n✓ 已同步到 {sync_manager.todo_file}")
 
     if sync_manager.sync_with_rollback(_do_todowrite):
-        pass
+        sys.exit(0)
     else:
-        raise click.ClickException("待办创建失败")
+        click.echo("❌ 待办创建失败")
+        sys.exit(2)
 
 
 @click.command(name="todoedit")

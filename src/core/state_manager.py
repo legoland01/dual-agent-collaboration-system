@@ -459,6 +459,7 @@ class StateManager:
         state = self._read_state_file()
         for id in state.get("agents", {}):
             state["agents"][id]["current"] = (id == agent_id)
+        state["current_agent"] = agent_id
         state["updated_at"] = get_current_time()
         self._write_state_file(state)
         return state

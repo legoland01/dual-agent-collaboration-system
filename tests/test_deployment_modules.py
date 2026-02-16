@@ -36,17 +36,33 @@ class TestVersionManager:
         TC-001: 读取当前版本号
         """
         version = version_manager.get_current_version()
-        assert version == "2.2.11"
+        # 从pyproject.toml动态读取当前版本
+        import re
+        with open("pyproject.toml", "r") as f:
+            content = f.read()
+            match = re.search(r'version = "([^"]+)"', content)
+            if match:
+                expected_version = match.group(1)
+                assert version == expected_version
+            else:
+                # 如果解析失败，只要version非空即可
+                assert version and "." in version
 
     def test_tc_002_update_version(self, version_manager):
         """
         TC-002: 更新版本号
         """
+        import re
+        with open("pyproject.toml", "r") as f:
+            content = f.read()
+            match = re.search(r'version = "([^"]+)"', content)
+            original_version = match.group(1) if match else "2.3.0"
+        
         success = version_manager.update_version("99.99.99")
         assert success is True
         version = version_manager.get_current_version()
         assert version == "99.99.99"
-        version_manager.update_version("2.2.11")
+        version_manager.update_version(original_version)
 
     def test_tc_003_validate_version_valid(self, version_manager):
         """

@@ -86,9 +86,25 @@ class ContextManager:
         if config_path is None:
             config_path = self.find_config_file()
             if config_path is None:
+                state_file = self.project_path / "state" / "project_state.yaml"
+                if state_file.exists():
+                    try:
+                        with open(state_file, 'r', encoding='utf-8') as f:
+                            state_data = yaml.safe_load(f)
+                        current_agent = state_data.get("current_agent", "")
+                        if current_agent and "agent" in current_agent:
+                            agent_id = int(current_agent.replace("agent", ""))
+                            return ProjectContext(
+                                project=state_data.get("project", "oc-collab"),
+                                path=str(self.project_path),
+                                agent=agent_id,
+                                version=state_data.get("version", "2.2.3"),
+                            )
+                    except Exception:
+                        pass
                 raise ContextNotFoundError(
                     f"未找到 {self.CONFIG_FILENAME} 文件。"
-                    f"请先运行 'oc-collab init' 初始化项目。"
+                    f"请先运行 'oc-collab init' 初始化项目，或运行 'oc-collab switch' 切换Agent。"
                 )
 
         try:

@@ -219,6 +219,142 @@ def test_welcome_disabled():
         assert message == ""
 
 
+def test_get_todo_items_reads_adhoc_yaml():
+    """测试 BUG-20260215-015: session_manager 从 agent_adhoc_todos.yaml 读取待办"""
+    from src.core.session_manager import SessionManager
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        adhoc_file = Path(tmpdir) / "state" / "agent_adhoc_todos.yaml"
+        adhoc_file.parent.mkdir(parents=True, exist_ok=True)
+        adhoc_file.write_text("""todos:
+- id: TODO-1-001
+  content: 测试任务A
+  status: pending
+  priority: P0
+- id: TODO-1-002
+  content: 测试任务B
+  status: completed
+  priority: P1
+""")
+
+        manager = SessionManager(tmpdir)
+        text = manager.get_todo_items()
+        assert "agent_adhoc_todos.yaml" in text
+        assert "TODO-1-001" in text
+        assert "测试任务A" in text
+        assert "TODO-1-002" not in text
+
+
+def test_get_todo_items_adhoc_only_pending():
+    """测试只显示pending状态的TODO"""
+    from src.core.session_manager import SessionManager
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        adhoc_file = Path(tmpdir) / "state" / "agent_adhoc_todos.yaml"
+        adhoc_file.parent.mkdir(parents=True, exist_ok=True)
+        adhoc_file.write_text("""todos:
+- id: TODO-1-003
+  content: 已完成任务
+  status: completed
+- id: TODO-1-004
+  content: 进行中任务
+  status: pending
+""")
+
+        manager = SessionManager(tmpdir)
+        text = manager.get_todo_items()
+        assert "进行中任务" in text
+        assert "已完成任务" not in text
+
+
+def test_auto_discover_tasks_creates_todo():
+    """测试 BUG-20260215-016: Agent2自动发现任务并创建TODO"""
+    from src.core.session_manager import SessionManager
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        state_file = Path(tmpdir) / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text("""phase: requirements_review
+agents: {}
+""")
+
+        manager = SessionManager(tmpdir)
+        discovered = manager.auto_discover_tasks()
+        assert isinstance(discovered, list)
+
+
+def test_auto_discover_tasks_no_duplicate():
+    """测试自动发现不重复创建TODO"""
+    from src.core.session_manager import SessionManager
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        state_file = Path(tmpdir) / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text("""phase: development
+agents: {}
+""")
+
+        adhoc_file = Path(tmpdir) / "state" / "agent_adhoc_todos.yaml"
+        adhoc_file.parent.mkdir(parents=True, exist_ok=True)
+        adhoc_file.write_text("""todos:
+- id: TODO-2-999
+  content: 开发实现功能模块
+  status: pending
+""")
+
+        manager = SessionManager(tmpdir)
+        discovered1 = manager.auto_discover_tasks()
+        discovered2 = manager.auto_discover_tasks()
+        assert discovered1 == discovered2
+
+
+def test_switch_to_agent2_triggers_auto_discover():
+    """测试切换到Agent2时触发自动发现"""
+    from click.testing import CliRunner
+    from src.cli.main import switch_command
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        state_file = Path(tmpdir) / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text("""phase: development
+agents:
+  agent1:
+    role: 产品经理
+  agent2:
+    role: 开发负责人
+session_start:
+  show_todo: true
+""")
+
+        runner = CliRunner()
+        result = runner.invoke(switch_command, ["2"], obj={"project_path": tmpdir})
+
+        assert result.exit_code == 0
+        assert "Agent 2" in result.output or "开发负责人" in result.output
+
+
+def test_state_manager_get_active_agent_fallback():
+    """测试 BUG-20260215-014: StateManager获取活跃Agent作为fallback"""
+    from src.core.state_manager import StateManager
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        state_file = Path(tmpdir) / "state" / "project_state.yaml"
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text("""phase: development
+agents:
+  agent1:
+    role: 产品经理
+    current: false
+  agent2:
+    role: 开发负责人
+    current: true
+""")
+
+        manager = StateManager(tmpdir)
+        active = manager.get_active_agent()
+        assert active == "agent2"
+
+
 def test_common_commands():
     from src.core.session_manager import SessionManager
 

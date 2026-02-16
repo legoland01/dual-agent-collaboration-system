@@ -1,0 +1,641 @@
+{
+  "total_requirements": 107,
+  "covered_count": 0,
+  "uncovered_count": 107,
+  "coverage_percent": 0.0,
+  "covered_items": [],
+  "uncovered_items": [
+    "oc-collab switch",
+    "oc-collab design outline",
+    "oc-collab deploy --dry-run",
+    "oc-collab signoff",
+    "oc-collab test blackbox --priority P2",
+    "oc-collab todoedit",
+    "oc-collab deploy check-docs",
+    "oc-collab .a",
+    "oc-collab run",
+    "oc-collab skill check",
+    "oc-collab deploy --version <ver>",
+    "oc-collab test blackbox --priority P1",
+    "oc-collab phase advance",
+    "oc-collab memory patterns",
+    "oc-collab design outline view <file>",
+    "oc-collab todowrite/todoedit",
+    "oc-collab todowrite --with-context",
+    "oc-collab rules init",
+    "oc-collab coverage report",
+    "oc-collab signoff test",
+    "oc-collab project set-phase testing",
+    "oc-collab release",
+    "oc-collab auto --force",
+    "oc-collab phase-advance --deploy",
+    "oc-collab init --skill-template <standard>",
+    "oc-collab agent status",
+    "oc-collab git sync",
+    "oc-collab design detail",
+    "oc-collab agent remove",
+    "oc-collab webhook status",
+    "oc-collab run --mode mock",
+    "oc-collab memory lessons",
+    "oc-collab coverage report --output coverage.md",
+    "oc-collab deploy --version 2.2.12",
+    "oc-collab switch [agent_id]",
+    "oc-collab doc check",
+    "oc-collab design outline create",
+    "oc-collab test blackbox --report",
+    "oc-collab todo list --unread",
+    "oc-collab coverage check --module daemon.py ...",
+    "oc-collab project progress",
+    "oc-collab auto",
+    "oc-collab design detail list",
+    "oc-collab memory decision --id DEC-001",
+    "oc-collab advance",
+    "oc-collab rules init [--force]",
+    "oc-collab push",
+    "oc-collab start",
+    "oc-collab agent --daemon",
+    "oc-collab deploy --verify-only",
+    "oc-collab webhook init",
+    "oc-collab compliance check --role --action edit --target <文件>",
+    "oc-collab xxx",
+    "oc-collab compliance check",
+    "oc-collab review [requirements\\|design\\|test]",
+    "oc-collab git commit --force",
+    "oc-collab skill test --all",
+    "oc-collab work",
+    "oc-collab deploy --verbose",
+    "oc-collab coverage trend",
+    "oc-collab signoff --sync",
+    "oc-collab sync",
+    "oc-collab auto --force --max-iterations 5",
+    "oc-collab todo make",
+    "oc-collab signoff [requirements\\|design\\|test]",
+    "oc-collab document history --file xxx",
+    "oc-collab design outline list",
+    "oc-collab agent add",
+    "oc-collab design detail create",
+    "oc-collab init [项目名]",
+    "oc-collab status",
+    "oc-collab todowrite --auto-check",
+    "oc-collab switch 2",
+    "oc-collab history",
+    "oc-collab design detail view <file>",
+    "oc-collab todo done",
+    "oc-collab webhook start",
+    "oc-collab skill coverage",
+    "oc-collab review resolve",
+    "oc-collab git commit",
+    "oc-collab deploy",
+    "oc-collab switch <agent_id>",
+    "oc-collab project update --test --passed 10",
+    "oc-collab project advance",
+    "oc-collab todo",
+    "oc-collab check requirements",
+    "oc-collab design outline edit <file>",
+    "oc-collab phase-advance",
+    "oc-collab advance -p",
+    "oc-collab deploy --skip-git",
+    "oc-collab todowrite",
+    "oc-collab config validate",
+    "oc-collab skill search --keywords <kw>",
+    "oc-collab test blackbox --priority P0",
+    "oc-collab design detail edit <file>",
+    "oc-collab todo list",
+    "oc-collab init <project>",
+    "oc-collab deploy --skip-pypi",
+    "oc-collab skill enforce --before-action",
+    "oc-collab skill test --skill <id>",
+    "oc-collab skill slice --level <chapter|section>",
+    "oc-collab compliance report",
+    "oc-collab init",
+    "oc-collab deployment configure",
+    "oc-collab webhook stop",
+    "oc-collab pdf validate",
+    "oc-collab test --isolated"
+  ],
+  "by_document": {
+    "requirements_v2.2.0.md": {
+      "commands": [
+        "oc-collab switch",
+        "oc-collab sync",
+        "oc-collab signoff",
+        "oc-collab test blackbox --priority P2",
+        "oc-collab agent add",
+        "oc-collab run",
+        "oc-collab test blackbox --priority P1",
+        "oc-collab memory patterns",
+        "oc-collab status",
+        "oc-collab coverage report",
+        "oc-collab agent remove",
+        "oc-collab run --mode mock",
+        "oc-collab memory lessons",
+        "oc-collab coverage report --output coverage.md",
+        "oc-collab test blackbox --report",
+        "oc-collab coverage check --module daemon.py ...",
+        "oc-collab project progress",
+        "oc-collab advance -p",
+        "oc-collab memory decision --id DEC-001",
+        "oc-collab advance",
+        "oc-collab config validate",
+        "oc-collab test blackbox --priority P0",
+        "oc-collab init",
+        "oc-collab coverage trend",
+        "oc-collab pdf validate",
+        "oc-collab test --isolated"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab run --mode mock",
+        "oc-collab switch",
+        "oc-collab memory lessons",
+        "oc-collab sync",
+        "oc-collab coverage report --output coverage.md",
+        "oc-collab signoff",
+        "oc-collab test blackbox --priority P2",
+        "oc-collab test blackbox --report",
+        "oc-collab agent add",
+        "oc-collab run",
+        "oc-collab coverage check --module daemon.py ...",
+        "oc-collab project progress",
+        "oc-collab advance -p",
+        "oc-collab memory decision --id DEC-001",
+        "oc-collab test blackbox --priority P1",
+        "oc-collab advance",
+        "oc-collab memory patterns",
+        "oc-collab status",
+        "oc-collab config validate",
+        "oc-collab coverage report",
+        "oc-collab test blackbox --priority P0",
+        "oc-collab pdf validate",
+        "oc-collab init",
+        "oc-collab coverage trend",
+        "oc-collab agent remove",
+        "oc-collab test --isolated"
+      ]
+    },
+    "requirements_v2.2.4.md": {
+      "commands": [
+        "oc-collab review resolve",
+        "oc-collab git commit",
+        "oc-collab git commit --force",
+        "oc-collab check requirements",
+        "oc-collab skill check",
+        "oc-collab phase advance"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab git commit --force",
+        "oc-collab check requirements",
+        "oc-collab skill check",
+        "oc-collab review resolve",
+        "oc-collab git commit",
+        "oc-collab phase advance"
+      ]
+    },
+    "requirements_agent_daemon_review_v1.md": {
+      "commands": [
+        "oc-collab agent --daemon"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab agent --daemon"
+      ]
+    },
+    "requirements_v2.2.5.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab compliance check --role --action edit --target <文件>",
+        "oc-collab signoff test"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab compliance check --role --action edit --target <文件>",
+        "oc-collab signoff test"
+      ]
+    },
+    "requirements_v2.2.1_READY.md": {
+      "commands": [
+        "oc-collab todo make",
+        "oc-collab document history --file xxx",
+        "oc-collab signoff",
+        "oc-collab todo",
+        "oc-collab push"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo",
+        "oc-collab todo make",
+        "oc-collab document history --file xxx",
+        "oc-collab signoff",
+        "oc-collab push"
+      ]
+    },
+    "requirements_infrastructure.md": {
+      "commands": [
+        "oc-collab switch",
+        "oc-collab init"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab switch",
+        "oc-collab init"
+      ]
+    },
+    "ANALYSIS_v2.2.10_Requirements_Analysis.md": {
+      "commands": [
+        "oc-collab todo list --unread"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo list --unread"
+      ]
+    },
+    "requirements_cli_improvement_v1.md": {
+      "commands": [
+        "oc-collab work",
+        "oc-collab todo",
+        "oc-collab auto"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab work",
+        "oc-collab todo",
+        "oc-collab auto"
+      ]
+    },
+    "requirements_v2.2.12.md": {
+      "commands": [
+        "oc-collab deploy --verify-only",
+        "oc-collab deploy --version 2.2.12",
+        "oc-collab deploy --dry-run",
+        "oc-collab deploy",
+        "oc-collab deploy --skip-pypi",
+        "oc-collab deploy --version <ver>",
+        "oc-collab deploy --skip-git",
+        "oc-collab deploy --verbose"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab deploy --verify-only",
+        "oc-collab deploy --version 2.2.12",
+        "oc-collab deploy --dry-run",
+        "oc-collab deploy",
+        "oc-collab deploy --skip-pypi",
+        "oc-collab deploy --version <ver>",
+        "oc-collab deploy --skip-git",
+        "oc-collab deploy --verbose"
+      ]
+    },
+    "requirements_v2.2.1_DRAFT.md": {
+      "commands": [
+        "oc-collab signoff",
+        "oc-collab signoff --sync",
+        "oc-collab push"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab signoff",
+        "oc-collab signoff --sync",
+        "oc-collab push"
+      ]
+    },
+    "PROPOSAL_v2.2.4_CLI_Design_Commands.md": {
+      "commands": [
+        "oc-collab design outline",
+        "oc-collab design detail edit <file>",
+        "oc-collab design outline list",
+        "oc-collab design outline create",
+        "oc-collab design detail view <file>",
+        "oc-collab design outline edit <file>",
+        "oc-collab design detail list",
+        "oc-collab design detail create",
+        "oc-collab design detail",
+        "oc-collab design outline view <file>"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab design outline",
+        "oc-collab design detail edit <file>",
+        "oc-collab design outline list",
+        "oc-collab design outline create",
+        "oc-collab design detail view <file>",
+        "oc-collab design outline edit <file>",
+        "oc-collab design detail list",
+        "oc-collab design detail create",
+        "oc-collab design detail",
+        "oc-collab design outline view <file>"
+      ]
+    },
+    "PARKED_v2.2.3_features.md": {
+      "commands": [
+        "oc-collab start",
+        "oc-collab deployment configure",
+        "oc-collab phase-advance --deploy"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab start",
+        "oc-collab deployment configure",
+        "oc-collab phase-advance --deploy"
+      ]
+    },
+    "requirements_bugfix_20260203_001.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab switch <agent_id>",
+        "oc-collab switch 2"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab switch <agent_id>",
+        "oc-collab switch 2"
+      ]
+    },
+    "requirements_v2.2.3_AutoContext.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab todo",
+        "oc-collab signoff",
+        "oc-collab phase-advance"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab todo",
+        "oc-collab signoff",
+        "oc-collab phase-advance"
+      ]
+    },
+    "requirements_bug_trigger_agent2_v1.md": {
+      "commands": [
+        "oc-collab auto"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab auto"
+      ]
+    },
+    "requirements_v2.2.8.md": {
+      "commands": [
+        "oc-collab rules init",
+        "oc-collab init <project>",
+        "oc-collab init"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab rules init",
+        "oc-collab init <project>",
+        "oc-collab init"
+      ]
+    },
+    "requirements_v2.2.10_DRAFT.md": {
+      "commands": [
+        "oc-collab todo list --unread"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo list --unread"
+      ]
+    },
+    "requirements_v2.2.2_READY.md": {
+      "commands": [
+        "oc-collab todo done",
+        "oc-collab phase-advance",
+        "oc-collab git sync"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo done",
+        "oc-collab phase-advance",
+        "oc-collab git sync"
+      ]
+    },
+    "requirements_v2.2.3_READY.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab todowrite/todoedit",
+        "oc-collab todoedit",
+        "oc-collab .a",
+        "oc-collab todowrite",
+        "oc-collab init"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab todowrite/todoedit",
+        "oc-collab .a",
+        "oc-collab todowrite",
+        "oc-collab init",
+        "oc-collab todoedit"
+      ]
+    },
+    "requirements_v2.2.11.md": {
+      "commands": [
+        "oc-collab todo list",
+        "oc-collab init --skill-template <standard>",
+        "oc-collab todowrite",
+        "oc-collab signoff"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo list",
+        "oc-collab init --skill-template <standard>",
+        "oc-collab todowrite",
+        "oc-collab signoff"
+      ]
+    },
+    "requirements_agent_auto_v1.md": {
+      "commands": [
+        "oc-collab auto --force",
+        "oc-collab auto",
+        "oc-collab auto --force --max-iterations 5"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab auto --force",
+        "oc-collab auto",
+        "oc-collab auto --force --max-iterations 5"
+      ]
+    },
+    "requirements_v2.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab switch [agent_id]",
+        "oc-collab sync",
+        "oc-collab signoff [requirements\\|design\\|test]",
+        "oc-collab history",
+        "oc-collab review [requirements\\|design\\|test]",
+        "oc-collab init [项目名]"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab history",
+        "oc-collab review [requirements\\|design\\|test]",
+        "oc-collab switch [agent_id]",
+        "oc-collab sync",
+        "oc-collab signoff [requirements\\|design\\|test]",
+        "oc-collab init [项目名]"
+      ]
+    },
+    "PROPOSAL_v2.2.3_Git_Commit_Command.md": {
+      "commands": [
+        "oc-collab git commit"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab git commit"
+      ]
+    },
+    "requirements_v2.2.1_PATCH_002.md": {
+      "commands": [
+        "oc-collab release",
+        "oc-collab doc check"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab release",
+        "oc-collab doc check"
+      ]
+    },
+    "requirements_v2.2.6.md": {
+      "commands": [
+        "oc-collab skill search --keywords <kw>",
+        "oc-collab skill enforce --before-action",
+        "oc-collab todowrite --auto-check",
+        "oc-collab skill slice --level <chapter|section>",
+        "oc-collab todowrite --with-context"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab skill slice --level <chapter|section>",
+        "oc-collab skill search --keywords <kw>",
+        "oc-collab todowrite --auto-check",
+        "oc-collab skill enforce --before-action",
+        "oc-collab todowrite --with-context"
+      ]
+    },
+    "PROPOSAL_v2.2.2_Deployment_Automation.md": {
+      "commands": [
+        "oc-collab status",
+        "oc-collab deployment configure",
+        "oc-collab phase-advance"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab status",
+        "oc-collab deployment configure",
+        "oc-collab phase-advance"
+      ]
+    },
+    "TEMPLATE_requirements.md": {
+      "commands": [
+        "oc-collab xxx"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab xxx"
+      ]
+    },
+    "requirements_v2.2.9_DRAFT.md": {
+      "commands": [
+        "oc-collab webhook status",
+        "oc-collab rules init",
+        "oc-collab signoff",
+        "oc-collab deploy check-docs",
+        "oc-collab compliance report",
+        "oc-collab compliance check",
+        "oc-collab todoedit",
+        "oc-collab todowrite",
+        "oc-collab phase-advance",
+        "oc-collab init",
+        "oc-collab rules init [--force]"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab webhook status",
+        "oc-collab rules init",
+        "oc-collab signoff",
+        "oc-collab deploy check-docs",
+        "oc-collab compliance report",
+        "oc-collab compliance check",
+        "oc-collab todoedit",
+        "oc-collab todowrite",
+        "oc-collab phase-advance",
+        "oc-collab init",
+        "oc-collab rules init [--force]"
+      ]
+    },
+    "requirements_bug_trigger_agent2_review_v1.md": {
+      "commands": [
+        "oc-collab auto"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab auto"
+      ]
+    },
+    "requirements_auto_update_v1.md": {
+      "commands": [
+        "oc-collab project update --test --passed 10",
+        "oc-collab project advance",
+        "oc-collab auto",
+        "oc-collab project set-phase testing"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab project update --test --passed 10",
+        "oc-collab project advance",
+        "oc-collab auto",
+        "oc-collab project set-phase testing"
+      ]
+    },
+    "requirements_v2.2.1_READY_Review_Agent2.md": {
+      "commands": [
+        "oc-collab todo make",
+        "oc-collab todo"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab todo make",
+        "oc-collab todo"
+      ]
+    },
+    "requirements_v2.2.7.md": {
+      "commands": [
+        "oc-collab webhook status",
+        "oc-collab webhook start",
+        "oc-collab webhook init",
+        "oc-collab skill coverage",
+        "oc-collab skill test --skill <id>",
+        "oc-collab phase-advance",
+        "oc-collab webhook stop",
+        "oc-collab skill test --all"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab webhook status",
+        "oc-collab webhook start",
+        "oc-collab webhook init",
+        "oc-collab skill coverage",
+        "oc-collab skill test --skill <id>",
+        "oc-collab phase-advance",
+        "oc-collab webhook stop",
+        "oc-collab skill test --all"
+      ]
+    },
+    "requirements_v2.1.0.md": {
+      "commands": [
+        "oc-collab agent status",
+        "oc-collab status"
+      ],
+      "covered": [],
+      "uncovered": [
+        "oc-collab agent status",
+        "oc-collab status"
+      ]
+    }
+  }
+}

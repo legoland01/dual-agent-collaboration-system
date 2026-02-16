@@ -39,6 +39,8 @@ from .deploy_full_commands import deploy_full
 from .todo_commands import todo_group
 from .startup_commands import startup_check_command
 from .state_commands import state_group
+from .bug_commands import bug_group
+from .requirements_commands import requirements_group
 
 
 console = Console()
@@ -187,6 +189,10 @@ def switch_command(agent_id: int, welcome: bool):
 
         if welcome:
             session_manager = SessionManager(project_path)
+            if agent_id == 2:
+                discovered = session_manager.auto_discover_tasks()
+                if discovered:
+                    click.echo(f"[自动发现] 已为Agent2创建任务: {', '.join(discovered)}")
             session_manager.show_welcome(f"agent{agent_id}")
         else:
             try:
@@ -236,23 +242,20 @@ def review_command(stage: str, file: str, new: bool, list: bool):
 @click.option("--comment", "-m", default="")
 @click.option("--reject", "-r", default=None)
 @click.option("--sync", "-s", is_flag=True, default=False, help="签署后自动同步到远程")
-@click.option("--auto-check/--no-auto-check", default=True,
-              help="是否自动检查Skill (默认启用)")
-def signoff_command(stage: str, comment: str, reject: str, sync: bool, auto_check: bool):
+def signoff_command(stage: str, comment: str, reject: str, sync: bool):
     """签署确认。"""
     try:
-        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
-        if auto_check:
-            skill_enforcer = SkillEnforcer()
-            skill_result = skill_enforcer.check_before_action("signoff")
-            
-            if skill_result["missing"]:
-                click.echo(f"\n⚠️  缺少相关Skill (signoff):")
-                for skill in skill_result["missing"]:
-                    click.echo(f"   • {skill}")
-                if skill_result["suggestions"]:
-                    click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
-                click.echo("")
+        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查（v2.2.11要求移除--auto-check）
+        skill_enforcer = SkillEnforcer()
+        skill_result = skill_enforcer.check_before_action("signoff")
+        
+        if skill_result["missing"]:
+            click.echo(f"\n⚠️  缺少相关Skill (signoff):")
+            for skill in skill_result["missing"]:
+                click.echo(f"   • {skill}")
+            if skill_result["suggestions"]:
+                click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+            click.echo("")
 
         project_path = get_project_path()
         state_manager = StateManager(project_path)
@@ -1319,23 +1322,20 @@ def project_command(action: str, type: str, value: str, cases: int,
 @click.option("--force", "-f", is_flag=True, help="强制推进")
 @click.option("--check", "-c", is_flag=True, help="仅检查条件")
 @click.option("--sync/--no-sync", "-s", default=True, help="推进后自动同步到 Git")
-@click.option("--auto-check/--no-auto-check", default=True,
-              help="是否自动检查Skill (默认启用)")
-def advance_command(phase: str, force: bool, check: bool, sync: bool, auto_check: bool):
+def advance_command(phase: str, force: bool, check: bool, sync: bool):
     """推进到下一阶段 (v2.2.2: 推进后自动同步 Git 状态)。"""
     try:
-        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查
-        if auto_check:
-            skill_enforcer = SkillEnforcer()
-            skill_result = skill_enforcer.check_before_action("phase_advance")
-            
-            if skill_result["missing"]:
-                click.echo(f"\n⚠️  缺少相关Skill (phase_advance):")
-                for skill in skill_result["missing"]:
-                    click.echo(f"   • {skill}")
-                if skill_result["suggestions"]:
-                    click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
-                click.echo("")
+        # v2.2.7: BUG-20260210-001 修复 - Skill强制检查（v2.2.11要求移除--auto-check）
+        skill_enforcer = SkillEnforcer()
+        skill_result = skill_enforcer.check_before_action("phase_advance")
+        
+        if skill_result["missing"]:
+            click.echo(f"\n⚠️  缺少相关Skill (phase_advance):")
+            for skill in skill_result["missing"]:
+                click.echo(f"   • {skill}")
+            if skill_result["suggestions"]:
+                click.echo(f"\n   建议: {skill_result['suggestions'][0]}")
+            click.echo("")
 
         project_path = get_project_path()
         phase_engine = PhaseAdvanceEngine(project_path)
@@ -1672,6 +1672,8 @@ main.add_command(deploy_group, "deploy")
 main.add_command(todo_group, "todo")
 main.add_command(startup_check_command, "startup-check")
 main.add_command(state_group, "state")
+main.add_command(bug_group, "bug")
+main.add_command(requirements_group, "requirements")
 
 
 if __name__ == "__main__":

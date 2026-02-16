@@ -1,0 +1,100 @@
+{
+  "total_requirements": 452,
+  "covered_count": 13,
+  "uncovered_count": 439,
+  "coverage_percent": 2.9,
+  "covered": [
+    {
+      "requirement": "HISTORY_POSTPONED_FEATURES_ANALYSIS.md::F-PROC-003",
+      "description": "F-PROC-003: ✅ F-TODO-001 (v2.2.11)",
+      "test": "test_v2_2_11_modules.py::test_generate_unique_ids"
+    },
+    {
+      "requirement": "requirements_v2.2.1_READY.md::FR-SIGNOFF-IMPROVE-001",
+      "description": "FR-SIGNOFF-IMPROVE-001: CLI 测试",
+      "test": "test_enforcement_system_e2e.py::test_cli_check_requirements_command"
+    },
+    {
+      "requirement": "requirements_v2.2.1_READY.md::FR-CHANGE-CLARITY-001",
+      "description": "FR-CHANGE-CLARITY-001: CLI 测试",
+      "test": "test_enforcement_system_e2e.py::test_cli_check_requirements_command"
+    },
+    {
+      "requirement": "requirements_v2.2.1_READY.md::FR-CHECKLIST-001",
+      "description": "FR-CHECKLIST-001: CLI 测试",
+      "test": "test_enforcement_system_e2e.py::test_cli_check_requirements_command"
+    },
+    {
+      "requirement": "ANALYSIS_v2.2.4_Requirements_Analysis.md::Q-004",
+      "description": "Q-004: v2.2.4",
+      "test": "test_session_manager_v2.py::test_signoff_requires_valid_phase"
+    },
+    {
+      "requirement": "requirements_v2.2.8.md::F-INIT-001",
+      "description": "F-INIT-001: PROPOSAL-2026-02-001",
+      "test": "test_v2_2_10_modules.py::test_add_and_get"
+    },
+    {
+      "requirement": "requirements_v2.2.4_review_agent2.md::FR-SKILL-001",
+      "description": "FR-SKILL-001: src/cli/main.py",
+      "test": "test_blackbox_v226.py::test_execute_without_args"
+    },
+    {
+      "requirement": "requirements_v2.2.4_review_agent2.md::FR-GIT-001",
+      "description": "FR-GIT-001: src/core/git.py",
+      "test": "test_e2e_v221.py::test_prd_only_change_workflow"
+    },
+    {
+      "requirement": "requirements_v2.2.4_review_agent2.md::FR-GIT-002",
+      "description": "FR-GIT-002: src/core/state_manager.py",
+      "test": "test_signoff.py::test_signoff_with_sync_no_git_helper"
+    },
+    {
+      "requirement": "requirements_v2.2.4_review_agent2.md::FR-AUTO-001",
+      "description": "FR-AUTO-001: src/core/state_manager.py",
+      "test": "test_e2e_v221.py::test_prd_only_change_workflow"
+    }
+  ],
+  "uncovered": [
+    {
+      "requirement": "requirements_v2.2.0.md::M5教训",
+      "description": "M5教训: 验收标准写了\"覆盖率>=80%\"，但没人真的检查；必须运行coverage命令并分析报告"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::CI配置",
+      "description": "CI配置: ```yaml"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::M1",
+      "description": "M1: Agent 动态管理"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::M2",
+      "description": "M2: 设计稿管理、对比"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::M3",
+      "description": "M3: 技术栈选择、接口管理"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::M4",
+      "description": "M4: 任务分配、进度看板、资源锁"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::M5",
+      "description": "M5: ConfigValidator, ModeManager, TestIsolator, IssueTracker, PDFQualityValidator"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::REJECTED",
+      "description": "REJECTED: 修订后重新提交"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::P0",
+      "description": "P0: FR-PDF-001"
+    },
+    {
+      "requirement": "requirements_v2.2.0.md::React",
+      "description": "React: 专注 React 技术栈"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "oc_collab_version_management_guide",
+  "name": "版本管理指南",
+  "version": "1.0.0",
+  "description": "统一管理oc-collab的版本号、发布流程和版本发布规则",
+  "author": "Agent 1",
+  "created_at": "2026-02-15",
+  "updated_at": "2026-02-15",
+  "tags": ["version", "release", "patch", "deployment", "management"],
+  "trigger_keywords": ["版本", "version", "发布", "release", "patch", "tag"],
+  "phases": ["all"],
+  "priority": "high"
+}

@@ -1,0 +1,33 @@
+version: '1.0'
+last_updated: '2026-02-16T00:54:26.937261'
+links:
+- bug_id: BUG-20260216-001
+  test_files:
+  - tests/test_v230_skill_index.py
+  created_at: '2026-02-16T00:39:24.827528'
+  updated_at: '2026-02-16T00:39:24.827538'
+- bug_id: BUG-TEST-001
+  test_files:
+  - tests/test_v230_skill_index.py
+  created_at: '2026-02-16T00:40:30.457620'
+  updated_at: '2026-02-16T00:40:30.457627'
+- bug_id: BUG-TEST-E2E-002
+  test_files:
+  - tests/test_v230_e2e.py
+  created_at: '2026-02-16T00:47:18.290758'
+  updated_at: '2026-02-16T00:47:18.290770'
+- bug_id: BUG-E2E-CLI-004
+  test_files:
+  - tests/test_v230_e2e.py
+  created_at: '2026-02-16T00:47:28.099633'
+  updated_at: '2026-02-16T00:47:28.099640'
+- bug_id: BUG-TEST-E2E-001
+  test_files:
+  - tests/test_v230_skill_index.py
+  created_at: '2026-02-16T00:48:58.369504'
+  updated_at: '2026-02-16T00:48:58.369514'
+- bug_id: BUG-20260215-001
+  test_files:
+  - tests/test_v230_bug_linker.py
+  created_at: '2026-02-16T00:54:26.937220'
+  updated_at: '2026-02-16T00:54:26.937232'

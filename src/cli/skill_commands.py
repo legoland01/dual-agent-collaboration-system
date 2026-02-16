@@ -15,6 +15,9 @@ from ..core.skill_tester import SkillTester
 from ..core.coverage_calculator import CoverageCalculator
 from ..core.reference_validator import ReferenceValidator
 from ..core.cli_action_validator import CLIActionValidator
+from ..core.skill_index import SkillIndex
+from ..core.skill_search_engine import SkillSearchEngine
+from ..core.index_auto_updater import IndexAutoUpdater
 
 console = Console()
 
@@ -187,7 +190,8 @@ def skill_group():
 @click.option("--skill", "-s", help="指定测试的Skill ID")
 @click.option("--verbose", "-v", is_flag=True, help="输出详细结果")
 @click.option("--json", "output_json", is_flag=True, help="JSON格式输出")
-def skill_test(skill: Optional[str], verbose: bool, output_json: bool):
+@click.option("--fix", "-f", is_flag=True, help="自动修复可修复问题")
+def skill_test(skill: Optional[str], verbose: bool, output_json: bool, fix: bool):
     """
     运行Skill内容准确性测试。
 
@@ -195,8 +199,13 @@ def skill_test(skill: Optional[str], verbose: bool, output_json: bool):
       oc-collab skill test                    # 测试所有Skill
       oc-collab skill test -s oc_collab_development_guide  # 测试指定Skill
       oc-collab skill test -v                 # 详细输出
+      oc-collab skill test --fix              # 自动修复可修复问题
     """
-    tester = SkillTester(verbose=verbose)
+    tester = SkillTester(verbose=verbose, auto_fix=fix)
+    
+    if fix:
+        click.echo("🔧 自动修复模式已启用...")
+    
     report = tester.run_all_tests(skill)
 
     if output_json:
@@ -312,3 +321,54 @@ skill_group.add_command(skill_slice, "slice")
 skill_group.add_command(skill_enforce, "enforce")
 skill_group.add_command(skill_test, "test")
 skill_group.add_command(skill_coverage, "coverage")
+
+
+@click.command(name="index")
+@click.option("--sync", is_flag=True, help="同步更新Skill索引")
+def skill_index_cmd(sync):
+    """Skill索引管理"""
+    if sync:
+        index = SkillIndex("config/skill_index.yaml")
+        updater = IndexAutoUpdater(index, "skills")
+        count = updater.sync_all()
+        console.print(f"已同步{count}个Skill到索引")
+    else:
+        index = SkillIndex("config/skill_index.yaml")
+        skills = index.get_all_skills()
+        console.print(f"索引中共{len(skills)}个Skill：")
+        for s in skills:
+            info = index.get_skill_info(s)
+            console.print(f"  - {s}: {info.get('description', '') if info else ''}")
+
+
+@click.command(name="query")
+@click.argument("query")
+@click.option("--slice", is_flag=True, help="搜索后进入skill slice界面")
+@click.option("--verbose", is_flag=True, help="显示匹配关键词详情")
+def skill_query_cmd(query, slice, verbose):
+    """关键词搜索Skill"""
+    index = SkillIndex("config/skill_index.yaml")
+    engine = SkillSearchEngine(index)
+    
+    results = engine.search(query, top_k=5)
+    
+    if not results:
+        console.print(f"未找到匹配'{query}'的Skill")
+        return
+    
+    console.print(f"搜索'{query}'找到{len(results)}个结果：\n")
+    
+    for i, r in enumerate(results, 1):
+        console.print(f"{i}. {r.skill}")
+        if verbose:
+            console.print(f"   描述: {r.description}")
+            console.print(f"   关键词: {', '.join(r.keywords)}")
+            console.print(f"   置信度: {r.confidence:.2f}")
+        console.print("")
+    
+    if slice:
+        console.print("[进入slice模式...]")
+
+
+skill_group.add_command(skill_index_cmd, "index")
+skill_group.add_command(skill_query_cmd, "query")
