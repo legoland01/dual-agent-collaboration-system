@@ -172,5 +172,49 @@
 
 ---
 
+## 六、分布式多Agent协作架构
+
+### 6.1 架构设计
+
+```
+用户(需求掌握)
+    │
+    ▼
+oc-collab (任务分发)
+    │
+    ├────┬────┬────┐
+    ▼    ▼    ▼    ▼
+ Agent1 Agent2 Agent3 Agent4
+ (PM)  (郭)  (李)  (陈)
+    │    │    │    │
+    ▼    ▼    ▼    ▼
+需求  Java Python VueJS
+     后端 后端 前端
+```
+
+### 6.2 Agent与仓库映射
+
+| Agent | 开发人员 | 技术栈 | 仓库 | 项目 |
+|-------|----------|--------|------|------|
+| Agent1 | 用户(PM) | - | - | 需求管理 |
+| Agent2 | 郭汉盟 | Java | financial-court-file-assistant | 卷宗后端 |
+| Agent3 | 李杨峰 | Python | dossierai, xhtools, wocheng-ai | 卷宗/AI |
+| Agent4 | 陈伟 | Vue/JS | financial-court-file-assistant-frontend | 卷宗前端 |
+
+### 6.3 协作流程
+
+1. **用户**掌握需求，创建TODO给Agent
+2. **Agent1**分析需求，分发给对应Agent
+3. **Agent2/3/4**在各自环境开发，提交代码
+4. **oc-collab**通过Git同步状态，汇总进度
+
+### 6.4 代码提交要求
+
+- 所有提交必须通过oc-collab
+- TODO创建 → Agent执行 → Git提交
+- 确保可追溯、可管理
+
+---
+
 **作者**: Consultant  
 **日期**: 2026-02-17
