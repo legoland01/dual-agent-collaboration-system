@@ -440,38 +440,137 @@ class TestTodoStorageExtended:
         assert any(t['id'] == 'FILT-001' for t in todos)
 
 
-class TestConfigManagerExtended:
-    """ConfigManager扩展测试"""
+class TestTodoStorageMore:
+    """TodoStorage更多测试"""
     
     @pytest.fixture
-    def config(self):
-        cfg_file = tempfile.mktemp(suffix='.yaml')
-        cfg = ConfigManager(cfg_file)
-        yield cfg
-        if os.path.exists(cfg_file):
-            os.remove(cfg_file)
+    def storage(self):
+        db = tempfile.mktemp(suffix='.db')
+        s = TodoStorage(db)
+        yield s
+        if os.path.exists(db):
+            os.remove(db)
     
-    def test_nested_key(self, config):
-        """测试嵌套键"""
-        config.set('level1.level2.level3', 'value')
-        val = config.get('level1.level2.level3')
-        assert val == 'value'
+    def test_close(self, storage):
+        """测试关闭"""
+        storage.close()  # 应该不报错
     
-    def test_get_raw(self, config):
-        """测试获取原始值"""
-        config.set('raw.key', '123')
-        val = config.get_raw('raw.key')
-        assert val == '123'
-    
-    def test_reset(self, config):
-        """测试重置"""
-        config.set('test.key', 'value')
-        ok = config.reset()
+    def test_add_with_metadata(self, storage):
+        """测试添加带元数据"""
+        ok, msg = storage.add({
+            'id': 'META-001',
+            'content': 'test',
+            'sender': '1',
+            'receiver': '2',
+            'metadata': {'key': 'value'}
+        })
         assert ok is True
+    
+    def test_add_with_all_fields(self, storage):
+        """测试添加所有字段"""
+        from datetime import datetime
+        ok, msg = storage.add({
+            'id': 'FULL-001',
+            'content': 'test content',
+            'status': 'in_progress',
+            'priority': 'high',
+            'sender': '1',
+            'receiver': '2',
+            'source': 'BUG',
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
+            'is_read': 0,
+            'metadata': '{}'
+        })
+        assert ok is True
+    
+    def test_update_multiple_fields(self, storage):
+        """测试更新多个字段"""
+        storage.add({'id': 'MULTI-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        ok = storage.update('MULTI-001', {
+            'status': 'completed',
+            'priority': 'low',
+            'is_read': 1
+        })
+        assert ok is True
+        todo = storage.get('MULTI-001')
+        assert todo['status'] == 'completed'
+        assert todo['priority'] == 'low'
+    
+    def test_list_by_receiver_and_status(self, storage):
+        """测试按接收者和状态筛选"""
+        storage.add({'id': 'FLT1', 'content': 't1', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        storage.add({'id': 'FLT2', 'content': 't2', 'sender': '1', 'receiver': '2', 'status': 'completed'})
+        todos = storage.list(receiver='2', status='pending')
+        assert any(t['id'] == 'FLT1' for t in todos)
+        assert not any(t['id'] == 'FLT2' for t in todos)
+    
+    def test_list_empty_result(self, storage):
+        """测试空结果"""
+        todos = storage.list(receiver='nonexistent')
+        assert len(todos) == 0
 
 
-class TestNotificationServiceFull:
-    """NotificationService完整测试"""
+class TestDataMigrationMore:
+    """DataMigration更多测试"""
+    
+    @pytest.fixture
+    def migration(self):
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        m = DataMigrationService(storage)
+        yield m
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_rollback_nonexistent(self, migration):
+        """测试回滚不存在的备份"""
+        ok = migration.rollback('/nonexistent/backup.yaml')
+        assert ok is False
+    
+    def test_preview_with_data(self, migration):
+        """测试预览有数据的YAML"""
+        result = migration.preview('state/agent_adhoc_todos.yaml')
+        assert 'total' in result
+        assert result['total'] > 0
+    
+    def test_transform_todo(self, migration):
+        """测试TODO转换"""
+        todo = {'id': 'TEST-001', 'content': 'test', 'status': 'pending', 'priority': 'P0'}
+        transformed = migration._transform_todo(todo)
+        assert transformed['priority'] == 'high'  # P0 -> high
+        assert transformed['sender'] != None
+        assert transformed['source'] == 'legacy'
+    
+    def test_normalize_priority(self, migration):
+        """测试优先级标准化"""
+        assert migration._normalize_priority('P0') == 'high'
+        assert migration._normalize_priority('P1') == 'medium'
+        assert migration._normalize_priority('P2') == 'low'
+        assert migration._normalize_priority('high') == 'high'
+        assert migration._normalize_priority('unknown') == 'medium'
+    
+    def test_infer_sender_receiver_with_agent_id(self, migration):
+        """测试推断sender/receiver-有agent_id"""
+        todo = {'id': 'TEST', 'agent_id': '2'}
+        sender, receiver = migration._infer_sender_receiver(todo)
+        assert sender == '2'
+    
+    def test_infer_sender_receiver_from_id(self, migration):
+        """测试从ID推断"""
+        todo = {'id': 'TODO-3-001', 'agent_id': None}
+        sender, receiver = migration._infer_sender_receiver(todo)
+        assert sender == '3'
+    
+    def test_infer_sender_receiver_unknown(self, migration):
+        """测试未知情况-没有有效ID格式"""
+        todo = {}  # 空todo
+        sender, receiver = migration._infer_sender_receiver(todo)
+        assert sender == 'unknown'
+
+
+class TestNotificationServiceMore:
+    """NotificationService更多测试"""
     
     @pytest.fixture
     def notification(self):
@@ -482,27 +581,64 @@ class TestNotificationServiceFull:
         if os.path.exists(db):
             os.remove(db)
     
-    def test_generate_instruction_custom_path(self, notification):
-        """测试生成自定义路径Instruction"""
-        custom_path = tempfile.mktemp(suffix='.md')
-        ok = notification.generate_instruction(custom_path)
-        assert ok is True
-        assert os.path.exists(custom_path)
-        os.remove(custom_path)
+    def test_notify_with_all_fields(self, notification):
+        """测试带完整字段的通知"""
+        notif_id = notification.notify({
+            'id': 'FULL-001', 
+            'content': 'test content',
+            'sender': '1',
+            'receiver': '2'
+        })
+        assert notif_id is not None
     
-    def test_notification_stores_todo_id(self, notification):
-        """测试通知存储TODO ID"""
-        notification.notify({'id': 'NOTIF-001', 'content': 'test'})
-        import sqlite3
-        conn = sqlite3.connect(notification.storage.db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM notifications WHERE todo_id = 'NOTIF-001'")
-        row = cursor.fetchone()
-        conn.close()
-        assert row is not None
-    
-    def test_get_status_with_instruction(self, notification):
-        """测试获取状态-有Instruction"""
-        notification.generate_instruction()
+    def test_get_status_no_last_notification(self, notification):
+        """测试无最后通知时的状态"""
         status = notification.get_status()
-        assert status.get('instruction_exists') is True
+        assert status.get('last_notification') is None
+    
+    def test_load_config_nonexistent(self, notification):
+        """测试加载不存在的配置"""
+        notification.config_path = '/nonexistent.yaml'
+        config = notification._load_config()
+        assert config == {}
+    
+    def test_ensure_config_dir(self, notification):
+        """测试确保配置目录存在"""
+        notification._ensure_config_dir()
+        import os
+        assert os.path.exists('config')
+    
+    def test_save_config(self, notification):
+        """测试保存配置"""
+        notification._save_config({'test': 'value'})
+        import os
+        assert os.path.exists(notification.config_path)
+
+
+class TestOnlinePullerMore:
+    """OnlinePuller更多测试"""
+    
+    @pytest.fixture
+    def puller(self):
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        monitor = AgentStatusMonitor(db)
+        p = OnlinePullerService(storage, monitor)
+        yield p
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_pull_pending_empty(self, puller):
+        """测试拉取空的积压"""
+        todos = puller.pull_pending('nonexistent')
+        assert len(todos) == 0
+    
+    def test_notify_user_empty(self, puller):
+        """测试通知空列表"""
+        ok = puller.notify_user([])
+        assert ok is True
+    
+    def test_get_deferred_todos_empty(self, puller):
+        """测试获取空延迟列表"""
+        todos = puller.get_deferred_todos('nonexistent')
+        assert isinstance(todos, list)

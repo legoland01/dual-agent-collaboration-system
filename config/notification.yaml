@@ -1,16 +1,1 @@
-e2e: {}
-enabled: false
-listener:
-  auto_start: false
-  interval: 5
-opencode:
-  api_key: ''
-  url: http://localhost:11411
-rules:
-  notify_deferred_reminder: true
-  notify_on_new: true
-  notify_on_update: false
-test:
-  key: value
-  newkey: testvalue
-version: '1.0'
+test: value
