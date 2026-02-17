@@ -238,3 +238,105 @@ class TestOnlinePuller:
         puller.storage.add({'id': 'NOTIFY-001', 'content': '测试', 'sender': '1', 'receiver': '2', 'status': 'pending'})
         ok = puller.check_and_notify('2')
         assert ok is True
+    
+    def test_get_deferred_todos(self, puller):
+        """测试获取延迟TODO"""
+        from datetime import datetime, timedelta
+        # 创建一个过期的延迟TODO
+        storage = puller.storage
+        storage.add({
+            'id': 'DEF-001', 
+            'content': '测试', 
+            'sender': '1', 
+            'receiver': '2', 
+            'status': 'deferred',
+            'deferred_until': '2020-01-01T00:00:00'  # 过去的日期
+        })
+        todos = puller.get_deferred_todos('2')
+        # 无论是否有过期TODO，函数应该能正常返回
+        assert isinstance(todos, list)
+    
+    def test_notify_user(self, puller):
+        """测试通知用户"""
+        puller.storage.add({'id': 'NOTIFY-002', 'content': '测试', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        todos = puller.storage.list(receiver='2')
+        ok = puller.notify_user(todos)
+        assert ok is True
+
+
+class TestDataMigration:
+    """DataMigration单元测试"""
+    
+    @pytest.fixture
+    def migration(self):
+        """创建迁移服务"""
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        m = DataMigrationService(storage)
+        yield m
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_list_backups(self, migration):
+        """测试列出备份"""
+        backups = migration.list_backups()
+        assert isinstance(backups, list)
+    
+    def test_backup_creation(self, migration):
+        """测试备份创建"""
+        import yaml
+        test_file = tempfile.mktemp(suffix='.yaml')
+        with open(test_file, 'w') as f:
+            yaml.dump({'todos': []}, f)
+        
+        backup_path = migration.backup(test_file)
+        assert os.path.exists(backup_path)
+        os.remove(backup_path)
+        os.remove(test_file)
+    
+    def test_preview_empty(self, migration):
+        """测试预览空文件"""
+        result = migration.preview('/nonexistent.yaml')
+        assert 'error' in result
+
+
+class TestNotificationService:
+    """NotificationService单元测试"""
+    
+    @pytest.fixture
+    def notification(self):
+        """创建通知服务"""
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        n = NotificationService(storage)
+        yield n
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_enable_notification(self, notification):
+        """测试启用通知"""
+        ok = notification.enable()
+        assert ok is True
+        status = notification.get_status()
+        assert status.get('enabled') is True
+    
+    def test_disable_notification(self, notification):
+        """测试禁用通知"""
+        notification.enable()
+        ok = notification.disable()
+        assert ok is True
+        status = notification.get_status()
+        assert status.get('enabled') is False
+    
+    def test_notify_todo(self, notification):
+        """测试TODO通知"""
+        notif_id = notification.notify({'id': 'TEST-001', 'content': '测试'})
+        assert notif_id is not None
+        assert 'notif-' in notif_id
+    
+    def test_generate_instruction(self, notification):
+        """测试生成Instruction"""
+        ok = notification.generate_instruction()
+        assert ok is True
+        import os
+        assert os.path.exists(notification.instruction_path)
