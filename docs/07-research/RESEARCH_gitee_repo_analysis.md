@@ -177,57 +177,53 @@
 ### 6.1 架构设计
 
 ```
-用户(掌握所有Agent分配权)
+用户(我) → 掌握所有Agent分配权
     │
     ▼
-PM-Agent (需求管理中心)
+PM-Agent (管理Agent资源池)
     │
-    ├──── 项目A → 执行人员: 郭汉盟 → PM-Agent自动挖洞(分配Agent)
-    ├──── 项目B → 执行人员: 李杨峰 → PM-Agent自动挖洞
-    ├──── 项目C → 执行人员: 陈伟 → PM-Agent自动挖洞
-    └──── 项目D → 执行人员: ?
+    ├──── 李杨峰 → 10个Agent (ID: agent3-001 ~ agent3-010)
+    ├──── 郭汉盟 → N个Agent
+    └──── 陈伟 → M个Agent
+    │
+    ▼ 项目组建立时
+项目组 → PM-Agent分配空闲Agent → Agent入组
+    │
+    ▼ Agent入组后
+oc-collab (协调Agent工作，PM-Agent不再管理)
 ```
 
-### 6.2 Agent分配机制
+### 6.2 Agent资源池 (PM-Agent管理)
 
-| 角色 | 职责 |
+| 开发人员 | Agent数量 | Agent ID |
+|----------|------------|-----------|
+| 李杨峰 | 10 | agent3-001 ~ agent3-010 |
+| 郭汉盟 | ? | agent2-001 ~ agent2-00X |
+| 陈伟 | ? | agent4-001 ~ agent4-00X |
+
+### 6.3 项目组建立流程
+
+1. **用户**创建项目组
+2. **拉开发人员进组** (李杨峰/郭汉盟/陈伟)
+3. **指定负责内容** (后端/前端/AI)
+4. **PM-Agent自动分配** → 从该人员的Agent池中找一个/多个空闲Agent入组
+5. **入组后** → oc-collab协调工作，PM-Agent不再管理
+
+### 6.4 Agent入组后
+
+- **oc-collab** 负责：
+  - TODO分发
+  - 任务协调
+  - Git提交管理
+- **PM-Agent** 不再管理这些Agent
+
+### 6.5 Agent状态
+
+| 状态 | 说明 |
 |------|------|
-| 用户(我) | 统一掌握所有Agent的分配权 |
-| PM-Agent | 根据执行人员的忙闲状态自动挖洞(分配Agent) |
-| Agent | 被分配到项目，执行任务 |
-
-### 6.3 Agent注册信息
-
-每个Agent注册时需要绑定：
-```yaml
-agent:
-  id: agent2
-  owner: 郭汉盟        # 开发者
-  project: 金融法院    # 当前项目(可选)
-  repos:              # 可访问仓库
-    - qushen-data/financial-court-file-assistant
-  status: busy         # 忙闲状态
-  skills:
-    - Java开发
-    - Spring Boot
-```
-
-### 6.4 分配流程
-
-1. **需求进入PM-Agent**
-2. **用户选择执行人员** (郭汉盟/李杨峰/陈伟等)
-3. **PM-Agent自动挖洞** → 根据忙闲分配可用Agent
-4. **Agent执行** → 访问项目仓库，提交代码
-
-### 6.5 项目与Agent池绑定
-
-| 项目 | 执行人员 | Agent池 | 仓库 |
-|------|----------|---------|------|
-| 金融法院卷宗 | 郭汉盟 | agent2 | Java后端 |
-| 金融法院卷宗 | 李杨峰 | agent3 | Python/AI |
-| 金融法院卷宗 | 陈伟 | agent4 | Vue前端 |
-| 徐汇司法阳光执法 | ? | agent? | Vue前端 |
-| ... | ... | ... | ... |
+| idle | 空闲，可分配 |
+| busy | 工作中 |
+| assigned | 已分配到项目组 |
 
 ---
 
