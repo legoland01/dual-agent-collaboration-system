@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from ..core.agent_registry import AgentRegistry
 from ..core.todo_queue_manager import TodoQueueManager
 from ..core.context_manager import ContextManager, ContextNotFoundError
+from ..core.todo_storage import TodoStorage
 
 
 @click.group("agent")
@@ -157,32 +158,50 @@ def agent_listen_command(interval: int, daemon: bool):
     click.echo("   按 Ctrl+C 停止")
     click.echo("")
     
-    queue_manager = TodoQueueManager()
-    seen_ids = set()
+    # 优先使用SQLite存储，回退到YAML
+    try:
+        storage = TodoStorage()
+        todos = storage.list(receiver=agent_id, status='pending', unread_only=True)
+        has_sqlite = True
+    except:
+        queue_manager = TodoQueueManager()
+        has_sqlite = False
     
-    # 不初始化seen_ids，每次都显示所有未读TODO（确保不遗漏）
+    seen_ids = set()
     
     def poll_loop():
         """轮询循环"""
         while True:
             try:
-                unread = queue_manager.get_unread(agent_id)
-                new_todos = [t for t in unread if t.id not in seen_ids]
+                if has_sqlite:
+                    # 使用SQLite
+                    todos = storage.list(receiver=agent_id, status='pending', unread_only=True)
+                    new_todos = [t for t in todos if t.get('id') not in seen_ids]
+                else:
+                    # 使用YAML
+                    unread = queue_manager.get_unread(agent_id)
+                    new_todos = [t for t in unread if t.id not in seen_ids]
                 
                 if new_todos:
                     # 系统通知（跨平台）
                     for t in new_todos:
-                        title = f"新TODO: {t.id}"
-                        message = f"来自: {t.from_agent}\n{t.content[:100]}"
+                        tid = t.get('id') or t.id
+                        tcontent = t.get('content') or ''
+                        tsender = t.get('sender') or t.from_agent or 'unknown'
+                        title = f"新TODO: {tid}"
+                        message = f"来自: {tsender}\n{tcontent[:100]}"
                         # 使用 Automator 创建通知
                         script = f'display notification "{message}" with title "{title}"'
                         os.system(f'/usr/bin/osascript -e \'{script}\' &')
                     
                     # 高亮输出到日志
                     for t in new_todos:
-                        click.echo(click.style(f"\n📬 [{datetime.now().strftime('%H:%M:%S')}] 新TODO: [{t.id}] {t.content[:50]}...", fg='green', bold=True))
-                        click.echo(click.style(f"   来自: {t.from_agent}", fg='cyan'))
-                        seen_ids.add(t.id)
+                        tid = t.get('id') or t.id
+                        tcontent = t.get('content') or ''
+                        tsender = t.get('sender') or t.from_agent or 'unknown'
+                        click.echo(click.style(f"\n📬 [{datetime.now().strftime('%H:%M:%S')}] 新TODO: [{tid}] {tcontent[:50]}...", fg='green', bold=True))
+                        click.echo(click.style(f"   来自: {tsender}", fg='cyan'))
+                        seen_ids.add(tid)
                     click.echo("")
                     
             except Exception as e:
