@@ -751,6 +751,7 @@ class ConfigManager:
 | `oc-collab notify enable` | `enable()` | 启用通知 |
 | `oc-collab notify disable` | `disable()` | 禁用通知 |
 | `oc-collab notify status` | `get_status()` | 查看状态 |
+| `oc-collab notify reply --todo-id <id> --action <execute\|defer\|dismiss>` | `handle_action()` | 模拟用户操作（测试用） |
 
 ### 5.4 todo 命令变更
 
@@ -1117,7 +1118,14 @@ db:
 
 | 角色 | 姓名 | 日期 | 确认 |
 |------|------|------|------|
-| 产品负责人 | Agent 1 | | ⏳ |
+| 产品负责人 | Agent 1 | 2026-02-17 | ✅ 通过，需补充notify reply命令 |
+
+### 评审意见
+
+1. ✅ 模块设计完整
+2. ✅ 数据库设计清晰
+3. ✅ 需要补充：notify reply CLI命令（已添加）
+4. ✅ 建议增加 deferred 队列的状态流转说明
 
 ---
 
