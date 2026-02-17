@@ -326,6 +326,30 @@ class DataMigrationService:
         """
         pass
     
+    def _parse_yaml(self, yaml_path: str) -> list[dict]:
+        """
+        解析YAML文件
+        Returns: TODO列表
+        """
+        pass
+    
+    def _transform_todo(self, todo: dict) -> dict:
+        """
+        转换TODO格式
+        - agent_id -> sender
+        - 推断receiver
+        - 添加缺失字段
+        """
+        pass
+    
+    def _infer_sender_receiver(self, todo: dict) -> tuple[str, str]:
+        """
+        推断sender和receiver
+        - 有agent_id: 使用agent_id作为sender
+        - 无agent_id: 标记为unknown
+        """
+        pass
+    
     def backup(self, yaml_path: str) -> str:
         """
         备份原YAML文件
@@ -339,15 +363,85 @@ class DataMigrationService:
         Returns: success
         """
         pass
-    
-    def _parse_legacy_format(self, todo_id: str) -> tuple[str, str]:
-        """
-        解析旧格式TODO ID
-        Returns: (sender, receiver)
-        TODO-1-001 -> (1, 1)
-        TODO-1to2-001 -> (1, 2)
-        """
-        pass
+```
+
+### 4.2.1 迁移详细流程
+
+```
+1. 备份阶段
+   ├── 复制 state/agent_adhoc_todos.yaml
+   └── 保存为 state/backup/agent_adhoc_todos_YYYYMMDD_HHMMSS.yaml
+
+2. 解析阶段
+   ├── 读取YAML文件
+   ├── 解析为dict列表
+   └── 验证基本结构
+
+3. 转换阶段
+   ├── 字段映射:
+   │   ├── id → id
+   │   ├── content → content
+   │   ├── status → status
+   │   ├── priority → priority
+   │   ├── agent_id → sender (null时为"unknown")
+   │   ├── created_at → created_at
+   │   └── updated_at → updated_at
+   │
+   └── 推断sender/receiver:
+       ├── agent_id有值 → sender=agent_id, receiver=推算
+       └── agent_id=null → sender="unknown", receiver="unknown"
+
+4. 写入阶段
+   ├── 连接SQLite
+   ├── 开启事务
+   ├── 逐条写入
+   └── 提交/回滚
+
+5. 验证阶段
+   ├── 对比数量
+   ├── 抽样校验
+   └── 生成报告
+```
+
+### 4.2.2 字段映射表
+
+| YAML字段 | SQLite字段 | 转换说明 |
+|----------|-----------|----------|
+| id | id | 直接复制 |
+| content | content | 直接复制 |
+| status | status | 直接复制 |
+| priority | priority | 直接复制 |
+| agent_id | sender | null→"unknown" |
+| - | receiver | 推断或"unknown" |
+| created_at | created_at | 直接复制 |
+| updated_at | updated_at | 直接复制 |
+| - | source | 默认为"legacy" |
+| - | is_read | 默认为0 |
+
+### 4.2.3 旧TODO处理策略
+
+对于YAML中 `agent_id: null` 的历史TODO：
+
+| 情况 | 处理方式 |
+|------|----------|
+| TODO编号可解析 | 尝试从编号推断（如TODO-1-xxx → sender=1） |
+| 无法推断 | sender="unknown", receiver="unknown" |
+| 保留原样 | 不删除，允许后续手动修正 |
+
+### 4.2.4 迁移命令
+
+```bash
+# 执行迁移（带确认）
+oc-collab migrate --to-sqlite
+
+# 预览迁移（不执行）
+oc-collab migrate --preview
+
+# 回滚
+oc-collab migrate --rollback --backup <backup_file>
+
+# 查看备份列表
+oc-collab migrate --list-backups
 ```
 
 ### 4.3 AgentListener (M3)
