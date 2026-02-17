@@ -165,20 +165,9 @@ v2目标：实现稳定可靠的双Agent协作框架
 **目标**: 确保oc-collab流程可靠 + 自动化流程触发
 
 **参考**: 
-- `PROPOSAL_2026-02-026_agent_id_and_role_rename.md`
-- `docs/05-design/RESEARCH_v2.3.3_auto_flow_trigger.md`
+- `docs/05-design/RESEARCH_v2.3.3_auto_flow_scenario.md` (Scenario分析)
 
-| 功能 | 说明 | 工时 | 优先级 | 状态 |
-|------|------|------|--------|------|
-| **TODO自动推送** | StateNotifier增强，推给目标Agent | 4h | P0 | pending |
-| **StateReceiver自动启动** | 接收Webhook自动启动 | 2h | P0 | pending |
-| **agent listen自动启动** | Agent启动时自动运行 | 2h | P0 | pending |
-| 需求签署自动创建设计 | 文档签署后自动创建 | 2h | P1 | pending |
-| 开发自检自动创建提测 | 自检通过自动创建 | 2h | P1 | pending |
-| Bug自动创建TODO | 发现Bug自动创建 | 2h | P1 | pending |
-| Skill强制 | 关键操作必须使用Skill | 3h | P1 | pending |
-
-**预计工时**: ~17h（一次开发完成）
+**详细需求规划**: 由Agent1负责
 
 ### v2.3.4：配置管理（新增）
 
