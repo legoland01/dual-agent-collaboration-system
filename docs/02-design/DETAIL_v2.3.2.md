@@ -548,6 +548,68 @@ class AgentListenerService:
     def _is_running(self, pid: int) -> bool:
         """检查进程是否运行"""
         pass
+    
+    def _auto_restart_on_crash(self):
+        """
+        守护进程异常处理：自动重启
+        - 监听进程异常退出后自动重启
+        - 记录重启次数
+        - 超过最大重试次数后放弃并告警
+        """
+        pass
+```
+
+### 4.3.1 守护进程异常处理增强
+
+```python
+class AgentListenerService:
+    """监听进程服务 - 带自动重启"""
+    
+    MAX_RESTART_ATTEMPTS = 5
+    RESTART_DELAY_SECONDS = 10
+    
+    def __init__(self, storage: TodoStorage, interval: int = 5):
+        self.storage = storage
+        self.interval = interval
+        self._daemon_process = None
+        self._restart_count = 0
+        self._should_stop = False
+    
+    def start_daemon(self, interval: int = None) -> bool:
+        """启动守护进程"""
+        while not self._should_stop:
+            try:
+                self._run_polling_loop()
+            except Exception as e:
+                self._handle_crash(e)
+    
+    def _handle_crash(self, error: Exception):
+        """
+        处理进程崩溃
+        - 记录错误日志
+        - 增加重启计数
+        - 尝试自动重启
+        """
+        self._restart_count += 1
+        
+        if self._restart_count <= self.MAX_RESTART_ATTEMPTS:
+            logger.warning(f"进程崩溃，{self.RESTART_DELAY_SECONDS}秒后重启 ({self._restart_count}/{self.MAX_RESTART_ATTEMPTS})")
+            time.sleep(self.RESTART_DELAY_SECONDS)
+            # 自动重启
+            self._run_polling_loop()
+        else:
+            logger.error(f"超过最大重启次数 ({self.MAX_RESTART_ATTEMPTS})，放弃重启")
+            self._send_alert()
+    
+    def _send_alert(self):
+        """发送告警通知"""
+        # 记录到日志文件
+        # 可选：发送Webhook告警
+        pass
+    
+    def stop(self):
+        """优雅停止"""
+        self._should_stop = True
 ```
 
 ### 4.4 StatusMonitor (M4)
@@ -753,7 +815,56 @@ class ConfigManager:
 | `oc-collab notify status` | `get_status()` | 查看状态 |
 | `oc-collab notify reply --todo-id <id> --action <execute\|defer\|dismiss>` | `handle_action()` | 模拟用户操作（测试用） |
 
-### 5.4 todo 命令变更
+### 5.4 migrate 命令组
+
+| 命令 | 函数 | 描述 |
+|------|------|------|
+| `oc-collab migrate --to-sqlite` | `migrate()` | 执行YAML→SQLite迁移 |
+| `oc-collab migrate --preview` | `preview()` | 预览迁移（不执行） |
+| `oc-collab migrate --rollback --backup <file>` | `rollback()` | 回滚迁移 |
+| `oc-collab migrate --list-backups` | `list_backups()` | 列出备份文件 |
+
+### 5.4.1 migrate 命令详细设计
+
+```python
+@click.group()
+def migrate():
+    """YAML到SQLite迁移命令组"""
+    pass
+
+@migrate.command()
+@click.option('--force', is_flag=True, help='强制执行，不确认')
+def to_sqlite(force):
+    """将YAML数据迁移到SQLite"""
+    # 1. 备份
+    # 2. 解析
+    # 3. 转换
+    # 4. 写入
+    # 5. 验证
+
+@migrate.command()
+def preview():
+    """预览迁移结果，不执行"""
+    # 仅解析和转换，不写入
+
+@migrate.command()
+@click.option('--backup', required=True, help='备份文件路径')
+def rollback(backup):
+    """回滚到备份"""
+    # 恢复YAML，删除SQLite
+
+@migrate.command()
+def list_backups():
+    """列出可用备份"""
+    # 显示state/backup/目录下的备份文件
+
+@migrate.command()
+def status():
+    """查看迁移状态"""
+    # 显示: 已迁移/未迁移/部分迁移
+```
+
+### 5.5 todo 命令变更
 
 | 命令 | 变更说明 |
 |------|----------|
