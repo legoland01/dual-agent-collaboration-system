@@ -129,32 +129,70 @@ oc-collab test deps --module F-STORE-001
 #### 2.2.1 数据库设计（SQLite）
 
 ```sql
--- test_results表（新增）
+-- test_cases表（测试用例）
+CREATE TABLE test_cases (
+    id TEXT PRIMARY KEY,                    -- T001, V315等
+    title TEXT NOT NULL,                    -- 用例名称
+    module TEXT NOT NULL,                    -- 功能模块ID
+    version TEXT NOT NULL,                   -- 版本
+    description TEXT,                        -- 用例描述
+    test_steps TEXT,                        -- 测试步骤
+    expected_result TEXT,                   -- 预期结果
+    requires TEXT,                          -- 前置条件（JSON）
+    setup TEXT,                             -- 初始化（JSON）
+    cleanup TEXT,                           -- 清理（JSON）
+    bug_id TEXT,                            -- 关联的bug（如BUG-20260217-001）
+    created_by TEXT,                        -- 创建人
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- test_results表（测试执行结果）
 CREATE TABLE test_results (
     id TEXT PRIMARY KEY,                    -- tr-001
-    test_case_id TEXT NOT NULL,             -- T001, V315等
-    test_case_title TEXT,                   -- 用例名称
-    version TEXT NOT NULL,                  -- v2.3.2
-    module TEXT,                            -- F-STORE-001等
+    test_case_id TEXT NOT NULL,            -- 关联test_cases.id
+    version TEXT NOT NULL,                  -- 版本
     result TEXT NOT NULL,                   -- PASS/FAIL/PENDING
-    executed_by TEXT NOT NULL,              -- agent1/agent2
+    executed_by TEXT NOT NULL,               -- agent1/agent2
     executed_at TIMESTAMP NOT NULL,         -- 执行时间
-    duration_seconds INTEGER,               -- 执行耗时
-    error_message TEXT,                    -- 失败原因
-    notes TEXT                             -- 备注
+    duration_seconds INTEGER,                -- 执行耗时
+    error_message TEXT,                     -- 失败原因
+    bug_id TEXT,                            -- 关联的bug（如测试发现BUG-20260217-001）
+    notes TEXT                              -- 备注
 );
 
 -- 索引
+CREATE INDEX idx_test_cases_version ON test_cases(version);
+CREATE INDEX idx_test_cases_module ON test_cases(module);
+CREATE INDEX idx_test_cases_bug ON test_cases(bug_id);
+CREATE INDEX idx_test_results_case ON test_results(test_case_id);
 CREATE INDEX idx_test_results_version ON test_results(version);
-CREATE INDEX idx_test_results_case_id ON test_results(test_case_id);
-CREATE INDEX idx_test_results_executed_by ON test_results(executed_by);
+CREATE INDEX idx_test_results_bug ON test_results(bug_id);
 ```
 
 #### 2.2.2 CLI命令
 
 ```bash
+# === 测试用例管理 ===
+# 创建测试用例
+oc-collab test case create --id T001 --module F-STORE-001 --title "SQLite初始化" \
+    --steps "1. 执行CLI 2. 检查db" --expected "db存在" --bug-id BUG-20260217-001
+
+# 查看测试用例
+oc-collab test case show T001
+
+# 列出所有测试用例
+oc-collab test case list --version v2.3.2
+
+# 关联Bug
+oc-collab test case link-bug --case T001 --bug BUG-20260217-001
+
+# === 测试执行 ===
 # 执行测试并记录结果
 oc-collab test run --version v2.3.2 --record
+
+# 执行单个测试用例
+oc-collab test run --case T001 --sandbox
 
 # 查看测试结果
 oc-collab test results --version v2.3.2
@@ -167,6 +205,13 @@ oc-collab test pending --version v2.3.2
 
 # 导出测试报告
 oc-collab test report --version v2.3.2 --format markdown
+
+# === 测试环境 ===
+# 检查测试环境是否就绪
+oc-collab test check-env --version v2.3.2
+
+# 查看模块测试依赖
+oc-collab test deps --module F-STORE-001
 ```
 
 #### 2.2.3 前端页面互动（测试平台能力）
