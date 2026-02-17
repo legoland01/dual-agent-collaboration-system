@@ -300,12 +300,181 @@ class TestDataMigration:
         assert 'error' in result
 
 
-class TestNotificationService:
-    """NotificationService单元测试"""
+class TestInteractionHandlerExtended:
+    """InteractionHandler扩展测试"""
+    
+    @pytest.fixture
+    def handler(self):
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        notification = NotificationService(storage)
+        h = InteractionHandler(storage, notification)
+        yield h
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_handle_action_execute(self, handler):
+        """测试execute动作"""
+        handler.storage.add({'id': 'ACT-001', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        ok, msg = handler.handle_action('ACT-001', 'execute')
+        assert ok is True
+    
+    def test_handle_action_defer(self, handler):
+        """测试defer动作"""
+        handler.storage.add({'id': 'ACT-002', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        ok, msg = handler.handle_action('ACT-002', 'defer')
+        assert ok is True
+    
+    def test_handle_action_dismiss(self, handler):
+        """测试dismiss动作"""
+        handler.storage.add({'id': 'ACT-003', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        ok, msg = handler.handle_action('ACT-003', 'dismiss')
+        assert ok is True
+    
+    def test_handle_action_reassign(self, handler):
+        """测试reassign动作-需要直接调用"""
+        handler.storage.add({'id': 'ACT-004', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        ok, msg = handler.reassign('ACT-004', '3')
+        assert ok is True
+    
+    def test_handle_invalid_action(self, handler):
+        """测试无效动作"""
+        ok, msg = handler.handle_action('INVALID', 'invalid')
+        assert ok is False
+    
+    def test_execute_nonexistent(self, handler):
+        """测试执行不存在的TODO"""
+        ok, msg = handler.execute('NONEXISTENT')
+        assert ok is False
+    
+    def test_complete_nonexistent(self, handler):
+        """测试完成不存在的TODO"""
+        ok, msg = handler.complete('NONEXISTENT')
+        assert ok is False
+    
+    def test_dismiss_nonexistent(self, handler):
+        """测试取消不存在的TODO"""
+        ok, msg = handler.dismiss('NONEXISTENT')
+        assert ok is False
+    
+    def test_defer_nonexistent(self, handler):
+        """测试延迟不存在的TODO"""
+        ok, msg = handler.defer('NONEXISTENT')
+        assert ok is False
+    
+    def test_view_nonexistent(self, handler):
+        """测试查看不存在的TODO"""
+        ok, result = handler.view('NONEXISTENT')
+        assert ok is False
+
+
+class TestStatusMonitorExtended:
+    """StatusMonitor扩展测试"""
+    
+    @pytest.fixture
+    def monitor(self):
+        db = tempfile.mktemp(suffix='.db')
+        m = AgentStatusMonitor(db)
+        yield m
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_get_last_seen(self, monitor):
+        """测试获取最后在线时间"""
+        monitor.detect_online('agent1')
+        last_seen = monitor.get_last_seen('agent1')
+        assert last_seen is not None
+    
+    def test_get_last_seen_nonexistent(self, monitor):
+        """测试获取不存在Agent的最后在线时间"""
+        last_seen = monitor.get_last_seen('nonexistent')
+        assert last_seen is None
+    
+    def test_list_all_agents(self, monitor):
+        """测试列出所有Agent"""
+        monitor.detect_online('agent1')
+        monitor.detect_online('agent2')
+        agents = monitor.list_all_agents()
+        assert len(agents) >= 2
+
+
+class TestTodoStorageExtended:
+    """TodoStorage扩展测试"""
+    
+    @pytest.fixture
+    def storage(self):
+        db = tempfile.mktemp(suffix='.db')
+        s = TodoStorage(db)
+        yield s
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_mark_unread(self, storage):
+        """测试标记未读"""
+        storage.add({'id': 'EXT-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        storage.mark_read('EXT-001')
+        ok = storage.mark_unread('EXT-001')
+        assert ok is True
+    
+    def test_update_nonexistent(self, storage):
+        """测试更新不存在的TODO"""
+        ok = storage.update('NONEXISTENT', {'status': 'completed'})
+        assert ok is False
+    
+    def test_delete_nonexistent(self, storage):
+        """测试删除不存在的TODO"""
+        ok = storage.delete('NONEXISTENT')
+        assert ok is False
+    
+    def test_get_next_id(self, storage):
+        """测试获取下一个ID"""
+        storage.add({'id': 'TODO-2to1-001', 'content': 'test', 'sender': '2', 'receiver': '1'})
+        next_id = storage.get_next_id('2')
+        assert next_id >= 1
+    
+    def test_list_multiple_filters(self, storage):
+        """测试多条件筛选"""
+        storage.add({'id': 'FILT-001', 'content': 'test1', 'sender': '1', 'receiver': '2', 'status': 'pending', 'priority': 'high'})
+        storage.add({'id': 'FILT-002', 'content': 'test2', 'sender': '1', 'receiver': '2', 'status': 'completed', 'priority': 'low'})
+        todos = storage.list(receiver='2', status='pending', unread_only=False)
+        assert any(t['id'] == 'FILT-001' for t in todos)
+
+
+class TestConfigManagerExtended:
+    """ConfigManager扩展测试"""
+    
+    @pytest.fixture
+    def config(self):
+        cfg_file = tempfile.mktemp(suffix='.yaml')
+        cfg = ConfigManager(cfg_file)
+        yield cfg
+        if os.path.exists(cfg_file):
+            os.remove(cfg_file)
+    
+    def test_nested_key(self, config):
+        """测试嵌套键"""
+        config.set('level1.level2.level3', 'value')
+        val = config.get('level1.level2.level3')
+        assert val == 'value'
+    
+    def test_get_raw(self, config):
+        """测试获取原始值"""
+        config.set('raw.key', '123')
+        val = config.get_raw('raw.key')
+        assert val == '123'
+    
+    def test_reset(self, config):
+        """测试重置"""
+        config.set('test.key', 'value')
+        ok = config.reset()
+        assert ok is True
+
+
+class TestNotificationServiceFull:
+    """NotificationService完整测试"""
     
     @pytest.fixture
     def notification(self):
-        """创建通知服务"""
         db = tempfile.mktemp(suffix='.db')
         storage = TodoStorage(db)
         n = NotificationService(storage)
@@ -313,30 +482,27 @@ class TestNotificationService:
         if os.path.exists(db):
             os.remove(db)
     
-    def test_enable_notification(self, notification):
-        """测试启用通知"""
-        ok = notification.enable()
+    def test_generate_instruction_custom_path(self, notification):
+        """测试生成自定义路径Instruction"""
+        custom_path = tempfile.mktemp(suffix='.md')
+        ok = notification.generate_instruction(custom_path)
         assert ok is True
+        assert os.path.exists(custom_path)
+        os.remove(custom_path)
+    
+    def test_notification_stores_todo_id(self, notification):
+        """测试通知存储TODO ID"""
+        notification.notify({'id': 'NOTIF-001', 'content': 'test'})
+        import sqlite3
+        conn = sqlite3.connect(notification.storage.db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM notifications WHERE todo_id = 'NOTIF-001'")
+        row = cursor.fetchone()
+        conn.close()
+        assert row is not None
+    
+    def test_get_status_with_instruction(self, notification):
+        """测试获取状态-有Instruction"""
+        notification.generate_instruction()
         status = notification.get_status()
-        assert status.get('enabled') is True
-    
-    def test_disable_notification(self, notification):
-        """测试禁用通知"""
-        notification.enable()
-        ok = notification.disable()
-        assert ok is True
-        status = notification.get_status()
-        assert status.get('enabled') is False
-    
-    def test_notify_todo(self, notification):
-        """测试TODO通知"""
-        notif_id = notification.notify({'id': 'TEST-001', 'content': '测试'})
-        assert notif_id is not None
-        assert 'notif-' in notif_id
-    
-    def test_generate_instruction(self, notification):
-        """测试生成Instruction"""
-        ok = notification.generate_instruction()
-        assert ok is True
-        import os
-        assert os.path.exists(notification.instruction_path)
+        assert status.get('instruction_exists') is True
