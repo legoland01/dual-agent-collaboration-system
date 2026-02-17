@@ -303,6 +303,53 @@ test_case:
 | element_visible | 元素是否可见 |
 | attribute_match | 属性是否匹配 |
 
+#### 2.2.6 自动Bug发现与修复流程
+
+**测试发现问题 → 自动报Bug → 修复 → 自动关Bug**
+
+```yaml
+# 测试用例配置
+test_case:
+  id: T001
+  on_fail: auto_create_bug  # 失败时自动创建Bug
+  auto_close_on_pass: true   # 通过时自动关闭关联Bug
+```
+
+**自动化流程**：
+
+```
+测试执行 → 失败
+     │
+     ▼
+自动创建Bug报告
+     │
+     ▼
+自动创建修复TODO → Agent2修复
+     │
+     ▼
+重新执行测试 → 通过
+     │
+     ▼
+自动关闭Bug
+```
+
+**CLI命令**：
+```bash
+# 手动触发：失败时自动创建Bug
+oc-collab test run --version v2.3.2 --auto-bug
+
+# 查看自动创建的Bug
+oc-collab test bugs --auto-created
+
+# 手动关联：测试与Bug
+oc-collab test link-bug --case T001 --bug BUG-2026-002
+```
+
+**优势**：
+- 测试发现问题立即记录，不遗漏
+- 修复后自动验证通过
+- 全流程可追溯
+
 #### 2.2.3 测试文档模板更新
 
 在E2E测试文档中增加结果列：
