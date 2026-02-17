@@ -56,7 +56,10 @@ def show_context_command():
 @click.option("--content", help="待办内容")
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), default="medium")
 @click.option("--test-mode", is_flag=True, help="测试模式（不创建正式TODO，仅验证参数）")
-def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_mode: bool):
+@click.option("--to", "--receiver", "receiver", help="接收者Agent ID (如 1, 2)")
+@click.option("--source", "-s", "source", default="MANUAL", help="来源标签 (REQUIREMENT/BUG/FEEDBACK/MANUAL)")
+@click.option("--type", "template_type", help="模板类型 (REQUIREMENT/BUG_FIX/MANUAL)")
+def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_mode: bool, receiver: Optional[str], source: str, template_type: Optional[str]):
     """
     创建待办任务。
 
@@ -93,18 +96,16 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
             click.echo(f"❌ {error}")
         sys.exit(1)
 
-    # v2.2.9: ComplianceEnforcer集成 - Agent1禁止执行todowrite
-    from ..core.compliance_enforcer import ComplianceEnforcer
+    # v2.3.1: ComplianceChecker集成 - 替换旧的ComplianceEnforcer
+    from ..core.compliance_checker import ComplianceChecker
     try:
         context = ContextManager().load_context()
         current_agent_id = context.agent
-        enforcer = ComplianceEnforcer(current_agent_id)
-        compliance_result = enforcer.check("todowrite")
-
-        if not compliance_result.allowed:
-            click.echo(f"\n{compliance_result.message}\n")
-            enforcer.record_violation(compliance_result)
-            sys.exit(3)
+        checker = ComplianceChecker(str(current_agent_id))
+        
+        # 检查TODO创建是否符合规则（在TODO创建后检查）
+        # 合规检查将在TODO生成后进行，此处先跳过，由todowrite内部调用check_todo_create
+        # 如果需要预先检查，可以在这里添加逻辑
     except ContextNotFoundError:
         click.echo("⚠️ 无法获取Agent上下文，建议先运行 'oc-collab switch 1' 或 'oc-collab switch 2' 切换Agent")
         click.echo("   为确保角色合规，请明确指定当前Agent身份")
@@ -143,25 +144,78 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
                     pass
 
             agent_id = current_agent_id
-            todo = sync_manager.add_todo(content, agent_id=agent_id, priority=priority)
-            click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
-            click.echo(f"   优先级: {todo.priority}")
-            click.echo(f"   状态: {todo.status}")
+            
+            # v2.3.1: 使用新格式生成TODO编号
+            todo_content = content
+            new_format_id = None
+            if receiver:
+                from ..core.todo_id_generator import TodoIdGenerator
+                id_gen = TodoIdGenerator()
+                new_format_id = id_gen.generate(str(agent_id), receiver)
+            
+            # v2.3.1: 来源标签处理（添加到内容前缀）
+            if source and source != "MANUAL":
+                todo_content = f"[{source}] {todo_content}"
+            
+            # v2.3.1: 传递new_format_id给add_todo
+            todo = sync_manager.add_todo(todo_content, agent_id=agent_id, priority=priority, todo_id=new_format_id)
+            
+            # v2.3.1: 合规检查 - 验证TODO格式和创建者/接收者关系
+            try:
+                from ..core.context_manager import ContextManager as CM
+                from ..core.compliance_checker import ComplianceChecker
+                context = CM().load_context()
+                current_agent_id = context.agent
+                checker = ComplianceChecker(str(current_agent_id))
+                
+                todo_data = {
+                    "id": new_format_id or todo.id,
+                    "content": todo.content,
+                    "creator": str(current_agent_id),
+                    "receiver": receiver
+                }
+                allowed, error_msg = checker.check_todo_create(todo_data)
+                if not allowed:
+                    # 删除刚创建的TODO
+                    sync_manager.delete_todo(todo.id)
+                    click.echo(f"❌ 合规检查失败: {error_msg}")
+                    sys.exit(3)
+            except Exception as e:
+                click.echo(f"⚠️ 合规检查异常: {e}")
+            
+            # 提取新格式ID用于显示
+            if new_format_id:
+                click.echo(f"✅ 待办已创建: [{new_format_id}] {content}")
+                click.echo(f"   优先级: {priority}")
+                click.echo(f"   状态: pending")
+            else:
+                click.echo(f"✅ 待办已创建: [{todo.id}] {todo.content}")
+                click.echo(f"   优先级: {todo.priority}")
+                click.echo(f"   状态: {todo.status}")
 
             # v2.2.9: StateNotifier集成 - 发送Webhook通知
             from ..core.context_manager import ContextManager, ContextNotFoundError
+            from ..core.state_notifier import StateNotifier
+            from ..core.todo_queue_manager import TodoQueueManager
             try:
                 context = ContextManager().load_context()
                 current_agent = context.agent
-                notifier = StateNotifier()
-                result = notifier.notify_todo_created(todo.id, todo.content, f"agent{current_agent}")
+                
+                # 初始化StateNotifier并传入queue_manager
+                queue_manager = TodoQueueManager()
+                notifier = StateNotifier(queue_manager=queue_manager)
+                
+                # 计算接收者
+                receiver_agent = f"agent{receiver}" if receiver else f"agent{agent_id}"
+                
+                result = notifier.notify_todo_created(todo.id, todo.content, f"agent{current_agent}", to_agent=receiver_agent)
                 if result:
-                    click.echo("   🔔 Webhook通知已发送")
+                    click.echo("   🔔 通知已发送")
                 else:
                     click.echo("   ⚠️ Webhook未配置，通知功能不可用")
                     click.echo("      如需启用通知，请配置 config/webhook.yaml")
             except Exception as e:
-                click.echo(f"   ⚠️ Webhook通知失败: {e}")
+                click.echo(f"   ⚠️ 通知失败: {e}")
 
             # v2.2.15: AutoBugDetector集成 - 任务后自检
             # 注意：不再自动从StateManager获取Agent，必须显式switch

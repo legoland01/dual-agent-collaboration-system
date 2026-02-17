@@ -240,3 +240,88 @@ def todo_clear_command(agent: str):
 
     except Exception as e:
         click.echo(f"❌ 清空失败: {e}")
+
+
+@todo_group.command("show")
+@click.argument("todo_id")
+@click.option("--json", is_flag=True, help="JSON格式输出")
+def todo_show_command(todo_id: str, json: bool):
+    """显示TODO详情
+    
+    示例:
+      oc-collab todo show TODO-1-001
+      oc-collab todo show TODO-1to2-001 --json
+    """
+    try:
+        from ..core.context_manager import ContextManager
+        from ..core.todo_sync_manager import TodoSyncManager
+        ctx = ContextManager().load_context()
+        
+        sync_manager = TodoSyncManager()
+        todo = sync_manager.get_todo(todo_id)
+        
+        if not todo:
+            click.echo(f"❌ 未找到TODO: {todo_id}")
+            return
+        
+        # 自动ACK（如果查看者是接收者）
+        current_agent = str(ctx.agent).replace("agent", "") if ctx.agent else None
+        if current_agent and todo.agent_id and int(current_agent) == todo.agent_id:
+            from ..core.ack_confirm import ACKConfirm
+            ack = ACKConfirm()
+            ack.auto_ack_on_show(todo_id, f"agent{current_agent}")
+        
+        if json:
+            import json
+            click.echo(json.dumps({
+                "id": todo.id,
+                "content": todo.content,
+                "status": todo.status,
+                "priority": todo.priority,
+                "agent_id": todo.agent_id,
+                "created_at": todo.created_at,
+                "updated_at": todo.updated_at
+            }, indent=2, ensure_ascii=False))
+        else:
+            click.echo(f"\n📋 TODO详情:")
+            click.echo(f"  ID: {todo.id}")
+            click.echo(f"  内容: {todo.content}")
+            click.echo(f"  状态: {todo.status}")
+            click.echo(f"  优先级: {todo.priority}")
+            click.echo(f"  接收者: agent{todo.agent_id}")
+            click.echo(f"  创建时间: {todo.created_at}")
+            click.echo("")
+    
+    except Exception as e:
+        click.echo(f"❌ 显示失败: {e}")
+
+
+@todo_group.command("ack")
+@click.argument("todo_id")
+def todo_ack_command(todo_id: str):
+    """手动确认TODO
+    
+    示例:
+      oc-collab todo ack TODO-1-001
+    """
+    try:
+        from ..core.context_manager import ContextManager
+        ctx = ContextManager().load_context()
+        
+        current_agent = ctx.agent.replace("agent", "") if ctx.agent else None
+        if not current_agent:
+            click.echo("❌ 无法确定当前Agent")
+            return
+        
+        from ..core.ack_confirm import ACKConfirm
+        ack = ACKConfirm()
+        
+        result = ack.acknowledge(todo_id, f"agent{current_agent}")
+        
+        if result:
+            click.echo(f"✅ TODO {todo_id} 已确认")
+        else:
+            click.echo(f"❌ 确认失败")
+    
+    except Exception as e:
+        click.echo(f"❌ 确认失败: {e}")

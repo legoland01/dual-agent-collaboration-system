@@ -163,7 +163,7 @@ class TodoSyncManager:
             raise TodoSaveError(f"写入待办文件失败: {str(e)}")
 
     def add_todo(self, content: str, agent_id: Optional[int] = None,
-                 priority: str = "medium") -> TodoItem:
+                 priority: str = "medium", todo_id: Optional[str] = None) -> TodoItem:
         """
         添加待办
 
@@ -195,7 +195,9 @@ class TodoSyncManager:
                 except (ValueError, IndexError):
                     pass
 
-        if agent_id:
+        if todo_id:
+            new_id = todo_id
+        elif agent_id:
             new_id = f"TODO-{agent_id}-{max_id + 1:03d}"
         else:
             new_id = f"TODO-{max_id + 1:03d}"
@@ -343,3 +345,182 @@ class TodoSyncManager:
             if self.rollback():
                 pass
             return False
+
+    def get_all(self, agent_id: Optional[str] = None) -> List[TodoItem]:
+        """获取所有TODO（兼容性方法）
+        
+        Args:
+            agent_id: 可选的agent过滤
+            
+        Returns:
+            TODO列表
+        """
+        state = self.load_todos()
+        todos = state.todos
+        
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todos = [t for t in todos if t.agent_id == agent_num]
+        
+        return todos
+    
+    def get_unread(self, agent_id: Optional[str] = None, priority: Optional[str] = None) -> List[TodoItem]:
+        """获取未读TODO（兼容性方法）
+        
+        Args:
+            agent_id: 可选的agent过滤
+            priority: 可选的优先级过滤
+            
+        Returns:
+            未读TODO列表
+        """
+        state = self.load_todos()
+        todos = [t for t in state.todos if t.status == "pending"]
+        
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todos = [t for t in todos if t.agent_id == agent_num]
+        
+        if priority:
+            todos = [t for t in todos if t.priority == priority]
+        
+        return todos
+    
+    def mark_read(self, todo_id: str, agent_id: Optional[str] = None) -> bool:
+        """标记TODO为已读
+        
+        Args:
+            todo_id: TODO ID
+            agent_id: 可选的接收者验证
+            
+        Returns:
+            是否成功
+        """
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todo = self.get_todo(todo_id)
+            if todo and todo.agent_id != agent_num:
+                return False
+        
+        return self.update_todo(todo_id, status="read") is not None
+    
+    def mark_all_read(self, agent_id: Optional[str] = None) -> bool:
+        """标记所有TODO为已读
+        
+        Args:
+            agent_id: 可选的agent过滤
+            
+        Returns:
+            是否成功
+        """
+        state = self.load_todos()
+        todos = state.todos
+        
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todos = [t for t in todos if t.agent_id == agent_num]
+        
+        for todo in todos:
+            self.update_todo(todo.id, status="read")
+        
+        return True
+    
+    def get_stats(self, agent_id: Optional[str] = None) -> dict:
+        """获取统计信息
+        
+        Args:
+            agent_id: 可选的agent过滤
+            
+        Returns:
+            统计信息字典
+        """
+        state = self.load_todos()
+        todos = state.todos
+        
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todos = [t for t in todos if t.agent_id == agent_num]
+        
+        return {
+            "total": len(todos),
+            "unread": len([t for t in todos if t.status == "pending"]),
+            "by_agent": {
+                "agent1": len([t for t in todos if t.agent_id == 1]),
+                "agent2": len([t for t in todos if t.agent_id == 2])
+            },
+            "by_priority": {
+                "high": len([t for t in todos if t.priority == "high"]),
+                "medium": len([t for t in todos if t.priority == "medium"]),
+                "low": len([t for t in todos if t.priority == "low"])
+            }
+        }
+    
+    def cleanup(self, days: int = 7) -> int:
+        """清理过期已读TODO
+        
+        Args:
+            days: 保留天数
+            
+        Returns:
+            清理数量
+        """
+        from datetime import datetime, timedelta
+        state = self.load_todos()
+        cutoff = datetime.now() - timedelta(days=days)
+        
+        to_keep = []
+        removed = 0
+        
+        for todo in state.todos:
+            if todo.status == "read":
+                if todo.updated_at:
+                    try:
+                        updated = datetime.fromisoformat(todo.updated_at)
+                        if updated < cutoff:
+                            removed += 1
+                            continue
+                    except:
+                        pass
+            to_keep.append(todo)
+        
+        state.todos = to_keep
+        self.save_todos(state)
+        return removed
+    
+    def clear(self, agent_id: Optional[str] = None) -> int:
+        """清空TODO
+        
+        Args:
+            agent_id: 可选的agent过滤
+            
+        Returns:
+            清空数量
+        """
+        state = self.load_todos()
+        todos = state.todos
+        
+        if agent_id:
+            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
+            todos = [t for t in todos if t.agent_id != agent_num]
+        else:
+            todos = []
+        
+        count = len(state.todos) - len(todos)
+        state.todos = todos
+        self.save_todos(state)
+        return count
+    
+    def get_todo(self, todo_id: str) -> Optional[TodoItem]:
+        """获取单个TODO
+        
+        Args:
+            todo_id: TODO ID
+            
+        Returns:
+            TODO项或None
+        """
+        state = self.load_todos()
+        for todo in state.todos:
+            if todo.id == todo_id:
+                return todo
+        return None

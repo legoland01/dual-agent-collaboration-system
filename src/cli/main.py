@@ -37,6 +37,7 @@ from .compliance_commands import compliance_group
 from .deploy_commands import deploy_group
 from .deploy_full_commands import deploy_full
 from .todo_commands import todo_group
+from .agent_commands import agent_group
 from .startup_commands import startup_check_command
 from .state_commands import state_group
 from .bug_commands import bug_group
@@ -60,7 +61,12 @@ def get_project_path() -> str:
 @click.group()
 def main():
     """双Agent协作框架 CLI工具。"""
-    pass
+    # 每次执行命令时检查未读TODO并显示
+    try:
+        from .check_todo_on_startup import check_and_notify_todos
+        check_and_notify_todos()
+    except Exception:
+        pass
 
 
 @main.command("init")
@@ -181,11 +187,21 @@ def switch_command(agent_id: int, welcome: bool):
         state_manager = StateManager(project_path)
 
         current_agent = state_manager.get_active_agent()
+        target_agent = f"agent{agent_id}"
+
         if current_agent == f"agent{agent_id}":
             click.echo(f"已经是 Agent {agent_id}")
             return
 
         state_manager.set_active_agent(f"agent{agent_id}")
+
+        # 显示未读TODO通知
+        from ..core.agent_startup_checker import AgentStartupChecker
+        checker = AgentStartupChecker(target_agent)
+        result = checker.run()
+        if result.has_unread_todos:
+            checker.display_notifications(result)
+            click.echo("")
 
         if welcome:
             session_manager = SessionManager(project_path)
@@ -1670,6 +1686,7 @@ main.add_command(rules_group, "rules")
 main.add_command(compliance_group, "compliance")
 main.add_command(deploy_group, "deploy")
 main.add_command(todo_group, "todo")
+main.add_command(agent_group, "agent")
 main.add_command(startup_check_command, "startup-check")
 main.add_command(state_group, "state")
 main.add_command(bug_group, "bug")

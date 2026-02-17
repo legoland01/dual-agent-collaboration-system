@@ -1,8 +1,8 @@
 # oc-collab 产品路线图
 
-**版本**: v3  
+**版本**: v4  
 **创建日期**: 2026-02-14  
-**更新日期**: 2026-02-15
+**更新日期**: 2026-02-17
 
 ---
 
@@ -12,19 +12,31 @@
 |------|------|----------|------|
 | **v1** | 基础框架验证 | 单Agent流程 | 已完成 |
 | **v2** | 稳定可靠的双Agent协作 | Agent1+Agent2分离式协作 | 🔄 **当前** |
-| **v3** | L1稳定 + L3项目管理 | CLI + PM-Agent | ⏳ 待规划 |
+| **v3** | TODO系统独立 + L3 PM-Agent | 全局TODO + 单点入口 | ⏳ 待规划 |
+
+---
+
+## 一、版本愿景总览
+
+| 版本 | 愿景 | 核心能力 | 阶段 |
+|------|------|----------|------|
+| **v1** | 基础框架验证 | 单Agent流程 | 已完成 |
+| **v2** | 稳定可靠的双Agent协作 | Agent1+Agent2分离式协作 | 🔄 **当前** |
+| **v3** | TODO系统独立 + L3 PM-Agent | 全局TODO + 单点入口 | ⏳ 待规划 |
 
 ---
 
 ## 二、架构分层（做什么）
 
 ```
-L1: oc-collab-core     → CLI工具，Agent协作
-L2: 接口/编排层        → API、Webhook
-L3: 管理平台层         → PM-Agent、项目管理
+L1: oc-collab-core     → CLI工具，项目内Agent协作（不含TODO）
+L2: TODO系统           → 全局共享，跨项目任务传递
+L3: PM-Agent          → 单点入口，项目管理
 ```
 
 **详细设计**: 见 `CORE_ARCHITECTURE.md`
+
+**研究结论**: 见 `RESEARCH_Multi_Project_Collaboration.md`
 
 ---
 
@@ -37,7 +49,8 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 ├── Agent1职责：发现问题 → 创建TODO → 记录文档
 ├── Agent2职责：执行代码 → 修复Bug → 合并到分支
-└── 核心能力：CLI工具 + Skill规范 + 流程自动化 + 状态通知
+├── 核心能力：CLI工具 + Skill规范 + 流程自动化 + 状态通知
+└── TODO系统：从oc-collab独立，全局共享
 ```
 
 ### v2 版本结构
@@ -46,10 +59,9 @@ v2目标：实现稳定可靠的双Agent协作框架
 |--------|------|------|------|
 | **v2.0** | 基础框架 | 双Agent协作基础 | ✅ 已发布 |
 | **v2.1** | 异常处理 | 异常捕获 + E2E测试 | ✅ 已发布 |
-| **v2.2** | 流程规范 | 签署 + Git同步 + Skill强制 | 🔄 **当前规划** |
-| **v2.3** | TODO核心优化 | 编号优化 + 基础通信层 | ⏳ 待规划 |
+| **v2.2** | 流程规范 | 签署 + Git同步 + Skill强制 | ✅ 已发布 |
+| **v2.3** | TODO系统 | Agent注册 + 跨项目路由 | 🔄 **当前规划** |
 | **v2.4** | **刚性框架** | **里程碑锁 + 审批权校验 + 审计** | ⏳ 待规划 |
-| **v2.5** | Agent扩展 + Skill系统 | 多Agent TODO支持 | ⏳ 待规划 |
 
 ---
 
@@ -95,51 +107,86 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 ---
 
-## 七、v2.3：TODO多Agent支持（应用层+通信层）
+## 七、v2.3：TODO系统（全局独立）
 
-**目标**: 彻底搞定TODO系统，支持多Agent团队之间互相发任务
+**目标**: 将TODO系统从oc-collab独立，支持跨项目任务传递
 
-**背景**: TODO是协作基础设施，v2.3.0已完成质量保证功能，本版本聚焦TODO通信能力
+**背景**: 
+- 多项目协作需要全局共享的TODO系统
+- oc-collab只管项目内流程，TODO独立出来
+- 参考: `RESEARCH_Multi_Project_Collaboration.md`
 
-### v2.3.1：TODO多Agent支持
+### v2.3.1：TODO核心功能
 
-**目标**: 支持多Agent团队（我们+PM Agent团队）之间互相发任务
-
-#### 1. 应用层功能
+**目标**: 支持跨项目TODO分发
 
 | 功能 | 说明 | 工时 | 优先级 |
 |------|------|------|--------|
-| TODO编号优化 | 支持多Agent：TODO-1to2-xxx, TODO-1to3-xxx | 4h | P0 |
+| TODO编号优化 | 支持多Agent：TODO-1to2-xxx | 4h | P0 |
 | 向后兼容 | 旧格式兼容 | 2h | P0 |
-| 来源标签 | REQUIREMENT/BUG/FEEDBACK | 3h | P0 |
-| 模板系统 | 自动填充 | 4h | P1 |
+| Agent注册表 | 支持注册多个Agent | 3h | P0 |
+| 项目标签 | 区分TODO属于哪个项目 | 2h | P0 |
+| 跨项目路由 | sender-to-receiver规则 | 4h | P0 |
 
-#### 2. 通信层功能
+### v2.3.2：TODO存储 + 监听 + 实时通知
+
+**目标**: SQLite存储 + 伴随监听进程 + 实时通知交互
+
+**参考**: `PROPOSAL_2026-02-027_agent_notification_interaction.md`
 
 | 功能 | 说明 | 工时 | 优先级 |
 |------|------|------|--------|
-| **自动Git同步** | 所有文档操作自动sync到所有远程仓库 | 4h | **P0** |
-| Agent注册表 | 支持注册多个Agent | 3h | P0 |
-| ACK确认 | commit message确认 | 3h | P1 |
+| SQLite存储 | 直接使用SQLite | 4h | P0 |
+| 数据迁移 | YAML转SQLite脚本 | 2h | P1 |
+| 监听进程 | agent listen自动启动 | 3h | P0 |
+| 状态感知 | online/offline实时感知 | 2h | P1 |
+| 上线拉取 | Agent上线后先处理积压 | 2h | P1 |
+| **实时通知** | prompt窗口显示通知 | 4h | P0 |
+| **交互选项** | 执行/推迟/拒绝 | 4h | P0 |
+| **配置管理** | opencode server连接配置 | 2h | P1 |
 
-#### 3. Agent注册与管理
+**v2.3.2预计工时**: ~23h
 
-**注册方式**：
-```bash
-# 方式1：环境变量
-export OC_AGENT_ID=agent1
+### v2.3.3：Skill遵从 + Agent命名 + 自动流程触发
 
-# 方式2：Git config自动识别
-oc-collab agent auto-register  # 启动时自动注册
-```
+**目标**: 确保oc-collab流程可靠 + Agent身份规范化 + 自动化流程
 
-**注册信息**：
-```yaml
-agents:
-  agent1:
-    id: agent1
-    role: DEVELOPMENT_LEAD
-    team: internal
+**参考**: `PROPOSAL_2026-02-026_agent_id_and_role_rename.md`
+
+| 功能 | 说明 | 工时 | 优先级 |
+|------|------|------|--------|
+| Skill强制 | 关键操作必须使用Skill | 4h | P0 |
+| 流程校验 | 阶段门禁校验 | 3h | P0 |
+| Agent命名规范化 | Agent1/2 → 产品经理/架构师 | 3h | P0 |
+| 审计日志 | 操作记录追溯 | 2h | P1 |
+| 异常检测 | 偏离流程的行为检测 | 3h | P1 |
+
+#### 自动流程触发
+
+**需人工干预的节点**：
+
+| 节点 | 原因 |
+|------|------|
+| 评审完成后 | 等待用户确认是否进入下一步 |
+| 验收通过后进入部署 | 避免collusion |
+
+**自动触发的节点**：
+
+| 触发条件 | 动作 |
+|----------|------|
+| TODO完成 | 自动创建通知回复TODO |
+| 需求文档签署 | 自动启动详细设计 |
+| 详细设计评审通过 | 自动触发Agent1创建测试用例设计 |
+| 测试用例设计完成 | 自动创建测试评审TODO |
+| Agent1发现Bug | 自动创建Bug修复TODO给Agent2 |
+| Agent2修复Bug | 自动创建Bug验收TODO给Agent1 |
+| 开发自检通过 | 自动创建提测TODO |
+
+**v2.3 预计工时**: ~31h
+
+---
+
+## 八、v2.4：刚性框架
     status: active
     git_name: "zhangsan"
   agent2:

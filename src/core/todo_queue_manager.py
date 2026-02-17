@@ -36,7 +36,51 @@ class TodoQueueItem:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'TodoQueueItem':
-        return cls(**data)
+        # 兼容agent_adhoc_todos.yaml格式转换
+        # TodoItem: id, content, status, priority, agent_id, created_at, updated_at
+        # TodoQueueItem: id, content, from_agent, to_agent, priority, created_at, read, read_at
+        
+        todo_id = data.get('id', '')
+        
+        # 首先尝试从TODO ID解析 (如 TODO-2to1-008)
+        from_agent = None
+        to_agent = None
+        
+        if 'to' in todo_id:
+            # 新格式: TODO-2to1-008
+            import re
+            match = re.match(r'TODO-(\d+)to(\d+)-(\d+)', todo_id)
+            if match:
+                from_agent = f'agent{match.group(1)}'
+                to_agent = f'agent{match.group(2)}'
+        
+        # 如果没有解析成功，使用数据中的字段
+        if not from_agent:
+            from_agent = data.get('from_agent') or data.get('from_agent')
+        if not to_agent:
+            to_agent = data.get('to_agent') or data.get('to_agent')
+        
+        # 如果都没有，使用agent_id
+        if not from_agent and 'agent_id' in data and data.get('agent_id'):
+            from_agent = f"agent{data.get('agent_id')}"
+            to_agent = from_agent
+        
+        if not to_agent:
+            to_agent = from_agent or 'agent1'
+        
+        # status -> read
+        read = data.get('status') != 'pending'
+        
+        return cls(
+            id=todo_id,
+            content=data.get('content', ''),
+            from_agent=from_agent or 'agent1',
+            to_agent=to_agent or 'agent1',
+            priority=data.get('priority', 'medium'),
+            created_at=data.get('created_at') or datetime.now().isoformat(),
+            read=read,
+            read_at=data.get('updated_at') if read else None
+        )
 
 
 @dataclass
@@ -52,7 +96,7 @@ class TodoQueueStats:
 class TodoQueueManager:
     """TODO消息队列管理器"""
 
-    QUEUE_FILE = "state/todo_queue.yaml"
+    QUEUE_FILE = "state/agent_adhoc_todos.yaml"
     LOCK_FILE = "state/todo_queue.lock"
     LOCK_TIMEOUT = 10
     CLEANUP_DAYS = 7
@@ -82,7 +126,19 @@ class TodoQueueManager:
 
         try:
             with open(self.queue_file, 'r', encoding='utf-8') as f:
-                return yaml.safe_load(f) or {
+                data = yaml.safe_load(f) or {}
+                
+                # 兼容agent_adhoc_todos.yaml格式 (直接是todos列表)
+                if "todos" in data and isinstance(data["todos"], list):
+                    # 检查是否是agent_adhoc_todos格式 (没有version字段)
+                    if "version" not in data:
+                        return {
+                            "version": "1.0",
+                            "last_updated": data.get("last_updated", datetime.now().isoformat()),
+                            "stats": self._init_stats(),
+                            "todos": data["todos"]
+                        }
+                return data or {
                     "version": "1.0",
                     "last_updated": datetime.now().isoformat(),
                     "stats": self._init_stats(),
@@ -165,22 +221,31 @@ class TodoQueueManager:
 
             result = []
             for todo_data in todos:
-                if todo_data.get("read", False):
+                # 先转换为TodoQueueItem获取正确的from/to
+                todo_item = TodoQueueItem.from_dict(todo_data)
+                
+                if todo_item.read:
                     continue
 
-                if agent_id and todo_data.get("to_agent") != agent_id:
+                # 如果是旧格式TODO（没有明确to_agent），直接显示给当前Agent
+                # 让Agent自己判断内容是否与自己相关
+                if agent_id and not todo_item.to_agent:
+                    # 旧格式TODO：没有明确接收者，全部显示
+                    pass
+                elif agent_id and todo_item.to_agent != agent_id:
+                    # 新格式TODO：检查接收者是否匹配
                     continue
 
-                if priority and todo_data.get("priority") != priority:
+                if priority and todo_item.priority != priority:
                     continue
 
-                result.append(TodoQueueItem.from_dict(todo_data))
+                result.append(todo_item)
 
             priority_order = {"high": 0, "medium": 1, "low": 2}
             
             def get_sort_key(item):
                 priority = item.priority
-                created = item.created_at
+                created = item.created_at or ""
                 return (priority_order.get(priority, 3), created)
             
             result.sort(key=get_sort_key)
@@ -199,7 +264,7 @@ class TodoQueueManager:
             if agent_id:
                 todos = [t for t in todos if t.get("to_agent") == agent_id]
 
-            todos.sort(key=lambda x: x.get("created_at", ""))
+            todos.sort(key=lambda x: x.get("created_at") or "")
             return [TodoQueueItem.from_dict(t) for t in todos]
 
         except Exception as e:

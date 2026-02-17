@@ -1,9 +1,9 @@
 # PM-Agent 需求拉通问题清单
 
 **日期**: 2026-02-16
-**发起人**: Agent3 (PM Agent)
+**发起人**: Agent3 (PM Agent - PM-Agent项目产品经理)
 **收件人**: Consultant
-**状态**: 待评审
+**状态**: ✅ **已解答**
 
 ---
 
@@ -102,26 +102,53 @@ PM-Agent模块定位有重要更新，核心变化如下：
 
 ---
 
-## 四待澄清问题
+## 四、待澄清问题（已解答）
 
-| 序号 | 问题 | 说明 |
-|------|------|------|
-| 1 | **开发控制方式** | 客户材料如何"控制/调整"oc-collab项目组？是通过修改需求优先级？触发新任务？调整迭代计划？ |
-| 2 | **项目组定义** | "项目组由多个agent组成"具体指什么？是多个oc-collab实例？还是一个项目内的Agent1+Agent2组合？ |
-| 3 | **输出内容** | 客户看到什么？是报告/进度/文档？什么格式？什么频率？ |
-| 4 | **整合方式** | PM-Agent如何调用oc-collab？API？CLI？Webhook？ |
-| 5 | **MVP首期范围** | 首期做到什么程度？入口+自动归属够了吗？是否需要包含与oc-collab的整合？ |
-| 6 | **与incoming流程关系** | 与PROPOSAL_Incoming是整合还是独立？PM-Agent是否复用incoming的收集/梳理机制？ |
-| 7 | **多客户隔离** | 多客户场景下，项目资料库是否需要隔离？如何保证数据安全？ |
-| 8 | **技术架构** | PM-Agent是独立Web服务（Vue.js+FastAPI）还是集成在oc-collab CLI中？ |
+| 序号 | 问题 | 说明 | 答案 |
+|------|------|------|------|
+| 1 | **开发控制方式** | 客户材料如何"控制/调整"oc-collab项目组？是通过修改需求优先级？触发新任务？调整迭代计划？ | **通过TODO控制**。PM-Agent生成的需求自动创建为oc-collab TODO，优先级决定开发顺序 |
+| 2 | **项目组定义** | "项目组由多个agent组成"具体指什么？是多个oc-collab实例？还是一个项目内的Agent1+Agent2组合？ | **Agent1 + Agent2 组合**。每个oc-collab项目由一个Agent1（产品经理）和一个Agent2（技术负责人）组成 |
+| 3 | **输出内容** | 客户看到什么？是报告/进度/文档？什么格式？什么频率？ | **代码/文档/进度/问题跟踪表**。按需生成，可配置定期推送 |
+| 4 | **整合方式** | PM-Agent如何调用oc-collab？API？CLI？Webhook？ | **通过Git**。PM-Agent将需求写入项目Git仓库，oc-collab通过Git同步获取 |
+| 5 | **MVP首期范围** | 首期做到什么程度？入口+自动归属够了吗？是否需要包含与oc-collab的整合？ | **完整闭环**：入口 + 自动归属 + oc-collab整合，三者缺一不可 |
+| 6 | **与incoming流程关系** | 与PROPOSAL_Incoming是整合还是独立？PM-Agent是否复用incoming的收集/梳理机制？ | **可复用**。PM-Agent可以复用incoming的需求收集和梳理机制，作为输入源之一 |
+| 7 | **多客户隔离** | 多客户场景下，项目资料库是否需要隔离？如何保证数据安全？ | **通过Git权限**。不同客户项目使用不同Git仓库，权限控制由Git平台负责 |
+| 8 | **技术架构** | PM-Agent是独立Web服务（Vue.js+FastAPI）还是集成在oc-collab CLI中？ | **独立Web服务**。Vue.js + FastAPI 架构，独立于oc-collab |
 
 ---
 
-## 五、下一步建议
+## 五、下一步（Agent3可以开始了）
 
-1. **确认业务流**：请consultant确认上述业务流是否符合预期
-2. **明确MVP范围**：确定首期交付的功能优先级
-3. **补充技术细节**：补充与oc-collab整合的技术实现方式
+### 5.1 已确认事项
+
+- ✅ 提案文档 (`PROPOSAL_2026-02-018_pm_agent.md`) - 已评审通过
+- ✅ 8个问题已全部解答
+- ✅ MVP范围：入口 + 自动归属 + oc-collab整合（完整闭环）
+
+### 5.2 Agent3工作流程
+
+按照oc-collab规范，PM-Agent项目需要创建：
+
+| 阶段 | 文档 | 路径 |
+|------|------|------|
+| 1 | 需求文档 | `docs/01-requirements/requirements_pm_agent.md` |
+| 2 | 概要设计 | `docs/02-design/OUTLINE_pm_agent.md` |
+| 3 | 详细设计 | `docs/02-design/DETAIL_pm_agent.md` |
+| 4 | 开发 | 按详细设计实现 |
+
+### 5.3 注意事项
+
+- **PM-Agent是独立项目**，有自己的版本号（如v1.0.0），不与oc-collab共享
+- **项目组**：Agent1（产品经理）+ Agent2（技术）
+- **整合方式**：通过Git，PM-Agent写入需求到oc-collab项目仓库
+
+### 5.4 关键参考文档
+
+| 文档 | 用途 |
+|------|------|
+| `skills/oc_collab_requirements_guide/content.md` | 需求文档编写规范 |
+| `skills/oc_collab_outline_design_guide/content.md` | 概要设计编写规范 |
+| `skills/oc_collab_detailed_design_guide/content.md` | 详细设计编写规范 |
 
 ---
 

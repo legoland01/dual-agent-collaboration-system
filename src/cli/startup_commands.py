@@ -28,6 +28,9 @@ def startup_check_command(no_confirm: bool, quiet: bool):
         try:
             context = ContextManager().load_context()
             agent_id = context.agent
+            # 确保是字符串格式
+            if isinstance(agent_id, int):
+                agent_id = f"agent{agent_id}"
         except Exception:
             agent_id = "unknown"
 

@@ -47,5 +47,59 @@ violations:
   reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
     \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
     \ --priority high --agent 2"
-total_violations: 8
+- timestamp: '2026-02-16T22:57:43.807420'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-16T23:04:44.759886'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-16T23:05:23.699966'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-16T23:12:20.612401'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-16T23:36:22.239026'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-16T23:36:58.108297'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-17T11:32:10.871485'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-17T11:32:17.003219'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+- timestamp: '2026-02-17T11:45:35.756238'
+  agent_id: agent1
+  command: todowrite
+  reason: "⛔ Agent1禁止执行todowrite命令。\n\n请创建TODO给Agent2执行。\n\n正确做法:\n  oc-collab todowrite\
+    \ --content '任务描述' --agent 2\n\n或使用完整格式:\n  oc-collab todowrite --content '任务描述'\
+    \ --priority high --agent 2"
+total_violations: 17
 last_updated: '2026-02-16T10:21:44.485688'
