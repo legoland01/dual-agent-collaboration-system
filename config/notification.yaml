@@ -11,4 +11,5 @@ rules:
   notify_on_update: false
 test:
   key: value
+  newkey: testvalue
 version: '1.0'
