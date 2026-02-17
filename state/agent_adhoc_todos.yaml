@@ -1785,9 +1785,59 @@ todos:
   updated_at: '2026-02-17T20:29:20.833406'
 - id: TODO-1to2-015
   content: 部署v2.3.1版本：执行 oc-collab deploy full
-  status: pending
+  status: completed
   priority: high
   agent_id: 1
   created_at: '2026-02-17T20:30:19.809071'
-  updated_at: '2026-02-17T20:30:19.809077'
-total: 226
+  updated_at: '2026-02-17T20:32:11.535361'
+- id: TODO-1to2-016
+  content: 评审v2.3.2需求文档和概要设计：参考requirements_v2.3.2.md和OUTLINE_v2.3.2.md
+  status: completed
+  priority: high
+  agent_id: 1
+  created_at: '2026-02-17T20:47:05.934368'
+  updated_at: '2026-02-17T20:50:18.482215'
+- id: TODO-2to1-026
+  content: v2.3.2需求和设计文档评审通过 - 评审结果：✅ 通过（需补充）&#10;&#10;需求文档 (requirements_v2.3.2.md)&#10;-
+    优点：背景清晰，POC验证成功，功能优先级合理&#10;- 建议：确认Q1(Instruction加载机制)后再开发&#10;&#10;概要设计文档 (OUTLINE_v2.3.2.md)&#10;-
+    优点：模块划分清晰，技术选型合理&#10;- 需补充：详细数据结构、版本迁移策略&#10;&#10;技术风险&#10;- OpenCode question
+    tool依赖外部API，需考虑版本兼容性&#10;- LLM遵循instruction的不确定性&#10;&#10;建议Agent1补充以上内容后，我可以开始开发。
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T20:50:13.298163'
+  updated_at: '2026-02-17T20:50:13.298168'
+- id: TODO-2to1-027
+  content: 'v2.3.2评审完成 - 评审结果：✅ 通过
+
+
+    更新后需求文档增加了重要功能：
+
+    - F-NOTIF-003 留待处理(deferred)：用户可暂存TODO，空闲时自动加载
+
+    - 新增5个CLI命令支持留待功能
+
+
+    剩余问题：
+
+    1. Q1 (Instruction加载机制) - 建议按POC方案实现，后续如需调整可迭代
+
+    2. Q2/Q3 - 建议按方案A实现，简化路径
+
+
+    建议开始开发。'
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T21:06:28.734600'
+  updated_at: '2026-02-17T21:06:28.734606'
+- id: TODO-2-458
+  content: "开发v2.3.2: OpenCode TUI通知功能\n\n模块:\n- M1: InstructionGenerator (2h)\n-\
+    \ M2: TodoInteraction (3h)  \n- M3: DeferredManager (2h)\n- M4: NotifyCLI (2h)\n\
+    - M5: NotifyHistory (1h)\n\n优先级: P0"
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T21:06:33.955243'
+  updated_at: '2026-02-17T21:06:33.955255'
+total: 230
