@@ -39,6 +39,41 @@ oc-collab test run --sandbox --db test.db
 oc-collab test run --sandbox --cleanup
 ```
 
+### 0.3 测试环境部署条件管理
+
+不同模块有不同的测试要求，需要在设计测试用例时确定：
+
+| 模块 | 部署条件 | 测试依赖 |
+|------|----------|----------|
+| SQLite存储 | todos.db存在 | 无 |
+| 监听进程 | agent listen运行中 | SQLite |
+| 实时通知 | OpenCode服务运行 | 监听进程 |
+| 配置管理 | config/notification.yaml存在 | 无 |
+
+**测试用例前置条件**：
+
+```yaml
+# 测试用例元数据
+test_case:
+  id: T001
+  module: F-STORE-001
+  requires:
+    - db: todos.db  # 需要数据库
+  setup:
+    - create table todos
+  cleanup:
+    - drop table todos
+```
+
+**CLI命令**：
+```bash
+# 检查测试环境是否就绪
+oc-collab test check-env --version v2.3.2
+
+# 查看模块测试依赖
+oc-collab test deps --module F-STORE-001
+```
+
 ### 0.2 测试平台能力
 
 | 能力 | 说明 |
