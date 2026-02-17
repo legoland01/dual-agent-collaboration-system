@@ -189,10 +189,25 @@ Agent上线后自动拉取积压的TODO。
 | 不用执行 | 标记为无需执行 |
 | 查看详情 | 显示完整内容 |
 
+**测试工具 - CLI模拟用户操作**：
+由于Question交互依赖OpenCode，需CLI工具模拟用户操作实现自动化测试：
+
+```bash
+# 模拟用户选择"立即执行"
+oc-collab notify reply --todo-id <id> --action execute
+
+# 模拟用户选择"留待空闲"
+oc-collab notify reply --todo-id <id> --action defer
+
+# 模拟用户选择"不用执行"
+oc-collab notify reply --todo-id <id> --action dismiss
+```
+
 **验收标准**：
 - [ ] question窗口显示TODO
 - [ ] 支持4种操作
 - [ ] 操作后更新状态
+- [ ] **CLI工具可自动化模拟用户操作**
 
 ### 3.8 F-CONFIG-001: 配置管理
 
@@ -235,6 +250,7 @@ oc-collab config list
 | `oc-collab notify enable` | 启用通知 | 1h |
 | `oc-collab notify disable` | 禁用通知 | 0.5h |
 | `oc-collab notify status` | 查看通知状态 | 0.5h |
+| `oc-collab notify reply` | 模拟用户操作回复（测试用） | 1h |
 
 ### 变更命令
 
