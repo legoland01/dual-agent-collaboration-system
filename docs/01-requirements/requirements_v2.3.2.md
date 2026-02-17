@@ -313,6 +313,6 @@ oc-collab config list
 
 ---
 
-**状态**: REVIEWED  
+**状态**: APPROVED  
 **待评审**: -
 
