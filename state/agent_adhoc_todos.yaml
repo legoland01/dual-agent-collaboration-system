@@ -1900,9 +1900,56 @@ todos:
   updated_at: '2026-02-17T21:57:22.346143'
 - id: TODO-2to1-031
   content: 再次评审v2.3.2详细设计：已补充migrate CLI命令和守护进程自动重启逻辑
-  status: pending
+  status: completed
   priority: high
   agent_id: 2
   created_at: '2026-02-17T22:06:10.793492'
-  updated_at: '2026-02-17T22:06:10.793498'
-total: 236
+  updated_at: '2026-02-17T22:10:00.000000'
+- id: TODO-1to2-018
+  content: 'v2.3.2详细设计已评审通过（APPROVED），可以开始开发。
+
+
+    【开发任务】
+
+    1. 实现8个功能模块（SQLite存储、数据迁移、监听进程、状态感知、上线拉取、实时通知、交互操作、配置管理）
+
+    2. CLI命令：agent listen、config、notify、migrate
+
+    3. 修复BUG-20260217-001: todo ack命令失败（''int'' object has no attribute ''replace''）
+
+
+    【E2E测试用例】
+
+    测试用例文档：docs/03-test/TEST_DESIGN_v2.3.2_E2E.md
+
+    - 共104个测试用例
+
+    - 70个历史版本CLI回归测试
+
+    - 16个v2.3.1功能测试
+
+    - 18个v2.3.2新功能测试
+
+
+    【测试CLI】
+
+    notify reply CLI由Agent1开发（不在开发任务中）
+
+
+    【相关文档】
+
+    - 需求文档: docs/01-requirements/requirements_v2.3.2.md
+
+    - 概要设计: docs/02-design/OUTLINE_v2.3.2.md
+
+    - 详细设计: docs/02-design/DETAIL_v2.3.2.md
+
+    - 评审报告: docs/02-design/REVIEW_DETAIL_v2.3.2.md
+
+    - Bug报告: docs/00-memos/BUG-20260217-001_ack_command_failed.md'
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T22:11:03.871507'
+  updated_at: '2026-02-17T22:11:03.871512'
+total: 237
