@@ -160,9 +160,9 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 **v2.3.2预计工时**: ~15h
 
-### v2.3.3：Skill遵从 + Agent命名 + 自动流程触发
+### v2.3.3：Skill遵从 + 自动流程触发
 
-**目标**: 确保oc-collab流程可靠 + Agent身份规范化 + 自动化流程
+**目标**: 确保oc-collab流程可靠 + 自动化流程触发
 
 **参考**: 
 - `PROPOSAL_2026-02-026_agent_id_and_role_rename.md`
@@ -170,13 +170,15 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 | 功能 | 说明 | 工时 | 优先级 | 状态 |
 |------|------|------|--------|------|
-| Skill强制 | 关键操作必须使用Skill | 4h | P0 | pending |
-| 流程校验 | 阶段门禁校验 | 3h | P0 | pending |
-| Agent命名规范化 | Agent1/2 → 产品经理/架构师 | 3h | P0 | pending |
-| 审计日志 | 操作记录追溯 | 2h | P1 | pending |
-| 异常检测 | 偏离流程的行为检测 | 3h | P1 | pending |
+| **TODO自动推送** | StateNotifier增强，推给目标Agent | 4h | P0 | pending |
+| **StateReceiver自动启动** | 接收Webhook自动启动 | 2h | P0 | pending |
+| **agent listen自动启动** | Agent启动时自动运行 | 2h | P0 | pending |
+| 需求签署自动创建设计 | 文档签署后自动创建 | 2h | P1 | pending |
+| 开发自检自动创建提测 | 自检通过自动创建 | 2h | P1 | pending |
+| Bug自动创建TODO | 发现Bug自动创建 | 2h | P1 | pending |
+| Skill强制 | 关键操作必须使用Skill | 3h | P1 | pending |
 
-**预计工时**: ~15h
+**预计工时**: ~17h（一次开发完成）
 
 ### v2.3.4：配置管理（新增）
 
@@ -192,29 +194,6 @@ v2目标：实现稳定可靠的双Agent协作框架
 | Skill版本管理 | Skill更新同步 | 3h | P0 | pending |
 | 跨项目同步 | 全局配置同步 | 3h | P0 | pending |
 | CLI命令 | config status/sync/check | 3h | P1 | pending |
-
-**预计工时**: ~26h
-
-**需人工干预的节点**：
-
-| 节点 | 原因 |
-|------|------|
-| 评审完成后 | 等待用户确认是否进入下一步 |
-| 验收通过后进入部署 | 避免collusion |
-
-**自动触发的节点**：
-
-| 触发条件 | 动作 |
-|----------|------|
-| TODO完成 | 自动创建通知回复TODO |
-| 需求文档签署 | 自动启动详细设计 |
-| 详细设计评审通过 | 自动触发Agent1创建测试用例设计 |
-| 测试用例设计完成 | 自动创建测试评审TODO |
-| Agent1发现Bug | 自动创建Bug修复TODO给Agent2 |
-| Agent2修复Bug | 自动创建Bug验收TODO给Agent1 |
-| 开发自检通过 | 自动创建提测TODO |
-
-**v2.3 预计工时**: ~31h
 
 ---
 
@@ -410,7 +389,7 @@ Agent1 看到状态更新
 | v2.3.0 | 质量保证 | ~18h | ✅ |
 | v2.3.1 | TODO多Agent支持 | ~23h | ✅ |
 | v2.3.2 | TODO存储+通知 | ~15h | 🔄 POC完成 |
-| v2.3.3 | Skill遵从+自动流程 | ~15h | ⏳ pending |
+| v2.3.3 | Skill遵从+自动流程 | ~17h | ⏳ pending |
 | v2.3.4 | 配置管理 | ~26h | ⏳ 设计完成 |
 | v2.4 | 刚性框架 | ~78h | ⏳ |
 | v2.5 | Agent扩展 + Skill系统 | ~14h | ⏳ |
