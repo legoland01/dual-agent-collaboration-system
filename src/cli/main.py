@@ -44,6 +44,7 @@ from .bug_commands import bug_group
 from .requirements_commands import requirements_group
 from .notify_commands import notify_group
 from .migrate_commands import migrate
+from .config_commands import config
 
 
 console = Console()
@@ -1695,6 +1696,7 @@ main.add_command(bug_group, "bug")
 main.add_command(requirements_group, "requirements")
 main.add_command(notify_group, "notify")
 main.add_command(migrate, "migrate")
+main.add_command(config, "config")
 
 
 if __name__ == "__main__":
