@@ -1,6 +1,6 @@
 # oc-collab 产品路线图
 
-**版本**: v4  
+**版本**: v5  
 **创建日期**: 2026-02-14  
 **更新日期**: 2026-02-17
 
@@ -132,20 +132,33 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 **目标**: SQLite存储 + 伴随监听进程 + 实时通知交互
 
-**参考**: `PROPOSAL_2026-02-027_agent_notification_interaction.md`
+**技术方案**: OpenCode Question Tool交互（已通过POC验证 ✅）
 
-| 功能 | 说明 | 工时 | 优先级 |
-|------|------|------|--------|
-| SQLite存储 | 直接使用SQLite | 4h | P0 |
-| 数据迁移 | YAML转SQLite脚本 | 2h | P1 |
-| 监听进程 | agent listen自动启动 | 3h | P0 |
-| 状态感知 | online/offline实时感知 | 2h | P1 |
-| 上线拉取 | Agent上线后先处理积压 | 2h | P1 |
-| **实时通知** | prompt窗口显示通知 | 4h | P0 |
-| **交互选项** | 执行/推迟/拒绝 | 4h | P0 |
-| **配置管理** | opencode server连接配置 | 2h | P1 |
+**参考**: 
+- `POC_OpenCode_TUI_Notification_Verification.md`
+- `PROPOSAL_2026-02-027_agent_notification_interaction.md`
 
-**v2.3.2预计工时**: ~23h
+| 功能 | 说明 | 工时 | 优先级 | 状态 |
+|------|------|------|--------|------|
+| SQLite存储 | 直接使用SQLite | 4h | P0 | pending |
+| 数据迁移 | YAML转SQLite脚本 | 2h | P1 | pending |
+| 监听进程 | agent listen自动启动 | 3h | P0 | pending |
+| 状态感知 | online/offline实时感知 | 2h | P1 | pending |
+| 上线拉取 | Agent上线后先处理积压 | 2h | P1 | pending |
+| **实时通知** | Question窗口显示通知 | 4h | P0 | 🔄 POC完成 |
+| **交互选项** | 执行/推迟/拒绝 | 4h | P0 | 🔄 POC完成 |
+| 配置管理 | opencode连接配置 | 2h | P1 | pending |
+
+**技术实现**:
+1. 使用OpenCode `instructions`机制加载自定义规则
+2. LLM根据规则自动调用question tool
+3. 用户在OpenCode界面选择操作
+
+**实现文件**:
+- `opencode_src/instructions/TODO_NOTIFY.md` - 通知处理instruction
+- `opencode_src/opencode.json` - 加载配置
+
+**v2.3.2预计工时**: ~15h
 
 ### v2.3.3：Skill遵从 + Agent命名 + 自动流程触发
 
@@ -374,9 +387,12 @@ Agent1 看到状态更新
 |------|------|----------|------|
 | v2.0 | 基础框架 | - | ✅ |
 | v2.1 | 异常处理 | - | ✅ |
-| v2.2 | 流程规范 | ~35h | 🔄 |
+| v2.2 | 流程规范 | ~35h | ✅ |
 | v2.3.0 | 质量保证 | ~18h | ✅ |
-| v2.3.1 | TODO多Agent支持 | ~23h | ⏳ |
+| v2.3.1 | TODO多Agent支持 | ~23h | ✅ |
+| v2.3.2 | TODO存储+通知 | ~15h | 🔄 POC完成 |
+
+| v2.3.3 | 配置管理 | ~26h | ⏳ 设计完成 |
 | v2.4 | 刚性框架 | ~78h | ⏳ |
 | v2.5 | Agent扩展 + Skill系统 | ~14h | ⏳ |
 | v3.x | PM-Agent | ~60h | ⏳ |
@@ -398,9 +414,11 @@ Agent1 看到状态更新
 | PROPOSAL_2026-02-023 | 状态管理系统 |
 | PROPOSAL_2026-02-024 | Git集成方案 |
 | PROPOSAL_2026-02-025 | Agent协作规范 |
+| PROPOSAL_2026-02-027 | Agent通知交互方案 - ✅ POC已通过 |
+| PROPOSAL_2026-02-028 | 配置管理模块设计 |
 
 ---
 
 **作者**: Agent 1 + Consultant  
-**日期**: 2026-02-15  
-**版本**: v3
+**日期**: 2026-02-17  
+**版本**: v5

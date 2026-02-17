@@ -1,7 +1,7 @@
 # POC验证报告：OpenCode TUI API实现TODO实时通知
 
 **日期**: 2026-02-17  
-**状态**: 技术验证完成，显示有bug  
+**状态**: ✅ **已完成** - 使用Question Tool交互方案  
 **提案**: PROPOSAL_2026-02-027_agent_notification_interaction.md
 
 ---
@@ -154,20 +154,58 @@ opencode_src/
 
 ### 6.4 使用方式
 
-1. 用户告诉LLM"你有一个新TODO"或类似信息
+1. 用户告诉LLM"你有一个新TODO"（或通过oc-collab触发）
 2. LLM根据instruction自动调用question tool
 3. 用户在OpenCode的Questions区域选择操作
 
-### 6.5 优点
+### 6.5 测试结果
+
+✅ **2026-02-17 实测成功**
+- LLM正确识别新TODO
+- 弹出question交互窗口
+- 用户可选择：立即执行/稍后处理/查看详情
+- 速度可接受
+
+### 6.6 优点
 
 - ✅ 不依赖TUI API（避免显示bug）
 - ✅ 支持交互式选择（执行/推迟/拒绝）
 - ✅ 用户体验好（原生OpenCode界面）
 - ✅ 可自定义instruction规则
+- ✅ 实现简单（只需配置文件）
+
+### 6.7 限制
+
+- 需要在OpenCode启动时加载instruction
+- LLM需要一定时间理解规则（首次稍慢）
+- 依赖LLM主动调用question tool
 
 ---
 
-## 七、关联文档
+## 七、oc-collab集成方案
+
+### 7.1 前置条件
+
+用户需要：
+1. 将`opencode_src/instructions/TODO_NOTIFY.md`复制到项目或全局配置目录
+2. 配置`opencode.json`加载该instruction
+
+### 7.2 工作流程
+
+1. **Agent创建TODO** → 写入`state/agent_adhoc_todos.yaml`
+2. **用户启动OpenCode** → instruction加载
+3. **用户告知LLM** → "我有新TODO"
+4. **LLM自动调用question tool** → 弹出交互窗口
+5. **用户选择操作** → 执行/推迟/拒绝
+
+### 7.3 下一步
+
+- 考虑将instruction文件整合到oc-collab项目中
+- 文档化安装配置步骤
+
+---
+
+## 八、关联文档
 
 - Proposal: `docs/04-proposals/PROPOSAL_2026-02-027_agent_notification_interaction.md`
 - 研究: `docs/07-research/RESEARCH_Multi_Project_Collaboration.md`
@@ -175,4 +213,4 @@ opencode_src/
 
 ---
 
-**结论**: API可行，显示有bug，需要等待OpenCode修复或使用替代方案。
+**结论**: ✅ POC成功！通过OpenCode的instruction机制实现TODO通知交互，不依赖有bug的TUI API。
