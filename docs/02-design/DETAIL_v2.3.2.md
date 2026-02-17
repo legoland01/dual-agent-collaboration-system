@@ -410,15 +410,42 @@ class DataMigrationService:
 | id | id | 直接复制 |
 | content | content | 直接复制 |
 | status | status | 直接复制 |
-| priority | priority | 直接复制 |
+| priority | priority | 见下方优先级转换 |
 | agent_id | sender | null→"unknown" |
 | - | receiver | 推断或"unknown" |
-| created_at | created_at | 直接复制 |
-| updated_at | updated_at | 直接复制 |
+| created_at | created_at | null→当前时间 |
+| updated_at | updated_at | null保留null |
 | - | source | 默认为"legacy" |
 | - | is_read | 默认为0 |
+| - | metadata | 存储原始YAML数据 |
 
-### 4.2.3 旧TODO处理策略
+### 4.2.3 优先级格式转换
+
+YAML中存在两种优先级格式，需要统一：
+
+| 旧格式 | 新格式 |
+|--------|--------|
+| P0 | high |
+| P1 | medium |
+| P2 | low |
+| high | high |
+| medium | medium |
+| low | low |
+
+```python
+def normalize_priority(priority: str) -> str:
+    mapping = {
+        'P0': 'high',
+        'P1': 'medium', 
+        'P2': 'low',
+        'high': 'high',
+        'medium': 'medium',
+        'low': 'low'
+    }
+    return mapping.get(priority, 'medium')
+```
+
+### 4.2.4 旧TODO处理策略
 
 对于YAML中 `agent_id: null` 的历史TODO：
 
@@ -427,6 +454,33 @@ class DataMigrationService:
 | TODO编号可解析 | 尝试从编号推断（如TODO-1-xxx → sender=1） |
 | 无法推断 | sender="unknown", receiver="unknown" |
 | 保留原样 | 不删除，允许后续手动修正 |
+
+### 4.2.5 空值处理
+
+| 字段 | 空值处理 |
+|------|----------|
+| created_at | null → 使用文件修改时间或当前时间 |
+| updated_at | null → 保留null |
+| priority | null → 默认为"medium" |
+| status | null → 默认为"pending" |
+
+### 4.2.6 数据验证
+
+迁移后执行以下验证：
+
+```python
+def validate_migration(yaml_count: int, db_count: int, errors: list) -> MigrationReport:
+    return {
+        "yaml_count": yaml_count,
+        "db_count": db_count,
+        "matched": yaml_count == db_count,
+        "errors": errors,
+        "warnings": [
+            "X条TODO无agent_id",
+            "Y条TODO无created_at"
+        ]
+    }
+```
 
 ### 4.2.4 迁移命令
 
