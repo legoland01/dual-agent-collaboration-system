@@ -744,6 +744,219 @@ def retry_operation(func, max_retries: int = 3, delay: float = 1.0):
 
 ---
 
+## 11. 边界条件与验证
+
+### 11.1 TODO ID格式验证
+
+| 格式 | 示例 | 合法性 |
+|------|------|--------|
+| 旧格式 | TODO-1-001 | ✅ 合法 |
+| 新格式Agent内部 | TODO-1-001 | ✅ 合法 |
+| 新格式跨Agent | TODO-1to2-001 | ✅ 合法 |
+| 未知Agent | TODO-1to9-001 | ⚠️ 警告 |
+| 非法格式 | TODO-abc-001 | ❌ 拒绝 |
+
+### 11.2 状态流转
+
+```
+┌──────────┐     execute     ┌─────────────┐
+│ pending  │ ───────────────▶ │ in_progress │
+└──────────┘                  └─────────────┘
+     │                              │
+     │                    complete  │
+     │◀─────────────────────────────┘
+     │
+     │ defer              ┌──────────┐
+     ├───────────────────▶│ deferred │
+     │                    └──────────┘
+     │                         │
+     │                    execute │
+     │◀─────────────────────────┘
+     │
+     │ dismiss              ┌──────────┐
+     └────────────────────▶│ cancelled│
+                           └──────────┘
+```
+
+### 11.3 边界条件
+
+| 场景 | 处理方式 |
+|------|----------|
+| 空content | 拒绝，提示"内容不能为空" |
+| 超长content | 截断或拒绝（>5000字符） |
+| 重复TODO ID | 拒绝，提示ID已存在 |
+| 未知receiver | 警告但允许创建 |
+| 并发写入 | SQLite锁重试 |
+| 数据库损坏 | 提示修复或重建 |
+
+---
+
+## 12. 配置文件
+
+### 12.1 notification.yaml
+
+```yaml
+# config/notification.yaml
+version: "1.0"
+
+# 通知开关
+enabled: true
+
+# OpenCode配置
+opencode:
+  url: "http://localhost:11411"
+  api_key: ""
+
+# 监听配置
+listener:
+  interval: 5  # 秒
+  auto_start: false
+  daemon_pid_file: "state/listener.pid"
+
+# 通知规则
+rules:
+  notify_on_new: true
+  notify_on_update: false
+  notify_deferred_reminder: true
+```
+
+### 12.2 config/instructions/TODO_NOTIFY.md
+
+```markdown
+# TODO通知处理规则
+
+## 触发条件
+当用户告知"我有新TODO"或"查看TODO"时，执行以下操作：
+
+## 操作流程
+1. 读取 state/todos.db 中的未读TODO
+2. 查找当前用户的未处理TODO
+3. 使用 question tool 询问用户操作
+
+## Question Tool 调用示例
+```
+
+### 12.3 数据库配置
+
+```yaml
+# config/database.yaml
+db:
+  path: "state/todos.db"
+  timeout: 30
+  journal_mode: "WAL"
+```
+
+---
+
+## 13. 错误码定义
+
+### 13.1 数据库错误 (1000-1099)
+
+| 错误码 | 含义 | 处理方式 |
+|--------|------|----------|
+| 1001 | 数据库连接失败 | 重试3次，提示检查文件权限 |
+| 1002 | 数据库锁定 | 等待后重试 |
+| 1003 | 数据验证失败 | 拒绝写入，提示原因 |
+| 1004 | 记录不存在 | 提示检查ID |
+
+### 13.2 迁移错误 (2000-2099)
+
+| 错误码 | 含义 | 处理方式 |
+|--------|------|----------|
+| 2001 | YAML文件不存在 | 提示文件路径 |
+| 2002 | YAML格式错误 | 显示解析错误位置 |
+| 2003 | 迁移中断 | 自动回滚 |
+| 2004 | 数据不完整 | 提示缺失字段 |
+
+### 13.3 守护进程错误 (3000-3099)
+
+| 错误码 | 含义 | 处理方式 |
+|--------|------|----------|
+| 3001 | PID文件损坏 | 清理后重试 |
+| 3002 | 进程已运行 | 提示查看状态 |
+| 3003 | 权限不足 | 提示检查权限 |
+
+### 13.4 配置错误 (4000-4099)
+
+| 错误码 | 含义 | 处理方式 |
+|--------|------|----------|
+| 4001 | 配置文件不存在 | 自动创建默认配置 |
+| 4002 | 配置格式错误 | 提示YAML语法错误 |
+| 4003 | 无效值 | 提示有效值范围 |
+
+---
+
+## 14. 文件清单
+
+### 14.1 新增文件
+
+| 文件路径 | 说明 | 行数预估 |
+|----------|------|----------|
+| src/core/todo_storage.py | SQLite存储层 | ~200 |
+| src/core/data_migration.py | 迁移服务 | ~150 |
+| src/core/agent_listener.py | 监听服务 | ~180 |
+| src/core/status_monitor.py | 状态监控 | ~120 |
+| src/core/online_puller.py | 上线拉取 | ~100 |
+| src/core/notification.py | 通知服务 | ~150 |
+| src/core/interaction_handler.py | 交互处理 | ~200 |
+| src/core/config_manager.py | 配置管理 | ~100 |
+| src/cli/listen_commands.py | listen命令 | ~80 |
+| src/cli/config_commands.py | config命令 | ~80 |
+| src/cli/notify_commands.py | notify命令 | ~80 |
+| src/templates/TODO_NOTIFY.md.j2 | Instruction模板 | ~50 |
+
+### 14.2 变更文件
+
+| 文件路径 | 变更内容 |
+|----------|----------|
+| src/core/todo_sync_manager.py | 适配SQLite存储 |
+| src/cli/enhanced_commands.py | 适配新存储层 |
+
+### 14.3 新增配置
+
+| 文件路径 | 说明 |
+|----------|------|
+| config/notification.yaml | 通知配置 |
+| config/database.yaml | 数据库配置 |
+| config/instructions/TODO_NOTIFY.md | Instruction文件 |
+
+---
+
+## 15. 部署与迁移
+
+### 15.1 首次部署
+
+1. 创建 state/ 目录
+2. 初始化 todos.db
+3. 创建 config/notification.yaml
+4. 注册Agent
+
+### 15.2 升级迁移
+
+1. 备份 state/agent_adhoc_todos.yaml
+2. 执行 DataMigration.migrate()
+3. 验证数据完整性
+4. 删除原YAML（可选）
+
+### 15.3 回滚
+
+1. 使用备份的YAML恢复
+2. 删除 todos.db
+3. 恢复旧版本代码
+
+---
+
+## 16. 性能考虑
+
+| 场景 | 预期性能 | 优化措施 |
+|------|----------|----------|
+| TODO创建 | <100ms | 索引、预编译 |
+| TODO查询 | <50ms | 索引、缓存 |
+| 列表查询 | <200ms | 分页、延迟加载 |
+| 数据库大小 | <10MB | 定期清理历史 |
+
+---
+
 ## 10. 签署确认
 
 ### Agent 2 创建
