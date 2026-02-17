@@ -243,6 +243,66 @@ oc-collab test deps --module F-STORE-001
 | **历史追溯** | 查看历史执行记录 |
 | **通过率统计** | 可视化展示通过率 |
 
+#### 2.2.4 页面截图对比
+
+每个测试用例执行时需要记录测试前/后的截图：
+
+```sql
+-- test_screenshots表
+CREATE TABLE test_screenshots (
+    id TEXT PRIMARY KEY,
+    test_result_id TEXT NOT NULL,     -- 关联test_results
+    phase TEXT NOT NULL,            -- BEFORE/AFTER
+    screenshot_path TEXT NOT NULL,  -- 截图文件路径
+    captured_at TIMESTAMP NOT NULL,
+    page_content TEXT,              -- 页面内容（文本）
+    notes TEXT
+);
+```
+
+**测试流程**：
+```
+1. 执行测试前 → 截图(BEFORE) + 提取页面内容
+2. 执行测试操作
+3. 执行测试后 → 截图(AFTER) + 提取页面内容
+4. 对比截图和内容变化
+5. 记录结果
+```
+
+#### 2.2.5 智能页面验证
+
+测试工具需要**解读页面内容**并**判断是否符合预期**：
+
+```yaml
+# 测试用例验证规则示例
+test_case:
+  id: T001
+  title: "创建TODO后列表显示"
+  verify_rules:
+    - type: element_exists
+      selector: ".todo-item"
+      expected: true
+    - type: text_contains
+      selector: ".todo-content"
+      expected: "测试内容"
+    - type: element_count
+      selector: ".todo-item"
+      expected: 3
+    - type: element_hidden
+      selector: ".loading-spinner"
+      expected: true
+```
+
+**验证类型**：
+| 类型 | 说明 |
+|------|------|
+| element_exists | 元素是否存在 |
+| text_contains | 文本是否包含关键词 |
+| element_count | 元素数量是否正确 |
+| element_hidden | 元素是否隐藏 |
+| element_visible | 元素是否可见 |
+| attribute_match | 属性是否匹配 |
+
 #### 2.2.3 测试文档模板更新
 
 在E2E测试文档中增加结果列：
