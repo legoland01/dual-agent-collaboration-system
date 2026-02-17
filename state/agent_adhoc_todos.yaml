@@ -1840,4 +1840,40 @@ todos:
   agent_id: 2
   created_at: '2026-02-17T21:06:33.955243'
   updated_at: '2026-02-17T21:06:33.955255'
-total: 230
+- id: TODO-2-459
+  content: '开发v2.3.2: SQLite存储 + 监听守护进程 + 实时通知
+
+
+    模块:
+
+    - M1: TodoStorage (4h)
+
+    - M2: DataMigration (2h)
+
+    - M3: AgentListener (3h)
+
+    - M4: StatusMonitor (2h)
+
+    - M5: OnlinePuller (2h)
+
+    - M6: Notification (3h)
+
+    - M7: Interaction (3h)
+
+    - M8: ConfigManager (2h)
+
+
+    优先级: P0'
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T21:24:33.725211'
+  updated_at: '2026-02-17T21:24:33.725218'
+- id: TODO-2to1-028
+  content: v2.3.2需求和概要设计已评审通过，可以开始详细设计和E2E测试用例设计
+  status: pending
+  priority: high
+  agent_id: 2
+  created_at: '2026-02-17T21:31:58.069523'
+  updated_at: '2026-02-17T21:31:58.069529'
+total: 232
