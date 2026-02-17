@@ -43,6 +43,7 @@ from .state_commands import state_group
 from .bug_commands import bug_group
 from .requirements_commands import requirements_group
 from .notify_commands import notify_group
+from .migrate_commands import migrate
 
 
 console = Console()
@@ -1693,6 +1694,7 @@ main.add_command(state_group, "state")
 main.add_command(bug_group, "bug")
 main.add_command(requirements_group, "requirements")
 main.add_command(notify_group, "notify")
+main.add_command(migrate, "migrate")
 
 
 if __name__ == "__main__":

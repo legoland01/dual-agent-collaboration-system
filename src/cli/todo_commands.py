@@ -308,10 +308,18 @@ def todo_ack_command(todo_id: str):
         from ..core.context_manager import ContextManager
         ctx = ContextManager().load_context()
         
-        current_agent = ctx.agent.replace("agent", "") if ctx.agent else None
-        if not current_agent:
+        current_agent = ctx.agent
+        if current_agent is None:
             click.echo("❌ 无法确定当前Agent")
             return
+        
+        # 处理agent可能是字符串或数字的情况
+        if isinstance(current_agent, int):
+            current_agent = str(current_agent)
+        elif isinstance(current_agent, str) and current_agent.isdigit():
+            pass  # 已经是数字字符串
+        else:
+            current_agent = current_agent.replace("agent", "") if current_agent else None
         
         from ..core.ack_confirm import ACKConfirm
         ack = ACKConfirm()
