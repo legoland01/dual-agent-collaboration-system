@@ -42,6 +42,7 @@ from .startup_commands import startup_check_command
 from .state_commands import state_group
 from .bug_commands import bug_group
 from .requirements_commands import requirements_group
+from .notify_commands import notify_group
 
 
 console = Console()
@@ -1691,6 +1692,7 @@ main.add_command(startup_check_command, "startup-check")
 main.add_command(state_group, "state")
 main.add_command(bug_group, "bug")
 main.add_command(requirements_group, "requirements")
+main.add_command(notify_group, "notify")
 
 
 if __name__ == "__main__":
