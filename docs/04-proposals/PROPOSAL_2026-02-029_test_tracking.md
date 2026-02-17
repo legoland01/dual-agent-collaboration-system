@@ -106,12 +106,29 @@ oc-collab test deps --module F-STORE-001
 - 测试用例设计有文档记录
 - 测试执行无跟踪机制
 - Bug漏到生产环境（如ACK命令bug）
+- **存在collusion风险**：自己测试自己的代码，可能不客观
 
-### 1.2 影响
+### 1.2 核心问题：测试舞弊（Collusion）
 
-- 虚假测试：用例设计完成即标记"完成"，实际未执行
-- 无法追溯：谁在什么时候跑了什么用例不清楚
-- 质量隐患：设计100%覆盖，实际执行0%
+| 风险 | 描述 |
+|------|------|
+| **自己测自己** | Agent2开发的功能自己测试，缺乏独立性 |
+| **虚假通过** | 测试通过但实际有bug |
+| **无法追溯** | 不知道是谁在什么时候跑了什么用例 |
+
+### 1.3 解决方向：原始记录可追溯
+
+每次测试执行必须记录：
+- **谁**执行的（executed_by）
+- **什么时候**执行的（executed_at）
+- **执行了什么**用例（test_case_id）
+- **结果如何**（result）
+- **关联什么Bug**（bug_id）
+
+这样可以：
+- 追溯测试执行历史
+- 审计测试独立性
+- 防止collusion
 
 ---
 
@@ -293,11 +310,16 @@ oc-collab test deps --module F-STORE-001
 
 ## 6. 验收标准
 
-### 6.1 阶段1验收
+### 6.1 阶段1验收（防collusion核心）
 
-- [ ] test_results表创建成功
+- [ ] test_cases表创建成功（测试用例数据库化）
+- [ ] test_results表创建成功（原始记录可追溯）
+- [ ] 每次执行记录executed_by（谁执行）
+- [ ] 每次执行记录executed_at（何时执行）
+- [ ] 每次执行记录result（执行结果）
+- [ ] 每次执行记录bug_id（关联Bug）
 - [ ] `oc-collab test run --record` 执行并记录结果
-- [ ] `oc-collab test results` 显示执行记录
+- [ ] `oc-collab test results` 显示执行记录（含执行人、时间）
 - [ ] `oc-collab test stats` 显示通过率统计
 
 ### 6.2 阶段2验收
@@ -305,6 +327,12 @@ oc-collab test deps --module F-STORE-001
 - [ ] `oc-collab test pending` 显示未执行用例
 - [ ] `oc-collab test report` 生成报告
 - [ ] E2E测试文档模板包含结果列
+
+### 6.3 防collusion验证
+
+- [ ] 可追溯：查询某个Agent执行的所有测试
+- [ ] 可审计：查询某个Bug相关的所有测试执行
+- [ ] 无虚假：未记录的测试 = 未执行
 
 ---
 
