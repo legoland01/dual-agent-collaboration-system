@@ -1966,4 +1966,32 @@ todos:
   agent_id: 2
   created_at: '2026-02-17T23:05:15.380689'
   updated_at: '2026-02-17T23:05:15.380694'
-total: 239
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-17T23:06:48.906198'
+  updated_at: '2026-02-17T23:06:48.906221'
+- id: TODO-371
+  content: test
+  status: pending
+  priority: medium
+  agent_id: null
+  created_at: '2026-02-17T23:08:27.283133'
+  updated_at: '2026-02-17T23:08:27.283141'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-17T23:08:52.966044'
+  updated_at: '2026-02-17T23:08:52.966067'
+- id: TEST-SUCCESS
+  content: 测试sync_with_rollback成功场景
+  status: pending
+  priority: high
+  agent_id: null
+  created_at: '2026-02-17T23:09:17.968276'
+  updated_at: '2026-02-17T23:09:17.968296'
+total: 243

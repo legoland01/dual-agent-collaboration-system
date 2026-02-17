@@ -583,8 +583,64 @@ notifications:
   sent_at: '2026-02-16T09:31:40.769322'
   failed_at: null
   error_message: null
-total: 73
-sent: 66
+- webhook_id: 01fbae14-e134-43ba-9d46-015202962740
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:08:45.876460'
+  sent_at: '2026-02-17T23:08:45.882734'
+  failed_at: null
+  error_message: null
+- webhook_id: 2114574a-52ba-46ca-aa3d-5fc823856e35
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:08:46.444541'
+  sent_at: '2026-02-17T23:08:46.446988'
+  failed_at: null
+  error_message: null
+- webhook_id: e287fe58-0d0e-4582-b976-62c046deaed6
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:08:46.501981'
+  sent_at: '2026-02-17T23:08:46.504461'
+  failed_at: null
+  error_message: null
+- webhook_id: 42de6d34-78a5-4167-a593-6bf3524c8f67
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:09:03.386685'
+  sent_at: '2026-02-17T23:09:03.386702'
+  failed_at: null
+  error_message: null
+- webhook_id: 7b85f33a-012d-4ad8-94da-9dbeffd9aa6b
+  event_type: todo.completed
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:09:03.444438'
+  sent_at: '2026-02-17T23:09:03.444461'
+  failed_at: null
+  error_message: null
+- webhook_id: 51c7f1db-0503-4147-92cd-fb46640daedc
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:09:03.548817'
+  sent_at: '2026-02-17T23:09:03.548838'
+  failed_at: null
+  error_message: null
+- webhook_id: cd55cfcf-3dec-4452-9abe-6e25b4e00992
+  event_type: todo.created
+  status: sent
+  retry_count: 0
+  created_at: '2026-02-17T23:09:03.683167'
+  sent_at: '2026-02-17T23:09:03.683187'
+  failed_at: null
+  error_message: null
+total: 80
+sent: 73
 failed: 7
 retried: 0
-last_updated: '2026-02-16T09:31:40.801926'
+last_updated: '2026-02-17T23:09:03.719887'
