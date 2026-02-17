@@ -164,7 +164,9 @@ v2目标：实现稳定可靠的双Agent协作框架
 
 **目标**: 确保oc-collab流程可靠 + Agent身份规范化 + 自动化流程
 
-**参考**: `PROPOSAL_2026-02-026_agent_id_and_role_rename.md`
+**参考**: 
+- `PROPOSAL_2026-02-026_agent_id_and_role_rename.md`
+- `docs/05-design/RESEARCH_v2.3.3_auto_flow_trigger.md`
 
 | 功能 | 说明 | 工时 | 优先级 | 状态 |
 |------|------|------|--------|------|
