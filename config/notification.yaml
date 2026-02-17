@@ -1,3 +1,4 @@
+e2e: {}
 enabled: false
 listener:
   auto_start: false

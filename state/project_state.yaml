@@ -1,0 +1,8 @@
+todo_id_counters:
+  1to1: 0
+  1to2: 0
+  2to1: 0
+  2to2: 0
+  Nonetoagent2: 2
+current_agent: agent1
+updated_at: '2026-02-17T23:48:55.542720'

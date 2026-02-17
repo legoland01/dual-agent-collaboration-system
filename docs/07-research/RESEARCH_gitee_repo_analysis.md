@@ -177,42 +177,56 @@
 ### 6.1 架构设计
 
 ```
-用户(需求掌握)
+用户(需求)
     │
     ▼
-oc-collab (任务分发)
+PM-Agent (需求管理中心)
     │
-    ├────┬────┬────┐
-    ▼    ▼    ▼    ▼
- Agent1 Agent2 Agent3 Agent4
- (PM)  (郭)  (李)  (陈)
-    │    │    │    │
-    ▼    ▼    ▼    ▼
-需求  Java Python VueJS
-     后端 后端 前端
+    ├──────┬──────┬──────┐
+    ▼      ▼      ▼      ▼
+  项目A   项目B   项目C   项目D
+    │      │      │      │
+    ▼      ▼      ▼      ▼
+ oc-collab (各项目自己的Agent池)
 ```
 
-### 6.2 Agent与仓库映射
+### 6.2 项目与Agent池绑定
 
-| Agent | 开发人员 | 技术栈 | 仓库 | 项目 |
-|-------|----------|--------|------|------|
-| Agent1 | 用户(PM) | - | - | 需求管理 |
-| Agent2 | 郭汉盟 | Java | financial-court-file-assistant | 卷宗后端 |
-| Agent3 | 李杨峰 | Python | dossierai, xhtools, wocheng-ai | 卷宗/AI |
-| Agent4 | 陈伟 | Vue/JS | financial-court-file-assistant-frontend | 卷宗前端 |
+| 项目 | 负责人 | Agent池 | 仓库 |
+|------|--------|---------|------|
+| 金融法院卷宗 | 郭汉盟 | Agent2 | Java后端 |
+| 金融法院卷宗 | 李杨峰 | Agent3 | Python/AI |
+| 金融法院卷宗 | 陈伟 | Agent4 | Vue前端 |
+| 徐汇司法阳光执法 | ? | Agent? | Vue前端 |
+| ... | ... | ... | ... |
 
-### 6.3 协作流程
+### 6.3 Agent注册信息
 
-1. **用户**掌握需求，创建TODO给Agent
-2. **Agent1**分析需求，分发给对应Agent
-3. **Agent2/3/4**在各自环境开发，提交代码
-4. **oc-collab**通过Git同步状态，汇总进度
+每个Agent注册时需要绑定：
+```yaml
+agent:
+  id: agent2
+  owner: 郭汉盟        # 开发者
+  project: 金融法院    # 所属项目
+  repos:              # 可访问仓库
+    - qushen-data/financial-court-file-assistant
+  skills:
+    - Java开发
+    - Spring Boot
+```
 
-### 6.4 代码提交要求
+### 6.4 协作流程
 
-- 所有提交必须通过oc-collab
-- TODO创建 → Agent执行 → Git提交
-- 确保可追溯、可管理
+1. **需求进入PM-Agent** → 分配到项目
+2. **项目负责人** → 在自己的Agent池创建TODO
+3. **Agent执行** → 访问项目仓库，提交代码
+4. **oc-collab同步** → 汇总到PM-Agent
+
+### 6.5 Agent区分机制
+
+- Agent ID格式：`agent2-项目名` 或 `agent2@郭汉盟`
+- 同一个开发者可以同时参与多个项目
+- 每个项目有独立的Agent实例
 
 ---
 
