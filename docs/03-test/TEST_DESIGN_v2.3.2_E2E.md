@@ -11,6 +11,24 @@
 
 **重要**: 所有测试验证必须查询SQLite数据库（state/todos.db），禁止查询YAML文件。
 
+### 测试前置条件
+
+**每次测试执行前必须**：
+1. 删除YAML文件：`rm state/agent_adhoc_todos.yaml`
+2. 保留SQLite数据库：`state/todos.db`
+3. 执行迁移（如尚未迁移）：`oc-collab migrate --to-sqlite`
+
+```bash
+# 测试前置脚本
+rm -f state/agent_adhoc_todos.yaml
+rm -f state/todo_queue.yaml
+rm -f state/state_queue.yaml
+# 仅保留SQLite数据库
+ls state/*.db
+```
+
+**原因**：v2.3.2使用SQLite存储，禁止使用YAML文件。所有测试必须基于SQLite数据验证。
+
 ### 验证方式
 
 | 验证类型 | 说明 | 示例 |
