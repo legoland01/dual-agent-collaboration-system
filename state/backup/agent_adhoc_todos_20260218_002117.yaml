@@ -1,0 +1,10 @@
+
+todos:
+  - id: TODO-1-001
+    content: Test TODO 1
+    status: pending
+    priority: high
+  - id: TODO-1-002
+    content: Test TODO 2
+    status: completed
+    priority: low

@@ -15,197 +15,36 @@
 
 ---
 
-## 二、实施计划 (4周)
+## 三、实施计划 (4周)
 
-### 第一周: 基础设施 (Day 1-7)
+### 第一周: 基础设施 + 数据同步 (Day 1-7)
 
-#### 2.1 创建目录结构
-
-```bash
-# 在本地创建
-mkdir -p projects/{_templates,_shared}
-mkdir -p projects/_templates/project_template/{docs/{01-requirements,02-design,03-test,04-progress},src,config,data,tests}
-
-# 复制到Gitee
-git clone qushen-data/projects
-```
-
-#### 2.2 创建项目模板文件
-
-| 文件 | 位置 | 用途 |
-|------|------|------|
-| PROJECT.md | 项目根目录 | 项目概览 |
-| project.yaml | 项目根目录 | 机器可读配置 |
-| agents.yaml | 项目根目录 | Agent配置 |
-| repos.yaml | 项目根目录 | 仓库配置 |
-| TASKS.md | 项目根目录 | 当前任务 |
-
-#### 2.3 Gitee仓库
-
-需要创建的仓库 (8个):
-
-| 仓库名 | 用途 | 语言 |
-|--------|------|------|
-| court-risk-assessment | 诉讼风险评估 | Python |
-| proc-org-service | 组织智能化 | ? |
-| proc-ops-log | 运维log | ? |
-| proc-video-management | 视频管理 | ? |
-| proc3-case-analysis | 案件分析 | ? |
-| env-impact-assessment | 环评审核 | ? |
-| env-data-extract | 数据提取 | Python |
-| xuhui-admin-doc | 行政复议 | ? |
-
----
-
-### 第二周: Agent管理 (Day 8-14)
-
-#### 2.4 Agent注册
-
-```bash
-# 注册Agent (示例: 给李杨峰注册10个)
-oc-collab agent register --owner "李杨峰" --skills "Python,FastAPI" --count 10
-
-# 给郭汉盟注册
-oc-collab agent register --owner "郭汉盟" --skills "Java,Spring" --count 5
-
-# 给陈伟注册
-oc-collab agent register --owner "陈伟" --skills "Vue,TypeScript" --count 3
-```
-
-#### 2.5 Agent池状态
-
-```yaml
-# projects/agents_global.yaml
-pools:
-  李杨峰:
-    total: 10
-    available: 10
-  郭汉盟:
-    total: 5
-    available: 5
-  陈伟:
-    total: 3
-    available: 3
-```
-
----
-
-### 第三周: 项目管理 (Day 15-21)
-
-#### 2.6 创建第一个项目
-
-```bash
-# 创建金融法院卷宗项目
-pm-agent project create \
-  --name "金融法院卷宗系统" \
-  --customer "金融法院" \
-  --priority "P0"
-
-# 添加成员并自动分配Agent
-pm-agent project add-member "金融法院卷宗系统" --member "郭汉盟" --role "后端" --agents 2
-pm-agent project add-member "金融法院卷宗系统" --member "李杨峰" --role "AI" --agents 3
-pm-agent project add-member "金融法院卷宗系统" --member "陈伟" --role "前端" --agents 1
-```
-
-#### 2.7 项目结构
-
-```
-金融法院卷宗系统/
-├── PROJECT.md              # 项目概览
-├── project.yaml          # 配置
-├── agents.yaml           # Agent配置 (6个Agent)
-├── repos.yaml            # 仓库配置 (4个仓库)
-├── skills.yaml           # Skill配置
-└── docs/
-    ├── 01-requirements/
-    ├── 02-design/
-    ├── 03-test/
-    └── 04-progress/
-```
-
----
-
-### 第四周: 协作与统计 (Day 22-28)
-
-#### 2.8 oc-collab集成
-
-- Agent入组后，读取TASKS.md获取任务
-- 执行完成后更新状态
-- Git提交同步到仓库
-
-#### 2.9 统计报告
-
-```bash
-# 每日报告
-pm-agent report daily
-
-# 输出:
-# - 今日代码提交: 12
-# - 今日TODO完成: 5
-# - 新增Bug: 2
-# - 部署: 1
-```
-
----
-
-## 三、核心文件
-
-### 3.1 项目配置
-
-```yaml
-# project.yaml
-project:
-  id: "PJ-001"
-  name: "金融法院卷宗系统"
-  customer: "金融法院"
-  priority: "P0"
-  deadline: "2026-12-31"
-  
-team:
-  - name: "郭汉盟"
-    role: "后端"
-    agents: ["agent2-001", "agent2-002"]
-  - name: "李杨峰"
-    role: "AI"
-    agents: ["agent3-001", "agent3-002", "agent3-003"]
-  - name: "陈伟"
-    role: "前端"
-    agents: ["agent4-001"]
-```
-
-### 3.2 Agent配置
-
-```yaml
-# agents.yaml
-agents:
-  - id: "agent2-001"
-    owner: "郭汉盟"
-    project: "金融法院卷宗系统"
-    status: "assigned"
-    skills: ["Java", "Spring Boot"]
-```
-
-### 3.3 仓库配置
-
-```yaml
-# repos.yaml
-repositories:
-  - name: "dossierai"
-    path: "qushen-data/dossierai"
-    agents: ["agent3-001"]
-  - name: "financial-court-file-assistant"
-    path: "qushen-data/financial-court-file-assistant"
-    agents: ["agent2-001"]
-```
-
----
-
-## 四、立即执行清单
-
-### Day 1-2: 目录与模板
+#### 1.1 创建目录结构
 
 - [ ] 创建 projects/ 目录结构
 - [ ] 创建项目模板文件
+
+#### 1.2 Gitee仓库
+
+- [ ] 创建 8个新仓库
+- [ ] 迁移 lhjczs_java_backend
+- [ ] 清理空仓库
+
+#### 1.3 数据同步 (关键!)
+
+| 数据 | 来源 | 同步方式 |
+|------|------|----------|
+| 项目信息 | CODING | 手动导入到 projects/registry.yaml |
+| 仓库信息 | Gitee API | 自动同步 |
+| 需求文档 | 现有项目 | 复制到 projects/项目名/docs/ |
+| 代码 | 各仓库 | Git clone到对应目录 |
+
+```bash
+# 数据同步命令
+pm-agent sync repos           # 同步Gitee仓库
+pm-agent sync projects        # 同步CODING项目
+pm-agent import requirements   # 导入需求
+```
 - [ ] 初始化全局配置 (registry.yaml, agents_global.yaml)
 
 ### Day 3-4: Gitee仓库
@@ -285,7 +124,56 @@ pm-agent report weekly --project "项目"
 
 ---
 
-## 七、成功标准
+## 七、oc-collab能力分析与Roadmap调整
+
+### 7.1 当前oc-collab已支持
+
+| 功能 | 命令 | 状态 |
+|------|------|------|
+| Agent管理 | agent register/list/status | ✅ 已有 |
+| 项目管理 | project list/update | ✅ 已有 |
+| 需求管理 | requirements | ✅ 已有 |
+| Git同步 | git push/pull | ✅ 已有 |
+| 部署 | deploy | ✅ 已有 |
+| 通知 | notify | ✅ 已有 |
+| TODO管理 | todo create/show/ack | ✅ 已有 |
+
+### 7.2 oc-collab需要新增的功能
+
+| 功能 | 说明 | 优先级 |
+|------|------|--------|
+| **agent pool** | Agent资源池管理 | P0 |
+| **agent assign** | Agent自动分配到项目 | P0 |
+| **project create** | 创建新项目 | P0 |
+| **project sync** | 同步Gitee仓库 | P1 |
+| **project import** | 导入现有需求 | P1 |
+| **gitee stats** | 代码提交统计 | P2 |
+
+### 7.3 Roadmap调整
+
+**新增版本 v2.3.5**:
+
+| 版本 | 目标 | 说明 |
+|------|------|------|
+| v2.3.2 | TODO存储+通知 | POC完成 |
+| v2.3.3 | 自动流程触发 | 待开发 |
+| v2.3.4 | 配置管理 | 设计完成 |
+| **v2.3.5** | **多项目管理体系** | **Agent pool + project管理** |
+
+### 7.4 v2.3.5需要开发的功能
+
+```python
+# 新增CLI命令
+oc-collab agent pool          # Agent资源池管理
+oc-collab agent assign       # 分配Agent到项目
+oc-collab project create    # 创建项目
+oc-collab project sync     # 同步Gitee仓库
+oc-collab gitee            # Gitee集成
+```
+
+---
+
+## 八、成功标准
 
 - [ ] 目录结构创建完成
 - [ ] 8个新仓库创建完成
@@ -293,6 +181,7 @@ pm-agent report weekly --project "项目"
 - [ ] 第一个项目创建成功
 - [ ] Agent能读取TASKS.md执行任务
 - [ ] 每日报告能生成
+- [ ] **v2.3.5 CLI命令开发完成**
 
 ---
 

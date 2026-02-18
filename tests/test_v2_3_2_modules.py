@@ -642,3 +642,283 @@ class TestOnlinePullerMore:
         """测试获取空延迟列表"""
         todos = puller.get_deferred_todos('nonexistent')
         assert isinstance(todos, list)
+
+
+class TestConfigManagerMore:
+    """ConfigManager更多测试"""
+    
+    @pytest.fixture
+    def config_mgr(self):
+        import tempfile
+        cfg = tempfile.mktemp(suffix='.yaml')
+        mgr = ConfigManager(cfg)
+        yield mgr
+        if os.path.exists(cfg):
+            os.remove(cfg)
+    
+    def test_delete_existing(self, config_mgr):
+        """测试删除存在的配置"""
+        config_mgr.set('test.key', 'value')
+        ok = config_mgr.delete('test.key')
+        assert ok is True
+    
+    def test_delete_nonexistent(self, config_mgr):
+        """测试删除不存在的配置"""
+        ok = config_mgr.delete('nonexistent.key')
+        assert ok is False
+    
+    def test_reset(self, config_mgr):
+        """测试重置配置"""
+        config_mgr.set('custom.setting', 'value')
+        ok = config_mgr.reset()
+        assert ok is True
+        value = config_mgr.get('version')
+        assert value == '1.0'
+    
+    def test_get_raw(self, config_mgr):
+        """测试获取原始配置值"""
+        config_mgr.set('raw.test', '123')
+        value = config_mgr.get_raw('raw.test')
+        assert value == '123'
+    
+    def test_get_raw_with_default(self, config_mgr):
+        """测试获取不存在的原始配置"""
+        value = config_mgr.get_raw('nonexistent', default='default_val')
+        assert value == 'default_val'
+    
+    def test_get_raw_error(self, config_mgr):
+        """测试获取原始配置时的错误处理"""
+        config_mgr.set('nested.value', 'test')
+        value = config_mgr.get_raw('nested.invalid.path', default='fallback')
+        assert value == 'fallback'
+
+
+class TestDataMigrationMoreTests:
+    """DataMigration更多测试"""
+    
+    @pytest.fixture
+    def migration(self):
+        import tempfile
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        m = DataMigrationService(storage)
+        yield m
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_migrate_nonexistent_file(self, migration):
+        """测试迁移不存在的文件"""
+        ok, msg = migration.migrate('/nonexistent.yaml')
+        assert ok is False
+        assert '不存在' in msg
+    
+    def test_migrate_invalid_yaml(self, migration):
+        """测试迁移无效YAML"""
+        import tempfile
+        invalid_yaml = tempfile.mktemp(suffix='.yaml')
+        with open(invalid_yaml, 'w') as f:
+            f.write('invalid: content')
+        ok, msg = migration.migrate(invalid_yaml)
+        os.remove(invalid_yaml)
+        assert ok is False
+    
+    def test_migrate_valid_yaml(self, migration):
+        """测试迁移有效YAML"""
+        import tempfile
+        valid_yaml = tempfile.mktemp(suffix='.yaml')
+        with open(valid_yaml, 'w') as f:
+            f.write("""
+todos:
+  - id: TODO-1-001
+    content: Test TODO 1
+    status: pending
+    priority: high
+  - id: TODO-1-002
+    content: Test TODO 2
+    status: completed
+    priority: low
+""")
+        ok, msg = migration.migrate(valid_yaml)
+        os.remove(valid_yaml)
+        assert ok is True
+        assert '成功' in msg
+    
+    def test_preview_with_invalid_file(self, migration):
+        """测试预览不存在的文件"""
+        result = migration.preview('/nonexistent.yaml')
+        assert 'error' in result
+    
+    def test_rollback_with_existing_db(self, migration):
+        """测试回滚存在的数据库"""
+        import tempfile
+        import os
+        db_path = "state/todos.db"
+        os.makedirs("state", exist_ok=True)
+        storage = TodoStorage(db_path)
+        storage.add({'id': 'TEST-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        
+        temp_yaml = tempfile.mktemp(suffix='.yaml')
+        with open(temp_yaml, 'w') as f:
+            f.write("todos: []")
+        
+        migration.storage = storage
+        backup_path = migration.backup(temp_yaml)
+        
+        ok = migration.rollback(backup_path)
+        assert ok is True
+        
+        os.remove(temp_yaml)
+        if os.path.exists(db_path):
+            os.remove(db_path)
+    
+    def test_rollback_nonexistent_backup(self, migration):
+        """测试回滚不存在的备份"""
+        ok = migration.rollback('/nonexistent/backup.yaml')
+        assert ok is False
+    
+    def test_list_backups_empty(self, migration):
+        """测试列出空备份"""
+        backups = migration.list_backups()
+        assert isinstance(backups, list)
+
+
+class TestNotificationServiceExtended:
+    """NotificationService扩展测试"""
+    
+    @pytest.fixture
+    def notification(self):
+        import tempfile
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        n = NotificationService(storage)
+        yield n
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_generate_instruction_default_path(self, notification):
+        """测试生成默认路径的instruction"""
+        ok = notification.generate_instruction()
+        assert ok is True
+        import os
+        assert os.path.exists(notification.instruction_path)
+    
+    def test_generate_instruction_custom_path(self, notification):
+        """测试生成自定义路径的instruction"""
+        custom_path = tempfile.mktemp(suffix='.md')
+        ok = notification.generate_instruction(custom_path)
+        assert ok is True
+        if os.path.exists(custom_path):
+            os.remove(custom_path)
+    
+    def test_enable(self, notification):
+        """测试启用通知"""
+        ok = notification.enable()
+        assert ok is True
+        status = notification.get_status()
+        assert status['enabled'] is True
+    
+    def test_disable(self, notification):
+        """测试禁用通知"""
+        notification.enable()
+        ok = notification.disable()
+        assert ok is True
+        status = notification.get_status()
+        assert status['enabled'] is False
+    
+    def test_get_status_with_notification(self, notification):
+        """测试有通知时的状态"""
+        notification.notify({'id': 'TEST-001'})
+        status = notification.get_status()
+        assert status['last_notification'] is not None
+
+
+class TestTodoStorageErrorHandling:
+    """TodoStorage错误处理测试"""
+    
+    @pytest.fixture
+    def storage(self):
+        db = tempfile.mktemp(suffix='.db')
+        s = TodoStorage(db)
+        yield s
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_add_duplicate_id(self, storage):
+        """测试添加重复ID"""
+        storage.add({'id': 'DUPE-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        ok, msg = storage.add({'id': 'DUPE-001', 'content': 'test2', 'sender': '1', 'receiver': '2'})
+        assert ok is False
+        assert '已存在' in msg
+    
+    def test_list_with_filters(self, storage):
+        """测试带过滤条件的列表"""
+        storage.add({'id': 'FILT-001', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'pending'})
+        storage.add({'id': 'FILT-002', 'content': 'test', 'sender': '1', 'receiver': '2', 'status': 'completed'})
+        todos = storage.list(status='pending', receiver='2')
+        assert len(todos) >= 1
+    
+    def test_get_nonexistent(self, storage):
+        """测试获取不存在的TODO"""
+        todo = storage.get('NONEXISTENT')
+        assert todo is None
+    
+    def test_list_unread_only(self, storage):
+        """测试只列出未读"""
+        storage.add({'id': 'UNREAD-001', 'content': 'test', 'sender': '1', 'receiver': '2', 'is_read': 0})
+        storage.add({'id': 'UNREAD-002', 'content': 'test', 'sender': '1', 'receiver': '2', 'is_read': 1})
+        todos = storage.list(unread_only=True)
+        assert any(t['id'] == 'UNREAD-001' for t in todos)
+    
+    def test_list_by_receiver_only(self, storage):
+        """测试按receiver筛选"""
+        storage.add({'id': 'REC-001', 'content': 'test', 'sender': '5', 'receiver': '8'})
+        todos = storage.list(receiver='8')
+        assert len(todos) >= 1
+    
+    def test_update_with_metadata(self, storage):
+        """测试更新metadata"""
+        storage.add({'id': 'META-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        ok = storage.update('META-001', {'metadata': {'key': 'value'}})
+        assert ok is True
+    
+    def test_update_empty_dict(self, storage):
+        """测试更新空字典"""
+        storage.add({'id': 'EMPTY-001', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        ok = storage.update('EMPTY-001', {})
+        assert ok is False
+    
+    def test_get_next_id_with_malformed(self, storage):
+        """测试获取下一个ID时处理格式错误的ID"""
+        storage.add({'id': 'TODO-abc', 'content': 'test', 'sender': '1', 'receiver': '2'})
+        next_id = storage.get_next_id('1')
+        assert next_id >= 1
+
+
+class TestNotificationServiceException:
+    """NotificationService异常测试"""
+    
+    @pytest.fixture
+    def notification(self):
+        import tempfile
+        db = tempfile.mktemp(suffix='.db')
+        storage = TodoStorage(db)
+        n = NotificationService(storage)
+        yield n
+        if os.path.exists(db):
+            os.remove(db)
+    
+    def test_generate_instruction_exception(self, notification):
+        """测试生成instruction时的异常"""
+        import os
+        original_open = open
+        def mock_open(*args, **kwargs):
+            if 'TODO_NOTIFY.md' in str(args[0]):
+                raise OSError("Mock IO error")
+            return original_open(*args, **kwargs)
+        import builtins
+        builtins.open = mock_open
+        try:
+            ok = notification.generate_instruction('/invalid/path/that/cannot/be/created/TODO_NOTIFY.md')
+            assert ok is False
+        finally:
+            builtins.open = original_open
