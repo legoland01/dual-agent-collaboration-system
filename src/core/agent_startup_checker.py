@@ -1,7 +1,7 @@
 """Agent启动自检器
 
 功能：
-- Agent启动时自动检查todo_queue.yaml
+- Agent启动时自动检查未读TODO (SQLite)
 - 显示未读TODO列表
 - 提示按优先级执行
 """

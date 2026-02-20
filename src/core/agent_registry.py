@@ -7,6 +7,7 @@ Agent注册表管理模块
 import os
 import subprocess
 import yaml
+from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
 
@@ -29,6 +30,56 @@ class AgentRegistry:
         """
         self.state_file = state_file
         self._ensure_state_file()
+    
+    def _get_identity_file(self) -> Path:
+        """获取agent identity文件路径"""
+        state_dir = Path(self.state_file).parent
+        return state_dir / "agent.identity"
+    
+    def set_agent_identity(self, agent_id: str, lock: bool = True) -> bool:
+        """
+        设置当前Agent身份并锁定
+        
+        Args:
+            agent_id: Agent ID
+            lock: 是否锁定身份（锁定后无法更改）
+        
+        Returns:
+            是否成功
+        """
+        identity_file = self._get_identity_file()
+        identity_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        content = {
+            "agent_id": agent_id,
+            "locked": lock,
+            "set_at": datetime.now().isoformat()
+        }
+        
+        with open(identity_file, 'w') as f:
+            yaml.safe_dump(content, f)
+        
+        return True
+    
+    def unlock_agent_identity(self) -> bool:
+        """解锁Agent身份"""
+        identity_file = self._get_identity_file()
+        if identity_file.exists():
+            with open(identity_file, 'r') as f:
+                content = yaml.safe_load(f) or {}
+            content["locked"] = False
+            with open(identity_file, 'w') as f:
+                yaml.safe_dump(content, f)
+        return True
+    
+    def is_identity_locked(self) -> bool:
+        """检查身份是否锁定"""
+        identity_file = self._get_identity_file()
+        if identity_file.exists():
+            with open(identity_file, 'r') as f:
+                content = yaml.safe_load(f) or {}
+            return content.get("locked", False)
+        return False
     
     def _ensure_state_file(self):
         """确保状态文件存在"""
@@ -54,17 +105,45 @@ class AgentRegistry:
         """
         获取当前Agent ID
         
-        优先级: CLI参数 > 环境变量 > Git config
+        优先级: 
+        1. agent.identity文件 (锁定状态)
+        2. 环境变量 OC_AGENT_ID
+        3. project_state.yaml中的current_agent
+        4. Git config
         
         Returns:
             Agent ID或None
         """
-        # 1. 环境变量
+        # 1. agent.identity文件 (最优先)
+        identity_file = self._get_identity_file()
+        if identity_file.exists():
+            try:
+                with open(identity_file, 'r') as f:
+                    content = yaml.safe_load(f) or {}
+                agent_id = content.get("agent_id")
+                if agent_id:
+                    return agent_id
+            except Exception as e:
+                print(f"Warning: Failed to read identity file: {e}")
+        
+        # 2. 环境变量
         agent_id = os.environ.get("OC_AGENT_ID")
         if agent_id:
             return agent_id
         
-        # 2. Git config
+        # 3. project_state.yaml中的current_agent
+        try:
+            state_path = Path(self.state_file)
+            if state_path.exists():
+                with open(state_path, 'r') as f:
+                    state = yaml.safe_load(f)
+                current = state.get("current_agent")
+                if current:
+                    return current
+        except Exception:
+            pass
+        
+        # 3. Git config
         try:
             result = subprocess.run(
                 ["git", "config", "user.email"],
@@ -159,12 +238,13 @@ class AgentRegistry:
         Returns:
             是否可以注销（有pending TODO时返回False）
         """
-        state = self._load_state()
-        todos = state.get("todos", [])
+        from .todo_sync_manager import TodoSyncManager
+        sync_manager = TodoSyncManager()
+        todo_state = sync_manager.load_todos()
+        todos = todo_state.todos
         
-        # 检查是否有分配给该Agent的pending TODO
         for todo in todos:
-            if todo.get("receiver") == agent_id and todo.get("status") == "pending":
+            if todo.receiver == agent_id and todo.status == "pending":
                 return False
         
         return True

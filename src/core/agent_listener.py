@@ -2,6 +2,7 @@ import os
 import time
 import signal
 import logging
+import json
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -115,6 +116,150 @@ class AgentListenerService:
             # 这里可以触发通知
             for todo in unread:
                 logger.debug(f"新TODO: {todo.get('id')} - {todo.get('content')[:30]}")
+        
+        # 检查触发文件
+        self._check_trigger_files()
+    
+    def _check_trigger_files(self):
+        """检查并处理触发文件"""
+        import time
+        state_dir = Path("state")
+        if not state_dir.exists():
+            return
+        
+        trigger_files = list(state_dir.glob("trigger_*.json"))
+        if not trigger_files:
+            return
+        
+        # 按修改时间排序，处理最早的
+        trigger_files.sort(key=lambda f: f.stat().st_mtime)
+        
+        for trigger_file in trigger_files:
+            try:
+                with open(trigger_file, 'r') as f:
+                    trigger_data = json.load(f)
+                
+                action = trigger_data.get("action")
+                agent_id = trigger_data.get("agent_id")
+                
+                if action == "notify_todo":
+                    logger.info(f"收到来自PM-Agent的触发: agent={agent_id}")
+                    # TODO: 暂时注释掉自动发送查看TODO，避免干扰其他窗口
+                    # 需要解决精确发送窗口问题后才能启用
+                    # self._activate_iterm2_notify(agent_id)
+                    pass
+                    # 等待足够长让OpenCode处理
+                    time.sleep(0.3)
+                
+                # 处理完成后删除触发文件
+                trigger_file.unlink()
+                logger.info(f"触发文件已处理: {trigger_file.name}")
+                
+            except Exception as e:
+                logger.error(f"处理触发文件失败: {e}")
+    
+    def _activate_iterm2_notify(self, target_agent: str = "agent2"):
+        """通过OpenCode API发送查看TODO - 发两次确保提交"""
+        import requests
+        import json
+        import os
+        import time
+        from pathlib import Path
+        
+        project_path = os.getcwd()
+        
+        logger.info(f"目标agent: {target_agent}")
+        
+        # 查找最新的session（按时间倒序）
+        import sqlite3
+        session_id = None
+        db_path = Path.home() / ".local/share/opencode/opencode.db"
+        if db_path.exists():
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id FROM session WHERE directory = ? ORDER BY time_updated DESC LIMIT 1",
+                (project_path,)
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                session_id = row[0]
+                logger.info(f"找到最新session: {session_id}")
+        
+        if not session_id:
+            logger.error("找不到session ID")
+            return
+        
+        # 遍历所有端口尝试，找到能处理目标session的端口
+        import subprocess
+        result = subprocess.run(['lsof', '-i', '-n'], capture_output=True, text=True)
+        ports = set()
+        for line in result.stdout.split('\n'):
+            if 'opencode' in line and 'LISTEN' in line:
+                for part in line.split():
+                    if ':' in part:
+                        try:
+                            port = int(part.split(':')[-1])
+                            if port > 1000:
+                                ports.add(str(port))
+                        except:
+                            pass
+        
+        if not ports:
+            logger.error("找不到OpenCode端口")
+            return
+        
+        logger.info(f"尝试端口: {ports}")
+        
+        # 找到项目下的所有session
+        session_ids = []
+        if db_path.exists():
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id FROM session WHERE directory = ? ORDER BY time_updated DESC LIMIT 10",
+                (project_path,)
+            )
+            session_ids = [row[0] for row in cursor.fetchall()]
+            conn.close()
+        
+        logger.info(f"尝试sessions: {session_ids}")
+        
+        # 尝试每个端口和session组合，用异步发送不等待响应
+        success = False
+        for port in ports:
+            for sid in session_ids:
+                api_url = f"http://127.0.0.1:{port}/session/{sid}/message"
+                
+                payload1 = {"parts": [{"type": "text", "text": "查看TODO"}]}
+                payload2 = {"parts": [{"type": "text", "text": " "}]}
+                
+                try:
+                    # 异步发送，不等待响应
+                    import threading
+                    def send():
+                        try:
+                            requests.post(api_url, json=payload1, timeout=1)
+                            time.sleep(0.2)
+                            requests.post(api_url, json=payload2, timeout=1)
+                        except:
+                            pass
+                    
+                    thread = threading.Thread(target=send)
+                    thread.daemon = True
+                    thread.start()
+                    
+                    logger.info(f"已发送: port={port}, session={sid}")
+                    success = True
+                    break
+                except Exception as e:
+                    pass
+            if success:
+                break
+        
+        if not success:
+            logger.error("所有组合都失败")
     
     def _handle_crash(self, error: Exception):
         """处理进程崩溃"""

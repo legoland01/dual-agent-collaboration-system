@@ -27,27 +27,18 @@ class ContextCarrier:
 
     def __init__(self, project_path: Optional[str] = None):
         self.project_path = Path(project_path) if project_path else Path.cwd()
-        self.todo_file = self.project_path / "state" / "agent_adhoc_todos.yaml"
+        self.db_path = str(self.project_path / "state" / "todos.db")
         self.state_file = self.project_path / "state" / "project_state.yaml"
 
     def load_history(self, limit: int = 10) -> List[Dict[str, Any]]:
-        """
-        加载历史TODO记录
-
-        Args:
-            limit: 返回数量限制
-
-        Returns:
-            历史TODO列表
-        """
-        if not self.todo_file.exists():
+        """加载历史TODO记录"""
+        try:
+            from .todo_storage import TodoStorage
+            storage = TodoStorage(self.db_path)
+            todos = storage.list(status="completed")
+            return todos[-limit:]
+        except Exception:
             return []
-
-        with open(self.todo_file) as f:
-            data = yaml.safe_load(f)
-
-        todos = data.get("adhoc_todos", [])
-        return [t for t in todos if t.get("status") == "completed"][-limit:]
 
     def generate_context_summary(self, new_todo_content: str) -> str:
         """

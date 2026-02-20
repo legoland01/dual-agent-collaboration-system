@@ -46,7 +46,11 @@ class SkillEnforcer:
         Args:
             skills_dir: Skill目录路径，默认为项目根目录/skills
         """
-        self.skills_dir = Path(skills_dir) if skills_dir else Path.cwd() / "skills"
+        import os
+        if os.environ.get("OC_SKIP_SKILL_CHECK"):
+            self.skills_dir = Path("skills")
+        else:
+            self.skills_dir = Path(skills_dir) if skills_dir else Path.cwd() / "skills"
     
     def check_required_skills(self, phase: str) -> Tuple[bool, List[str]]:
         """

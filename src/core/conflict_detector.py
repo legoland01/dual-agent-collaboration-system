@@ -29,17 +29,16 @@ class ConflictDetector:
 
     def __init__(self, project_path: Optional[str] = None):
         self.project_path = Path(project_path) if project_path else Path.cwd()
-        self.todo_file = self.project_path / "state" / "agent_adhoc_todos.yaml"
+        self.db_path = str(self.project_path / "state" / "todos.db")
 
     def load_todos(self) -> List[Dict[str, Any]]:
         """加载所有TODO"""
-        if not self.todo_file.exists():
+        try:
+            from .todo_storage import TodoStorage
+            storage = TodoStorage(self.db_path)
+            return storage.list()
+        except Exception:
             return []
-
-        with open(self.todo_file) as f:
-            data = yaml.safe_load(f)
-
-        return data.get("adhoc_todos", [])
 
     def detect_duplicate(self, content: str, todos: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """

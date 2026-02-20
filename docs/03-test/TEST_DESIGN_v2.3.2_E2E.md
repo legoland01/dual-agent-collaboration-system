@@ -7,27 +7,45 @@
 
 ---
 
-## 测试验证方式说明
+## ⚠️ 测试环境要求（必读）
 
-**重要**: 所有测试验证必须查询SQLite数据库（state/todos.db），禁止查询YAML文件。
+### 沙箱测试原则
+
+**测试必须在独立环境中执行，禁止直接在生产环境操作：**
+
+1. **数据保护原则**：测试只清理自己创建的数据，不删除原有数据
+   ```bash
+   # ✅ 正确：只删除测试创建的TODO
+   sqlite3 state/todos.db "DELETE FROM todos WHERE content LIKE '测试%';"
+   
+   # ❌ 错误：删除所有数据
+   sqlite3 state/todos.db "DELETE FROM todos;"
+   ```
+
+2. **沙箱数据库**（长期方案）：
+   - 创建独立测试数据库 `state/todos_test.db`
+   - 测试时使用 `--test-db` 参数或环境变量 `OC_TEST_DB=1` 切换
+   - 或在非生产时间执行测试
+
+3. **测试标记**：测试创建的TODO应包含明确标记（如前缀"测试_"）
 
 ### 测试前置条件
 
 **每次测试执行前必须**：
-1. 删除YAML文件：`rm state/agent_adhoc_todos.yaml`
-2. 保留SQLite数据库：`state/todos.db`
-3. 执行迁移（如尚未迁移）：`oc-collab migrate --to-sqlite`
+1. 检查当前环境是否为测试环境
+2. 备份重要数据（如有）
+3. 记录测试前状态
 
 ```bash
-# 测试前置脚本
-rm -f state/agent_adhoc_todos.yaml
-rm -f state/todo_queue.yaml
-rm -f state/state_queue.yaml
-# 仅保留SQLite数据库
-ls state/*.db
+# 测试前置检查
+# 1. 记录当前TODO数量
+sqlite3 state/todos.db "SELECT COUNT(*) FROM todos;"
+
+# 2. 只删除测试创建的TODO（包含"测试"前缀的）
+sqlite3 state/todos.db "DELETE FROM todos WHERE content LIKE '%测试%';"
 ```
 
-**原因**：v2.3.2使用SQLite存储，禁止使用YAML文件。所有测试必须基于SQLite数据验证。
+**原因**：v2.3.2使用SQLite存储，直接删除全表数据会影响在用系统。
 
 ### 验证方式
 
@@ -293,11 +311,11 @@ CREATE TABLE notifications (
 
 ### F-TODO-003: 模板系统
 
-| 序号 | 测试场景 | 测试命令 | 预期结果 |
-|------|----------|----------|----------|
-| V309 | BUG模板 | `--type BUG_FIX` | 使用模板 |
-| V310 | 需求模板 | `--type REQUIREMENT` | 使用模板 |
-| V311 | 模板文件 | 检查config/templates.yaml | 文件存在 |
+| 序号 | 测试场景 | 测试命令 | 预期结果 | 验证方式 |
+|------|----------|----------|----------|----------|
+| V309 | BUG模板 | `--type BUG_FIX` | 使用模板 | SQLite: SELECT * FROM todos WHERE metadata LIKE '%BUG_FIX%' |
+| V310 | 需求模板 | `--type REQUIREMENT` | 使用模板 | SQLite: SELECT * FROM todos WHERE metadata LIKE '%REQUIREMENT%' |
+| V311 | 模板文件 | 检查config/templates.yaml | 文件存在 | 文件检查 |
 
 ---
 
@@ -366,6 +384,8 @@ CREATE TABLE notifications (
 
 | 序号 | 测试场景 | 测试步骤 | 预期结果 | 验证方式 |
 |------|----------|----------|----------|----------|
+| S011 | 手动查看TODO | 在OpenCode输入框输入"查看TODO"并提交 | 弹出question窗口 | UI验证 |
+| S012 | 显示接收人 | question窗口显示TODO信息 | 显示"来源: sender → receiver"格式 | UI验证 |
 | S013 | 立即执行 | 选择该操作 | status=in_progress | SQLite: SELECT status FROM todos WHERE status='in_progress' |
 | S014 | 留待空闲 | 选择该操作 | 移入deferred | SQLite: SELECT status FROM todos WHERE status='deferred' |
 | S015 | 不用执行 | 选择该操作 | status=dismissed | SQLite: SELECT status FROM todos WHERE status='cancelled' |
@@ -388,8 +408,8 @@ CREATE TABLE notifications (
 |----------|--------|
 | 过往版本CLI回归测试 | 70 |
 | v2.3.1新功能测试 | 16 |
-| v2.3.2新功能测试 | 18 |
-| **总计** | **104** |
+| v2.3.2新功能测试 | 20 |
+| **总计** | **106** |
 
 ---
 

@@ -596,25 +596,24 @@ todos:
 | 为了"可能有需要"自创TODO | 实际需要时再创建 |
 | 手动编辑文件后不git add/commit | 编辑后立即提交 |
 
-### ⚠️ BUG-20260208-007教训：手动编辑文件的问题
+### ⚠️ v2.3.3架构变更：使用SQLite存储
 
-**场景**：Agent1直接编辑 `state/agent_adhoc_todos.yaml`，Agent2看不到更改
+**变更说明**：
+- v2.3.3+ 使用 SQLite (`state/todos.db`) 存储TODO
+- 不再使用 YAML 文件
+- 使用 CLI 命令操作：`oc-collab todowrite`, `oc-collab todo list`
 
-**问题**：
-- Agent1编辑文件后忘记git add/commit
-- Agent2拉取远程后看不到新TODO
-- 误以为是todowrite工具的bug
-
-**教训**：
+**正确的操作方式**：
 ```
-不是todowrite的bug，而是操作问题！
+# 创建TODO
+oc-collab todowrite --content "任务描述" --to 2
 
-手动编辑 state/agent_adhoc_todos.yaml 后，必须：
-1. git add state/agent_adhoc_todos.yaml
-2. git commit -m "chore: 添加TODO-XXX"
-3. git push（或等待其他人push）
+# 查看TODO
+oc-collab todo list
 
-验证方法：
+# 标记完成
+oc-collab todo complete TODO-1-001
+```
 git status  # 检查文件是否已标记
 git log --oneline  # 检查提交是否成功
 ```
@@ -689,7 +688,7 @@ oc-collab todo
 - state/project_state.yaml 中查看当前 phase
 
 ### 任务来源
-- 检查 state/agent_adhoc_todos.yaml 中的待办任务
+- 使用 `oc-collab todo list` 查看待办任务 (SQLite)
 
 ### 下一步行动
 - 遵循当前阶段的工作流程

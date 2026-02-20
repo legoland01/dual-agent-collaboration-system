@@ -51,6 +51,9 @@ class TodoStorage:
                 completed_at TIMESTAMP,
                 deferred_until TIMESTAMP,
                 is_read INTEGER DEFAULT 0,
+                acknowledged INTEGER DEFAULT 0,
+                acknowledged_by TEXT,
+                acknowledged_at TIMESTAMP,
                 metadata TEXT
             )
         """)

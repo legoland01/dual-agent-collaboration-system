@@ -143,6 +143,10 @@ class SignoffEngine:
         }
         
         current_status = stage_data.get("status", "")
+        
+        if not current_status:
+            return True, ""
+        
         if current_status not in [required_status.get(stage, ""), "approved", "passed"]:
             return False, f"当前阶段状态不允许签署: {current_status}"
         
@@ -269,3 +273,116 @@ class SignoffEngine:
                 success=False,
                 message=f"签署失败: {e}"
             )
+    
+    def auto_trigger_signoff(self, stage: str, test_results: dict) -> dict:
+        """测试通过后自动触发signoff流程
+        
+        Args:
+            stage: 阶段名 (requirements/design/test)
+            test_results: 测试结果 {"passed": int, "failed": int, "coverage": float}
+            
+        Returns:
+            触发结果 {"triggered": bool, "action": str, "message": str}
+        """
+        if test_results.get("failed", 0) > 0:
+            return {
+                "triggered": False,
+                "action": "none",
+                "message": f"测试有{test_results['failed']}个失败，无法触发signoff"
+            }
+        
+        if test_results.get("passed", 0) == 0:
+            return {
+                "triggered": False,
+                "action": "none",
+                "message": "没有通过的测试"
+            }
+        
+        coverage = test_results.get("coverage", 0)
+        min_coverage = test_results.get("min_coverage", 80)
+        
+        if coverage < min_coverage:
+            return {
+                "triggered": False,
+                "action": "none",
+                "message": f"代码覆盖率{coverage}%低于最低要求{min_coverage}%"
+            }
+        
+        summary = self.get_signoff_summary(stage)
+        if summary.get("both_signed"):
+            return {
+                "triggered": False,
+                "action": "none",
+                "message": f"{stage}阶段已经完成签署"
+            }
+        
+        pending_signers = []
+        if not summary.get("pm_signoff"):
+            pending_signers.append("agent1")
+        if not summary.get("dev_signoff"):
+            pending_signers.append("agent2")
+        
+        return {
+            "triggered": True,
+            "action": "create_signoff_todo",
+            "stage": stage,
+            "pending_signers": pending_signers,
+            "test_results": test_results,
+            "message": f"测试通过，准备签署{stage}阶段，待签署: {', '.join(pending_signers)}"
+        }
+    
+    def create_signoff_todo_from_test(self, stage: str, test_results: dict, todo_manager=None) -> dict:
+        """根据测试结果创建signoff TODO
+        
+        Args:
+            stage: 阶段名
+            test_results: 测试结果
+            todo_manager: TodoSyncManager实例
+            
+        Returns:
+            创建结果
+        """
+        trigger_result = self.auto_trigger_signoff(stage, test_results)
+        
+        if not trigger_result.get("triggered"):
+            return trigger_result
+        
+        if not todo_manager:
+            from .todo_sync_manager import TodoSyncManager
+            todo_manager = TodoSyncManager()
+        
+        created_todos = []
+        
+        for signer in trigger_result.get("pending_signers", []):
+            signer_num = signer.replace("agent", "")
+            receiver_num = "1" if signer == "agent2" else "2"
+            
+            todo_content = f"""签署确认: {stage}阶段
+
+测试结果:
+- 通过: {test_results.get('passed', 0)}
+- 失败: {test_results.get('failed', 0)}
+- 覆盖率: {test_results.get('coverage', 0)}%
+
+请执行: oc-collab signoff {stage}"""
+            
+            todo = todo_manager.add_todo(
+                todo_content,
+                agent_id=signer_num,
+                priority="high",
+                receiver=receiver_num
+            )
+            
+            if todo:
+                created_todos.append({
+                    "todo_id": todo.id,
+                    "signer": signer,
+                    "stage": stage
+                })
+        
+        return {
+            "triggered": True,
+            "action": "created_todos",
+            "todos": created_todos,
+            "message": f"已创建{len(created_todos)}个signoff TODO"
+        }

@@ -262,6 +262,28 @@ class TestOnlinePuller:
         todos = puller.storage.list(receiver='2')
         ok = puller.notify_user(todos)
         assert ok is True
+    
+    def test_instruction_file_generation(self, puller):
+        """测试Instruction文件生成 - BUG-20260218-003验证"""
+        from pathlib import Path
+        
+        puller.storage.add({'id': 'INST-001', 'content': '测试Instruction生成', 'sender': '1', 'receiver': '2', 'status': 'pending', 'priority': 'high'})
+        todos = puller.storage.list(receiver='2')
+        
+        # 调用notify_user生成instruction文件
+        ok = puller.notify_user(todos)
+        assert ok is True
+        
+        # 验证文件存在
+        instruction_path = Path("config/instructions/TODO_NOTIFY.md")
+        assert instruction_path.exists(), "Instruction文件未生成"
+        
+        # 验证内容包含TODO信息
+        content = instruction_path.read_text(encoding='utf-8')
+        assert 'INST-001' in content, "TODO ID未包含在instruction中"
+        assert '测试Instruction生成' in content, "TODO内容未包含在instruction中"
+        assert 'question' in content, "Question tool调用示例未包含"
+        assert '立即执行' in content, "操作选项未包含"
 
 
 class TestDataMigration:

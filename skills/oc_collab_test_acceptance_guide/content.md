@@ -90,6 +90,44 @@ rm -rf .pytest_cache __pycache__ src/*/__pycache__
 
 ---
 
+## ⚠️ 测试数据保护原则（必读）
+
+### 核心原则：只清理自己创建的数据
+
+| 场景 | ✅ 正确做法 | ❌ 错误做法 |
+|------|-------------|-------------|
+| 测试前清理 | 只删除测试创建的TODO | DELETE FROM todos（删除全部） |
+| 测试标记 | 使用前缀如"测试_"标识 | 无标识 |
+| 测试后 | 删除自己创建的测试数据 | 保留或删除全部 |
+
+### 数据清理示例
+
+```bash
+# ✅ 正确：只删除测试创建的TODO
+sqlite3 state/todos.db "DELETE FROM todos WHERE content LIKE '%测试%';"
+
+# ❌ 错误：删除所有数据
+sqlite3 state/todos.db "DELETE FROM todos;"
+sqlite3 state/todos.db "DELETE FROM todos; DELETE FROM agent_status;"
+```
+
+### 沙箱测试环境（长期方案）
+
+1. **独立测试数据库**: 创建 `state/todos_test.db`
+2. **环境变量切换**: `OC_TEST_DB=1 python -m pytest ...`
+3. **非生产时间**: 选择无业务时段执行测试
+
+### 测试文档要求
+
+所有测试设计文档必须包含：
+- 测试前置条件中的数据保护说明
+- 测试后清理规则
+- 沙箱环境要求
+
+**教训**: BUG-20260218-001 - 测试误删在用数据
+
+---
+
 ## 测试准备流程
 
 ### Agent 1 的测试准备工作
@@ -569,3 +607,4 @@ v2.2.11 StateReceiver 问题暴露：StateReceiver 使用 `state/state_queue.jso
 |------|------|------|------|
 | v1.0.1 | 2026-02-14 | 新增"验收TODO规范"章节 | Agent 1 |
 | v1.0.2 | 2026-02-14 | 新增"状态同步验证测试"章节 | Agent 2 |
+| v1.0.3 | 2026-02-18 | 新增"测试数据保护原则"章节 | Agent 1 |

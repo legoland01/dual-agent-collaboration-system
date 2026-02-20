@@ -155,18 +155,20 @@ cp docs/02-design/TEMPLATE_detailed_design.md docs/02-design/DETAIL_vX.X.X.md
 | 数据类型 | 存储文件 | 格式 | 读取方 | 写入方 |
 |----------|----------|------|--------|--------|
 | 项目状态 | state/project_state.yaml | YAML | Agent1, Agent2 | 双方 |
-| TODO队列 | state/todo_queue.yaml | YAML | Agent1, Agent2 | 双方 |
+| TODO队列 | state/todos.db | SQLite | Agent1, Agent2 | 双方 |
 | 状态通知 | state/state_queue.json | JSON | Agent1, Agent2 | StateReceiver |
 
 ### 2.5.2 数据流图
+
+> ⚠️ **v2.3.3架构变更**: TODO存储已从YAML迁移到SQLite
 
 ```
 [数据流图 - 用ASCII图表示数据流向]
 
 示例：
-┌─────────────┐     webhook      ┌──────────────┐     同步      ┌─────────────┐
-│   Agent1    │ ──────────────▶ │ StateReceiver │ ───────────▶ │ CLI Queue   │
-│  (sender)   │                 │  (:8081)     │              │(todo_queue) │
+┌─────────────┐     webhook      ┌──────────────┐     SQLite     ┌─────────────┐
+│   Agent1    │ ──────────────▶ │ StateReceiver │ ───────────▶ │ todos.db   │
+│  (sender)   │                 │  (:8081)     │              │(SQLite)    │
 └─────────────┘                 └──────────────┘              └─────────────┘
 ```
 
@@ -174,9 +176,8 @@ cp docs/02-design/TEMPLATE_detailed_design.md docs/02-design/DETAIL_vX.X.X.md
 
 | 场景 | 源 | 目标 | 同步方式 | 验证方法 |
 |------|-----|------|----------|----------|
-| TODO创建 | todowrite | todo_queue.yaml | 直接写入 | oc-collab todo list |
-| StateReceiver | webhook | state_queue.json | HTTP写入 | curl health |
-| StateReceiver→CLI | state_queue.json | todo_queue.yaml | 同步方法 | TODO list 显示 |
+| TODO创建 | todowrite | todos.db (SQLite) | 直接写入 | oc-collab todo list |
+| StateReceiver | webhook | todos.db | HTTP写入 | curl health |
 
 ### 2.5.4 风险点
 

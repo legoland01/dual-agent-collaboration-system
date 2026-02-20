@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from ..core.todo_queue_manager import TodoQueueManager, TodoQueueItem
 from ..core.context_manager import ContextManager
+from ..core.agent_registry import AgentRegistry
 
 
 @click.group("todo")
@@ -21,18 +22,29 @@ def todo_group():
 @click.option("--unread", is_flag=True, help="仅显示未读TODO")
 @click.option("--agent", type=click.Choice(["1", "2"]), help="按接收者筛选")
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), help="按优先级筛选")
+@click.option("--source", type=click.Choice(["BUG", "REQUIREMENT", "FEEDBACK", "MANUAL"]), help="按来源筛选")
 @click.option("--json", is_flag=True, help="JSON格式输出")
-def todo_list_command(unread: bool, agent: str, priority: str, json: bool):
+def todo_list_command(unread: bool, agent: str, priority: str, source: str, json: bool):
     """显示TODO列表
 
     示例:
-      oc-collab todo list                  # 显示所有TODO
-      oc-collab todo list --unread        # 仅未读
+      oc-collab todo list                  # 显示当前Agent的TODO
+      oc-collab todo list --unread        # 仅显示未读TODO
       oc-collab todo list --unread --agent 2  # 筛选接收者
       oc-collab todo list --unread --json # JSON格式
     """
     try:
         queue_manager = TodoQueueManager()
+
+        # 默认使用当前Agent过滤，除非显式指定--agent
+        current_agent = None
+        if agent is None:
+            registry = AgentRegistry()
+            current = registry.get_current_agent_id()
+            if current:
+                # 提取数字部分：agent2 -> 2
+                current_agent = current.replace("agent", "")
+                agent = current_agent
 
         if unread:
             agent_id = f"agent{agent}" if agent else None
@@ -122,15 +134,15 @@ def mark_read_command(todo_id: str, agent: str):
       oc-collab todo mark-read TODO-001
     """
     try:
-        queue_manager = TodoQueueManager()
-        agent_id = f"agent{agent}" if agent else None
+        from ..core.todo_sync_manager import TodoSyncManager
+        sync_manager = TodoSyncManager()
 
-        result = queue_manager.mark_read(todo_id, agent_id)
+        result = sync_manager.update_todo(todo_id, is_read=1)
 
         if result:
             click.echo(f"✅ TODO {todo_id} 已标记为已读")
         else:
-            click.echo(f"❌ TODO {todo_id} 不存在或接收者不匹配")
+            click.echo(f"❌ TODO {todo_id} 不存在")
 
     except Exception as e:
         click.echo(f"❌ 标记失败: {e}")
@@ -333,3 +345,82 @@ def todo_ack_command(todo_id: str):
     
     except Exception as e:
         click.echo(f"❌ 确认失败: {e}")
+
+
+@todo_group.command("complete")
+@click.argument("todo_id")
+@click.option("--signoff/--no-signoff", default=False, help="完成后自动触发signoff")
+@click.option("--test-results", type=str, default="", help="测试结果 JSON: {\"passed\":10,\"failed\":0,\"coverage\":93}")
+def todo_complete_command(todo_id: str, signoff: bool, test_results: str):
+    """标记TODO为完成
+    
+    示例:
+      oc-collab todo complete TODO-1-001
+      oc-collab todo complete TODO-1-001 --signoff --test-results '{"passed":10,"failed":0,"coverage":93}'
+    """
+    try:
+        import json
+        from ..core.todo_sync_manager import TodoSyncManager
+        sync_manager = TodoSyncManager()
+        
+        result = sync_manager.update_todo(todo_id, status="completed")
+        
+        if result:
+            click.echo(f"✅ TODO {todo_id} 已标记为完成")
+            
+            if signoff and test_results:
+                try:
+                    import json
+                    from pathlib import Path
+                    project_path = str(Path.cwd())
+                    test_data = json.loads(test_results)
+                    from ..core.state_manager import StateManager
+                    from ..core.workflow import WorkflowEngine
+                    from ..core.signoff import SignoffEngine
+                    state_manager = StateManager(project_path)
+                    workflow_engine = WorkflowEngine(state_manager)
+                    signoff_mgr = SignoffEngine(state_manager, workflow_engine)
+                    
+                    stage = "test"
+                    trigger_result = signoff_mgr.auto_trigger_signoff(stage, test_data)
+                    
+                    if trigger_result.get("triggered"):
+                        click.echo(f"🔔 自动触发signoff: {trigger_result.get('message')}")
+                        signoff_todo = signoff_mgr.create_signoff_todo_from_test(stage, test_data)
+                        click.echo(f"✅ 已创建signoff TODO: {signoff_todo.get('message', '')}")
+                    else:
+                        click.echo(f"ℹ️  未触发signoff: {trigger_result.get('message')}")
+                except json.JSONDecodeError:
+                    click.echo("⚠️  test-results JSON格式错误")
+                except Exception as e:
+                    click.echo(f"⚠️  signoff触发失败: {e}")
+            elif signoff:
+                click.echo("ℹ️  使用 --signoff 时请同时提供 --test-results")
+        else:
+            click.echo(f"❌ TODO {todo_id} 不存在")
+    
+    except Exception as e:
+        click.echo(f"❌ 操作失败: {e}")
+
+
+@todo_group.command("delete")
+@click.argument("todo_id")
+def todo_delete_command(todo_id: str):
+    """删除TODO
+    
+    示例:
+      oc-collab todo delete TODO-1-001
+    """
+    try:
+        from ..core.todo_sync_manager import TodoSyncManager
+        sync_manager = TodoSyncManager()
+        
+        result = sync_manager.delete_todo(todo_id)
+        
+        if result:
+            click.echo(f"✅ TODO {todo_id} 已删除")
+        else:
+            click.echo(f"❌ TODO {todo_id} 不存在")
+    
+    except Exception as e:
+        click.echo(f"❌ 删除失败: {e}")

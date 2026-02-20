@@ -11,12 +11,16 @@ from ..core.context_manager import ContextManager
 def check_and_notify_todos():
     """检查未读TODO并在有新TODO时显示通知"""
     try:
-        # 获取当前Agent
+        # 获取当前Agent - 优先使用环境变量，如果没有则从project_state.yaml读取
         try:
-            context = ContextManager().load_context()
-            agent_id = context.agent
-            if isinstance(agent_id, int):
-                agent_id = f"agent{agent_id}"
+            from ..core.agent_registry import AgentRegistry
+            registry = AgentRegistry()
+            agent_id = registry.get_current_agent_id()  # 这个方法会先检查环境变量，然后检查project_state.yaml
+            if not agent_id:
+                context = ContextManager().load_context()
+                agent_id = context.agent
+                if isinstance(agent_id, int):
+                    agent_id = f"agent{agent_id}"
         except Exception:
             return
         

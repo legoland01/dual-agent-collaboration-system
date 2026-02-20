@@ -1,16 +1,9 @@
-agents:
-  '3289267336':
-    id: '3289267336'
-    registered_at: '2026-02-17T23:49:18.160447'
-    role: DEVELOPMENT_LEAD
-    status: active
-    team: internal
-current_agent: agent1
+agents: {}
 todo_id_counters:
   1to1: 0
   1to2: 0
   2to1: 0
   2to2: 0
-  Nonetoagent2: 2
-todos: []
-updated_at: '2026-02-17T23:48:55.542720'
+  Noneto2: 1
+current_agent: agent1
+updated_at: '2026-02-20T19:10:30.767709'

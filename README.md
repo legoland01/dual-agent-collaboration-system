@@ -127,21 +127,28 @@ myproject/
 
 | 版本 | 日期 | 功能 |
 |------|------|------|
+| v2.3.2 | 2026-02-19 | SQLite存储 + 实时通知交互 + 监听守护进程 + Agent TODO隔离 |
 | v2.2.12 | 2026-02-15 | 部署自动化CLI：完整部署流程、预览模式、版本管理、PyPI/Git推送、发布验证 |
 | v2.2.11 | 2026-02-14 | Agent独立TODO编号、Skill强制执行增强、StateReceiver状态接收器 |
 | v2.2.10 | 2026-02-14 | TodoQueueManager + Agent Startup Checker + CLI Enhancements |
 | v2.2.9 | 2026-02-14 | StateNotifier集成（todowrite/signoff/phase_advance）、自动Bug检测、Agent Compliance CLI准入、规则自动加载 |
 | v2.2.8 | 2026-02-13 | Webhook基础架构：EventDispatcher、StateNotifier骨架、HMAC验证 |
-| v2.2.12 | 2026-02-15 | 部署自动化CLI（完整部署命令、dry-run模式、版本管理） |
-| v2.2.11 | 2026-02-14 | Agent独立TODO编号、Skill强制执行、StateNotifier Receiver |
 | v2.2.7 | 2026-02-10 | Skill内容准确性测试、覆盖率统计、事件监听与崩溃恢复 |
 | v2.2.6 | 2026-02-09 | 智能辅助：todowrite自动检查、TODO上下文携带、冲突检测；Skill关键词检索、切片查看、强制查找 |
-| v2.2.5 | 2026-02-09 | 文件Owner机制、signoff修复、版本结束后需求分析流程、评审机制优化 |
+| v2.2.5 | 2026-02-09 | 文件Owner机制、signoff修复、需求分析流程、评审机制优化 |
 | v2.2.4 | 2026-02-08 | Skill强制加载检查、Git提交前签署验证、需求文档完整性检查 |
 | v2.2.3 | 2026-02-08 | Agent体验优化：`.a`项目信息、任务同步、状态摘要 |
 | v2.2.2 | 2026-02-07 | 协作规范强制执行、Git同步集成 |
 | v2.2.1 | 2026-02-07 | 双代理认知免疫系统、动态Checklist |
 | v2.2.0 | 2026-02-06 | 初始版本 |
+
+---
+
+## 子系统集成
+
+如需将 oc-collab 集成到其他子系统（如 PM-Agent），请查阅：
+- **能力使用指南**: `docs/07-research/RESEARCH_oc-collab_capabilities_for_PM-Agent.md`
+- **核心架构**: `docs/00-architecture/CORE_ARCHITECTURE.md`
 
 ---
 

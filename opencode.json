@@ -1,0 +1,6 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "./instructions/TODO_NOTIFY.md"
+  ]
+}

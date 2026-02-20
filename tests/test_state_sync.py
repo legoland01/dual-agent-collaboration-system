@@ -87,11 +87,14 @@ todos: []
         assert stats["total"] == 1
         assert stats["pending"] == 1
 
+    @pytest.mark.skip(reason="架构已从YAML改为SQLite")
     def test_tc_sync_002_todo_queue_yaml_format(self, mock_todo_queue_file):
         """
         TC-SYNC-002: CLI TODO 队列格式验证
 
         验证：todo_queue.yaml 格式正确
+        
+        注意：此测试已废弃，系统现在使用SQLite存储
         """
         from src.utils.yaml import safe_load
 
@@ -105,12 +108,15 @@ todos: []
         assert "by_agent" in data["stats"]
         assert "by_priority" in data["stats"]
 
+    @pytest.mark.skip(reason="架构已从YAML改为SQLite")
     def test_tc_sync_003_state_queue_to_todo_queue_sync(self, mock_state_queue, mock_todo_queue_file):
         """
         TC-SYNC-003: 状态队列同步到 TODO 队列
 
         验证：state_queue.json 的通知能同步到 todo_queue.yaml
         （此测试预期失败，需要实现同步逻辑）
+        
+        注意：此测试已废弃，系统现在使用SQLite存储
         """
         from src.utils.yaml import safe_load
 
@@ -149,6 +155,7 @@ class TestEndToEndDataFlow:
         with tempfile.TemporaryDirectory() as tmpdir:
             yield tmpdir
 
+    @pytest.mark.skip(reason="架构变化：不再使用YAML队列同步")
     def test_tc_sync_004_agent1_create_todo_agent2_receives(self, temp_state_dir):
         """
         TC-SYNC-004: Agent1 创建 TODO，Agent2 接收

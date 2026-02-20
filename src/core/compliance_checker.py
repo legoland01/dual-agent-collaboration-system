@@ -108,11 +108,7 @@ class ComplianceChecker:
         creator = parsed.get("creator")
         receiver = parsed.get("receiver")
         
-        # Agent1只能创建给自己或Agent2
-        if creator == "1":
-            return receiver in ["1", "2"]
-        
-        # Agent2可以创建给任何人
+        # 任何Agent都可以创建TODO给任何人
         return True
     
     def validate_source(self, source: str) -> Tuple[bool, str]:

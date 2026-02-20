@@ -2,7 +2,7 @@ import shutil
 import os
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import yaml
 import logging
 
@@ -101,11 +101,16 @@ class DataMigrationService:
         
         return str(backup_path)
     
-    def migrate(self, yaml_path: str = "state/agent_adhoc_todos.yaml") -> Tuple[bool, str]:
+    def migrate(self, yaml_path: Optional[str] = None) -> Tuple[bool, str]:
         """
         执行迁移
+        Args:
+            yaml_path: YAML文件路径，用于旧项目迁移。新项目不需要。
         Returns: (success, message)
         """
+        if yaml_path is None:
+            return False, "请显式指定YAML路径: migrate(yaml_path='state/agent_adhoc_todos.yaml')"
+        
         # 检查YAML文件是否存在
         if not os.path.exists(yaml_path):
             return False, f"YAML文件不存在: {yaml_path}"
@@ -145,11 +150,16 @@ class DataMigrationService:
             logger.error(f"迁移失败: {e}")
             return False, str(e)
     
-    def preview(self, yaml_path: str = "state/agent_adhoc_todos.yaml") -> Dict[str, Any]:
+    def preview(self, yaml_path: Optional[str] = None) -> Dict[str, Any]:
         """
         预览迁移结果，不执行
+        Args:
+            yaml_path: YAML文件路径，用于旧项目迁移。新项目不需要。
         Returns: 预览信息
         """
+        if yaml_path is None:
+            return {"error": "请显式指定YAML路径: preview(yaml_path='state/agent_adhoc_todos.yaml')"}
+        
         if not os.path.exists(yaml_path):
             return {"error": f"文件不存在: {yaml_path}"}
         

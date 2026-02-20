@@ -18,12 +18,13 @@ def migrate():
 @migrate.command()
 @click.option('--force', is_flag=True, help='强制执行，不确认')
 def to_sqlite(force):
-    """将YAML数据迁移到SQLite"""
+    """将YAML数据迁移到SQLite（仅用于旧项目迁移）"""
     click.echo("开始迁移...")
     
     storage = TodoStorage()
     migration = DataMigrationService(storage)
     
+    # 旧项目迁移专用路径
     yaml_path = "state/agent_adhoc_todos.yaml"
     
     if not os.path.exists(yaml_path):
@@ -44,13 +45,14 @@ def to_sqlite(force):
 
 @migrate.command()
 def preview():
-    """预览迁移结果，不执行"""
+    """预览迁移结果，不执行（仅用于旧项目）"""
     click.echo("预览迁移...")
     
     storage = TodoStorage()
     migration = DataMigrationService(storage)
     
-    result = migration.preview()
+    yaml_path = "state/agent_adhoc_todos.yaml"
+    result = migration.preview(yaml_path)
     
     if "error" in result:
         click.echo(f"❌ {result['error']}")

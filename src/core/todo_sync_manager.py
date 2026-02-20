@@ -1,10 +1,7 @@
 from pathlib import Path
-from typing import List, Optional, Dict, Any, Callable
-from dataclasses import dataclass, field, asdict
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass, field
 from datetime import datetime
-import yaml
-import os
-import shutil
 
 
 @dataclass
@@ -15,15 +12,19 @@ class TodoItem:
     status: str = "pending"
     priority: str = "medium"
     agent_id: Optional[int] = None
+    receiver: Optional[str] = None
+    sender: Optional[str] = None
+    source: str = "MANUAL"
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
+    is_read: int = 0
 
 
 @dataclass
 class TodoState:
     """待办状态"""
     todos: List[TodoItem] = field(default_factory=list)
-    version: str = "1.0"
+    version: str = "2.3.2"
     last_updated: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -42,20 +43,22 @@ class TodoSaveError(TodoSyncError):
     pass
 
 
-class TodoRollbackError(TodoSyncError):
-    """待办回滚错误"""
-    pass
-
-
 class TodoSyncManager:
-    """待办同步管理器"""
+    """待办同步管理器 - 使用SQLite存储"""
 
-    TODO_FILENAME = "state/agent_adhoc_todos.yaml"
+    DB_FILENAME = "state/todos.db"
 
     def __init__(self, project_path: Optional[str] = None):
         self.project_path = Path(project_path) if project_path else Path.cwd()
-        self.todo_file = self.project_path / self.TODO_FILENAME
-        self._backup_file: Optional[Path] = None
+        self.db_path = str(self.project_path / self.DB_FILENAME)
+        self._storage = None
+
+    def _get_storage(self):
+        """获取SQLite存储层"""
+        if self._storage is None:
+            from .todo_storage import TodoStorage
+            self._storage = TodoStorage(self.db_path)
+        return self._storage
 
     def load_todos(self) -> TodoState:
         """
@@ -68,102 +71,33 @@ class TodoSyncManager:
             TodoLoadError: 加载失败
         """
         try:
-            if not self.todo_file.exists():
-                return TodoState()
-
-            with open(self.todo_file, 'r', encoding='utf-8') as f:
-                data = yaml.safe_load(f)
-
-            if data is None:
-                return TodoState()
-
+            storage = self._get_storage()
+            rows = storage.list()
+            
             todos = []
-            for item in data.get("adhoc_todos", data.get("todos", [])):
-                # 解析 agent_id：优先取 agent_id，其次从 to.agent_id 取
-                agent_id_val = item.get("agent_id")
-                if agent_id_val is None and isinstance(item.get("to"), dict):
-                    agent_id_val = item.get("to", {}).get("agent_id")
-                
+            for row in rows:
                 todo = TodoItem(
-                    id=item.get("id"),
-                    content=item.get("content"),
-                    status=item.get("status", "pending"),
-                    priority=item.get("priority", "medium"),
-                    agent_id=agent_id_val,
-                    created_at=item.get("created_at"),
-                    updated_at=item.get("updated_at"),
+                    id=row['id'],
+                    content=row['content'],
+                    status=row['status'],
+                    priority=row.get('priority', 'medium'),
+                    agent_id=row.get('agent_id'),
+                    receiver=row.get('receiver'),
+                    sender=row.get('sender'),
+                    source=row.get('source', 'MANUAL'),
+                    created_at=row.get('created_at', datetime.now().isoformat()),
+                    updated_at=row.get('updated_at', datetime.now().isoformat()),
+                    is_read=row.get('is_read', 0),
                 )
                 todos.append(todo)
-
-            return TodoState(
-                todos=todos,
-                version=data.get("version", "1.0"),
-                last_updated=data.get("last_updated"),
-            )
-        except yaml.YAMLError as e:
-            raise TodoLoadError(f"解析待办文件失败: {str(e)}")
-        except IOError as e:
-            raise TodoLoadError(f"读取待办文件失败: {str(e)}")
-
-    def save_todos(self, state: TodoState) -> None:
-        """
-        保存待办状态
-
-        Args:
-            state: TodoState 对象
-
-        Raises:
-            TodoSaveError: 保存失败
-            ValueError: ID 重复
-        """
-        # 检查 TODO-ID 唯一性（只检查 TODO- 开头的 ID）
-        todo_ids = [todo.id for todo in state.todos if todo.id and todo.id.startswith("TODO-")]
-        if len(todo_ids) != len(set(todo_ids)):
-            seen = set()
-            for todo_id in todo_ids:
-                if todo_id in seen:
-                    raise ValueError(f"TODO ID 重复: {todo_id}")
-                seen.add(todo_id)
-        
-        try:
-            todos_list = [
-                {
-                    "id": todo.id,
-                    "content": todo.content,
-                    "status": todo.status,
-                    "priority": todo.priority,
-                    "agent_id": todo.agent_id,
-                    "created_at": todo.created_at,
-                    "updated_at": todo.updated_at,
-                }
-                for todo in state.todos
-            ]
-
-            data = {
-                "todos": todos_list,
-                "total": len(todos_list),
-            }
-
-            self.todo_file.parent.mkdir(parents=True, exist_ok=True)
-
-            if self.todo_file.exists():
-                self._backup_file = self.todo_file.with_suffix(".bak")
-                shutil.copy2(self.todo_file, self._backup_file)
-
-            with open(self.todo_file, 'w', encoding='utf-8') as f:
-                yaml.dump(data, f, allow_unicode=True, sort_keys=False)
-
-            if self._backup_file and self._backup_file.exists():
-                self._backup_file.unlink()
-                self._backup_file = None
-
-        except yaml.YAMLError as e:
-            raise TodoSaveError(f"序列化待办数据失败: {str(e)}")
-        except IOError as e:
-            raise TodoSaveError(f"写入待办文件失败: {str(e)}")
+            
+            return TodoState(todos=todos)
+        except Exception as e:
+            raise TodoLoadError(f"加载待办失败: {e}")
 
     def add_todo(self, content: str, agent_id: Optional[int] = None,
-                 priority: str = "medium", todo_id: Optional[str] = None) -> TodoItem:
+                 priority: str = "medium", todo_id: Optional[str] = None,
+                 receiver: Optional[str] = None, source: str = "MANUAL") -> TodoItem:
         """
         添加待办
 
@@ -171,6 +105,8 @@ class TodoSyncManager:
             content: 待办内容
             agent_id: Agent 编号 (1 或 2)
             priority: 优先级
+            todo_id: 指定TODO ID
+            receiver: 接收者
 
         Returns:
             TodoItem 对象
@@ -178,349 +114,190 @@ class TodoSyncManager:
         Raises:
             TodoSaveError: 保存失败
         """
-        state = self.load_todos()
+        storage = self._get_storage()
 
         max_id = 0
-        for todo in state.todos:
-            if todo.id.startswith("TODO-"):
+        existing = storage.list()
+        
+        prefix = f"TODO-{agent_id}"
+        if receiver:
+            prefix = f"TODO-{agent_id}to{receiver}"
+        
+        for item in existing:
+            item_id = item['id']
+            if item_id.startswith(prefix):
                 try:
-                    parts = todo.id.split("-")
-                    if len(parts) >= 3 and parts[1] in ("1", "2"):
-                        if agent_id and parts[1] == str(agent_id):
-                            num = int(parts[2])
-                            max_id = max(max_id, num)
-                    else:
-                        num = int(parts[1])
-                        max_id = max(max_id, num)
+                    parts = item_id.split("-")
+                    num = int(parts[-1])
+                    max_id = max(max_id, num)
                 except (ValueError, IndexError):
                     pass
 
         if todo_id:
             new_id = todo_id
         elif agent_id:
-            new_id = f"TODO-{agent_id}-{max_id + 1:03d}"
+            new_id = f"{prefix}-{max_id + 1:03d}"
         else:
             new_id = f"TODO-{max_id + 1:03d}"
 
-        todo = TodoItem(
-            id=new_id,
-            content=content,
-            agent_id=agent_id,
-            priority=priority,
-        )
+        now = datetime.now().isoformat()
+        
+        if receiver is None and agent_id is not None:
+            receiver = str(agent_id)
+        
+        todo_dict = {
+            'id': new_id,
+            'content': content,
+            'status': 'pending',
+            'priority': priority,
+            'agent_id': agent_id,
+            'receiver': receiver,
+            'sender': str(agent_id) if agent_id else None,
+            'source': source,
+            'created_at': now,
+            'updated_at': now,
+            'is_read': 0,
+        }
 
-        state.todos.append(todo)
+        success, result = storage.add(todo_dict)
+        if not success:
+            raise TodoSaveError(f"保存待办失败: {result}")
 
-        try:
-            self.save_todos(state)
-        except TodoSaveError:
-            raise
-
-        return todo
+        return TodoItem(**todo_dict)
 
     def update_todo(self, todo_id: str, **kwargs) -> Optional[TodoItem]:
-        """
-        更新待办
-
-        Args:
-            todo_id: 待办 ID
-            **kwargs: 更新字段
-
-        Returns:
-            更新后的 TodoItem，未找到返回 None
-        """
-        state = self.load_todos()
-
-        for todo in state.todos:
-            if todo.id == todo_id:
-                for key, value in kwargs.items():
-                    if hasattr(todo, key):
-                        setattr(todo, key, value)
-                todo.updated_at = datetime.now().isoformat()
-
-                try:
-                    self.save_todos(state)
-                except TodoSaveError:
-                    raise
-
-                return todo
-
+        """更新待办"""
+        storage = self._get_storage()
+        
+        updates = {}
+        for key, value in kwargs.items():
+            if key == 'status':
+                updates['status'] = value
+            elif key == 'priority':
+                updates['priority'] = value
+            elif key == 'content':
+                updates['content'] = value
+            elif key == 'is_read':
+                updates['is_read'] = value
+        
+        if updates:
+            storage.update(todo_id, updates)
+        
+        row = storage.get(todo_id)
+        if row:
+            return TodoItem(
+                id=row['id'],
+                content=row['content'],
+                status=row['status'],
+                priority=row.get('priority', 'medium'),
+                receiver=row.get('receiver'),
+                sender=row.get('sender'),
+                source=row.get('source', 'MANUAL'),
+                created_at=row.get('created_at', ''),
+                updated_at=row.get('updated_at', ''),
+                is_read=row.get('is_read', 0),
+            )
         return None
 
     def delete_todo(self, todo_id: str) -> bool:
-        """
-        删除待办
+        """删除待办"""
+        storage = self._get_storage()
+        return storage.delete(todo_id)
 
-        Args:
-            todo_id: 待办 ID
+    def get_todo(self, todo_id: str) -> Optional[TodoItem]:
+        """获取单个待办"""
+        storage = self._get_storage()
+        row = storage.get(todo_id)
+        if row:
+            return TodoItem(
+                id=row['id'],
+                content=row['content'],
+                status=row['status'],
+                priority=row.get('priority', 'medium'),
+                receiver=row.get('receiver'),
+                sender=row.get('sender'),
+                source=row.get('source', 'MANUAL'),
+                created_at=row.get('created_at', ''),
+                updated_at=row.get('updated_at', ''),
+                is_read=row.get('is_read', 0),
+            )
+        return None
 
-        Returns:
-            是否删除成功
-        """
-        state = self.load_todos()
+    def list_todos(self, receiver: Optional[str] = None, 
+                   status: Optional[str] = None) -> List[TodoItem]:
+        """列出待办"""
+        storage = self._get_storage()
+        rows = storage.list(receiver=receiver, status=status)
+        
+        return [
+            TodoItem(
+                id=row['id'],
+                content=row['content'],
+                status=row['status'],
+                priority=row.get('priority', 'medium'),
+                receiver=row.get('receiver'),
+                sender=row.get('sender'),
+                source=row.get('source', 'MANUAL'),
+                created_at=row.get('created_at', ''),
+                updated_at=row.get('updated_at', ''),
+                is_read=row.get('is_read', 0),
+            )
+            for row in rows
+        ]
 
-        original_count = len(state.todos)
-        state.todos = [todo for todo in state.todos if todo.id != todo_id]
+    def mark_read(self, todo_id: str) -> bool:
+        """标记为已读"""
+        storage = self._get_storage()
+        return storage.mark_read(todo_id)
 
-        if len(state.todos) < original_count:
-            try:
-                self.save_todos(state)
-                return True
-            except TodoSaveError:
-                raise
+    def mark_unread(self, todo_id: str) -> bool:
+        """标记为未读"""
+        storage = self._get_storage()
+        return storage.mark_unread(todo_id)
 
-        return False
+    def count_unread(self, receiver: str) -> int:
+        """统计未读待办数量"""
+        storage = self._get_storage()
+        return storage.count_unread(receiver)
 
-    def get_todos_by_agent(self, agent_id: Optional[int] = None,
-                           status: Optional[str] = None) -> List[TodoItem]:
-        """
-        按条件获取待办列表
+    def save_todos(self, state: TodoState) -> None:
+        """保存待办状态（兼容接口，实际不执行任何操作）"""
+        pass
 
-        Args:
-            agent_id: Agent 编号过滤
-            status: 状态过滤
+    @property
+    def todo_file(self):
+        """兼容属性 - 返回数据库路径"""
+        return self.db_path
 
-        Returns:
-            过滤后的待办列表
-        """
-        state = self.load_todos()
-
-        result = state.todos
-
-        if agent_id is not None:
-            result = [todo for todo in result if todo.agent_id == agent_id]
-
-        if status is not None:
-            result = [todo for todo in result if todo.status == status]
-
-        return result
-
-    def create_backup(self) -> None:
-        """创建备份"""
-        if self.todo_file.exists():
-            self._backup_file = self.todo_file.with_suffix(".bak")
-            shutil.copy2(self.todo_file, self._backup_file)
-
-    def restore_backup(self) -> bool:
-        """
-        从备份恢复
-
-        Returns:
-            是否恢复成功
-        """
-        if self._backup_file and self._backup_file.exists():
-            shutil.copy2(self._backup_file, self.todo_file)
-            self._backup_file = None
+    def sync_with_rollback(self, func: callable) -> bool:
+        """兼容方法 - 执行函数并处理异常"""
+        try:
+            func()
             return True
-        return False
+        except Exception:
+            return False
 
     def rollback(self) -> bool:
         """
-        回滚操作
-
+        回滚操作（兼容方法）
+        
         Returns:
-            是否回滚成功
+            False: 无需回滚
         """
-        if self._backup_file and self._backup_file.exists():
-            shutil.copy2(self._backup_file, self.todo_file)
-            self._backup_file = None
-            return True
         return False
 
-    def sync_with_rollback(self, operation: Callable) -> bool:
+    def create_backup(self) -> Optional[str]:
         """
-        带回滚的同步操作
-
-        Args:
-            operation: 需要执行的操作函数
-
+        创建备份（兼容方法）
+        
         Returns:
-            是否执行成功
+            备份文件路径，如果没有备份则返回None
         """
-        try:
-            self.create_backup()
-            operation()
-            return True
-        except Exception as e:
-            if self.rollback():
-                pass
-            return False
-
-    def get_all(self, agent_id: Optional[str] = None) -> List[TodoItem]:
-        """获取所有TODO（兼容性方法）
-        
-        Args:
-            agent_id: 可选的agent过滤
-            
-        Returns:
-            TODO列表
-        """
-        state = self.load_todos()
-        todos = state.todos
-        
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todos = [t for t in todos if t.agent_id == agent_num]
-        
-        return todos
-    
-    def get_unread(self, agent_id: Optional[str] = None, priority: Optional[str] = None) -> List[TodoItem]:
-        """获取未读TODO（兼容性方法）
-        
-        Args:
-            agent_id: 可选的agent过滤
-            priority: 可选的优先级过滤
-            
-        Returns:
-            未读TODO列表
-        """
-        state = self.load_todos()
-        todos = [t for t in state.todos if t.status == "pending"]
-        
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todos = [t for t in todos if t.agent_id == agent_num]
-        
-        if priority:
-            todos = [t for t in todos if t.priority == priority]
-        
-        return todos
-    
-    def mark_read(self, todo_id: str, agent_id: Optional[str] = None) -> bool:
-        """标记TODO为已读
-        
-        Args:
-            todo_id: TODO ID
-            agent_id: 可选的接收者验证
-            
-        Returns:
-            是否成功
-        """
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todo = self.get_todo(todo_id)
-            if todo and todo.agent_id != agent_num:
-                return False
-        
-        return self.update_todo(todo_id, status="read") is not None
-    
-    def mark_all_read(self, agent_id: Optional[str] = None) -> bool:
-        """标记所有TODO为已读
-        
-        Args:
-            agent_id: 可选的agent过滤
-            
-        Returns:
-            是否成功
-        """
-        state = self.load_todos()
-        todos = state.todos
-        
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todos = [t for t in todos if t.agent_id == agent_num]
-        
-        for todo in todos:
-            self.update_todo(todo.id, status="read")
-        
-        return True
-    
-    def get_stats(self, agent_id: Optional[str] = None) -> dict:
-        """获取统计信息
-        
-        Args:
-            agent_id: 可选的agent过滤
-            
-        Returns:
-            统计信息字典
-        """
-        state = self.load_todos()
-        todos = state.todos
-        
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todos = [t for t in todos if t.agent_id == agent_num]
-        
-        return {
-            "total": len(todos),
-            "unread": len([t for t in todos if t.status == "pending"]),
-            "by_agent": {
-                "agent1": len([t for t in todos if t.agent_id == 1]),
-                "agent2": len([t for t in todos if t.agent_id == 2])
-            },
-            "by_priority": {
-                "high": len([t for t in todos if t.priority == "high"]),
-                "medium": len([t for t in todos if t.priority == "medium"]),
-                "low": len([t for t in todos if t.priority == "low"])
-            }
-        }
-    
-    def cleanup(self, days: int = 7) -> int:
-        """清理过期已读TODO
-        
-        Args:
-            days: 保留天数
-            
-        Returns:
-            清理数量
-        """
-        from datetime import datetime, timedelta
-        state = self.load_todos()
-        cutoff = datetime.now() - timedelta(days=days)
-        
-        to_keep = []
-        removed = 0
-        
-        for todo in state.todos:
-            if todo.status == "read":
-                if todo.updated_at:
-                    try:
-                        updated = datetime.fromisoformat(todo.updated_at)
-                        if updated < cutoff:
-                            removed += 1
-                            continue
-                    except:
-                        pass
-            to_keep.append(todo)
-        
-        state.todos = to_keep
-        self.save_todos(state)
-        return removed
-    
-    def clear(self, agent_id: Optional[str] = None) -> int:
-        """清空TODO
-        
-        Args:
-            agent_id: 可选的agent过滤
-            
-        Returns:
-            清空数量
-        """
-        state = self.load_todos()
-        todos = state.todos
-        
-        if agent_id:
-            agent_num = int(agent_id.replace("agent", "")) if isinstance(agent_id, str) else agent_id
-            todos = [t for t in todos if t.agent_id != agent_num]
-        else:
-            todos = []
-        
-        count = len(state.todos) - len(todos)
-        state.todos = todos
-        self.save_todos(state)
-        return count
-    
-    def get_todo(self, todo_id: str) -> Optional[TodoItem]:
-        """获取单个TODO
-        
-        Args:
-            todo_id: TODO ID
-            
-        Returns:
-            TODO项或None
-        """
-        state = self.load_todos()
-        for todo in state.todos:
-            if todo.id == todo_id:
-                return todo
         return None
+
+    def get_todos_by_agent(self, agent_id: Optional[int] = None, 
+                          status: Optional[str] = None) -> List[TodoItem]:
+        """获取指定Agent的待办"""
+        todos = self.list_todos(receiver=str(agent_id) if agent_id else None, 
+                               status=status)
+        return todos

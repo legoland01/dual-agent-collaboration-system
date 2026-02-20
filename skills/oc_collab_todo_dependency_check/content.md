@@ -36,7 +36,7 @@ priority: high
 
 **Step 1: 解析TODO元数据**
 
-读取 `state/agent_adhoc_todos.yaml`，提取：
+从 SQLite 数据库 `state/todos.db` 查询，提取：
 - `id`: TODO编号
 - `from`: 发起者
 - `to`: 接收者
@@ -252,8 +252,8 @@ log:
 
 | 规则 | 说明 | 违反后果 |
 |------|------|----------|
-| **Agent1只能创建TODO-1-XXX** | Agent1创建的TODO必须使用TODO-1前缀 | YAML结构损坏 |
-| **Agent2只能创建TODO-2-XXX** | Agent2创建的TODO必须使用TODO-2前缀 | YAML结构损坏 |
+| **Agent1只能创建TODO-1-XXX** | Agent1创建的TODO必须使用TODO-1前缀 | SQLite约束冲突 |
+| **Agent2只能创建TODO-2-XXX** | Agent2创建的TODO必须使用TODO-2前缀 | SQLite约束冲突 |
 | **禁止手动指定ID** | 编号由todowrite自动生成，禁止手动指定 | 编号冲突 |
 | **历史TODO保持兼容** | v2.2.10之前的TODO无需强制迁移 | 兼容旧版本 |
 
@@ -297,7 +297,7 @@ def validate_todo_id(todo):
 
 | 文档 | 说明 |
 |------|------|
-| `state/agent_adhoc_todos.yaml` | TODO数据源 |
+| `state/todos.db` | TODO数据源 (SQLite) |
 | `docs/00-memos/BUG-20260213-005_todo_dependency_check.md` | Bug报告（问题背景） |
 | `skills/oc_collab_requirements_guide/content.md` | 需求阶段参考 |
 | `skills/oc_collab_requirements_review_guide/content.md` | 评审阶段参考 |

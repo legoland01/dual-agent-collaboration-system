@@ -62,8 +62,13 @@ def get_project_path() -> str:
 
 
 @click.group()
+@click.version_option(version="2.3.2.6")
 def main():
     """双Agent协作框架 CLI工具。"""
+    import sys
+    # 跳过 switch 命令的 TODO 检查（因为 switch 会改变 agent）
+    if len(sys.argv) > 1 and sys.argv[1] == "switch":
+        return
     # 每次执行命令时检查未读TODO并显示
     try:
         from .check_todo_on_startup import check_and_notify_todos
@@ -197,6 +202,32 @@ def switch_command(agent_id: int, welcome: bool):
             return
 
         state_manager.set_active_agent(f"agent{agent_id}")
+        
+        # 保存当前session ID到映射文件
+        project_path_obj = Path(project_path)
+        db_path = Path.home() / ".local/share/opencode/opencode.db"
+        if db_path.exists():
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id FROM session WHERE directory = ? ORDER BY time_updated DESC LIMIT 1",
+                (str(project_path_obj),)
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                session_id = row[0]
+                # 保存到映射文件
+                mapping_file = project_path_obj / "state" / "agent_session_mapping.json"
+                mapping_file.parent.mkdir(exist_ok=True)
+                import json
+                mapping = {}
+                if mapping_file.exists():
+                    mapping = json.loads(mapping_file.read_text())
+                mapping[f"agent{agent_id}"] = session_id
+                mapping_file.write_text(json.dumps(mapping, ensure_ascii=False))
+                click.echo(f"[session] 已关联 {target_agent} -> {session_id}")
 
         # 显示未读TODO通知
         from ..core.agent_startup_checker import AgentStartupChecker
@@ -1591,6 +1622,60 @@ def compliance_results_command(type: str, limit: int):
         sys.exit(1)
 
 
+@compliance_group.command("report")
+def compliance_report_command():
+    """生成合规报告"""
+    try:
+        project_path = get_project_path()
+        engine = ComplianceEngine(project_path)
+        
+        results = engine.get_results(limit=100)
+        
+        passed = sum(1 for r in results if r.get("result_type") == "passed")
+        failed = sum(1 for r in results if r.get("result_type") == "denied")
+        total = len(results)
+        
+        console.print("\n[bold]合规报告摘要[/bold]")
+        console.print(f"  总检查数: {total}")
+        console.print(f"  ✅ 通过: {passed}")
+        console.print(f"  ❌ 失败: {failed}")
+        console.print(f"  合规率: {passed/total*100:.1f}%" if total > 0 else "  合规率: N/A")
+        
+    except Exception as e:
+        click.echo(f"错误: {e}")
+
+
+@compliance_group.command("violations")
+@click.option("--agent", type=str, help="按Agent筛选")
+@click.option("--limit", "-n", type=int, default=20, help="显示数量")
+def compliance_violations_command(agent: str, limit: int):
+    """查看违规记录"""
+    try:
+        project_path = get_project_path()
+        engine = ComplianceEngine(project_path)
+        
+        results = engine.get_results(limit=limit)
+        violations = [r for r in results if r.get("result_type") == "denied"]
+        
+        if agent:
+            violations = [v for v in violations if v.get("agent_id") == agent]
+        
+        if not violations:
+            console.print("✅ 无违规记录")
+            return
+        
+        console.print(f"\n[bold]违规记录 ({len(violations)} 条)[/bold]")
+        
+        for v in violations:
+            console.print(f"\n❌ [{v.get('agent_id')}] {v.get('action')}")
+            console.print(f"   目标: {v.get('target', 'N/A')}")
+            console.print(f"   消息: {v.get('message')}")
+            console.print(f"   时间: {v.get('timestamp', '')[:19]}")
+        
+    except Exception as e:
+        click.echo(f"错误: {e}")
+
+
 main.add_command(show_context_command, ".a")
 main.add_command(todowrite_command, "todowrite")
 main.add_command(todoedit_command, "todoedit")
@@ -1691,6 +1776,7 @@ main.add_command(deploy_group, "deploy")
 main.add_command(todo_group, "todo")
 main.add_command(agent_group, "agent")
 main.add_command(startup_check_command, "startup-check")
+main.add_command(startup_check_command, "startup")
 main.add_command(state_group, "state")
 main.add_command(bug_group, "bug")
 main.add_command(requirements_group, "requirements")

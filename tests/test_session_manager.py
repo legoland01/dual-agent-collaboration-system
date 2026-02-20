@@ -219,6 +219,7 @@ def test_welcome_disabled():
         assert message == ""
 
 
+@pytest.mark.skip(reason="架构变化：不再使用adhoc.yaml")
 def test_get_todo_items_reads_adhoc_yaml():
     """测试 BUG-20260215-015: session_manager 从 agent_adhoc_todos.yaml 读取待办"""
     from src.core.session_manager import SessionManager
@@ -245,6 +246,7 @@ def test_get_todo_items_reads_adhoc_yaml():
         assert "TODO-1-002" not in text
 
 
+@pytest.mark.skip(reason="架构变化：不再使用adhoc.yaml")
 def test_get_todo_items_adhoc_only_pending():
     """测试只显示pending状态的TODO"""
     from src.core.session_manager import SessionManager

@@ -1,5 +1,160 @@
 # Changelog
 
+## v2.3.2.6 - v2.3.2.6 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-007 | switch 命令执行时错误显示旧 agent 的 TODO | ✅ Fixed |
+
+### Changes
+
+- **src/cli/main.py** - switch 命令跳过 check_todo_on_startup
+
+---
+
+## v2.3.2.5 - v2.3.2.5 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Changes
+
+- **src/cli/check_todo_on_startup.py** - 优化注释，逻辑不变
+
+---
+
+## v2.3.2.4 - v2.3.2.4 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-006 | check_todo_on_startup 使用错误的 agent 获取方式 | ✅ Fixed |
+
+### Changes
+
+- **src/cli/check_todo_on_startup.py** - 优先使用 AgentRegistry 获取当前 agent
+
+---
+
+## v2.3.2.3 - v2.3.2.3 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-005 | get_unread 传递错误的 receiver 格式 | ✅ Fixed |
+
+### Changes
+
+- **src/core/todo_queue_manager.py** - get_unread 直接传递 agent_id 而非转换后的数字
+
+---
+
+## v2.3.2.2 - v2.3.2.2 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-004 | TodoQueueItem.from_dict未读取receiver字段 | ✅ Fixed |
+
+### Changes
+
+- **src/core/todo_queue_manager.py** - from_dict增加读取receiver字段
+
+---
+
+## v2.3.2.1 - v2.3.2.1 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - Bugfix Patch
+
+**Signoff Status**:
+- Agent2: ✅ 2026-02-19
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-002 | Agent能看到非发给自己的TODO - 修复Agent隔离 | ✅ Fixed |
+| BUG-20260219-003 | get_current_agent_id未读取project_state.yaml | ✅ Fixed |
+
+### Changes
+
+- **src/core/agent_registry.py** - get_current_agent_id优先级增加project_state.yaml
+- **src/cli/todo_commands.py** - 默认按当前Agent过滤TODO列表
+
+---
+
+## v2.3.2 - v2.3.2 Released
+
+**Date**: 2026-02-19
+**Status**: ✅ **RELEASED** - SQLite存储 + 实时通知交互
+
+**Signoff Status**:
+- Agent1: ✅ 2026-02-19
+- Agent2: ✅ 2026-02-19
+
+### Features
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **F-STORE-001** | SQLite存储 | ✅ |
+| **F-NOTIFY-001** | 实时通知交互 | ✅ |
+| **F-LISTEN-001** | 监听守护进程 | ✅ |
+
+### Bugfixes
+
+| Bug ID | Description | Status |
+|--------|-------------|--------|
+| BUG-20260219-001 | TODO存储已迁移到SQLite，代码仍引用YAML | ✅ Fixed |
+| BUG-20260219-002 | Agent能看到非发给自己的TODO | ✅ Fixed |
+
+### Changes
+
+- **src/core/todo_storage.py** - SQLite存储层
+- **src/core/todo_queue_manager.py** - 集成SQLite
+- **src/cli/todo_commands.py** - Agent隔离过滤
+- **tests/test_v232_e2e.py** - 添加Agent隔离测试
+
+### Behavior
+
+- TODO数据存储在 SQLite (state/todos.db)
+- 启动时检查未读TODO并通知
+- Agent只能看到发给自己的TODO
+
+---
+
 ## v2.2.12.2 - v2.2.12.2 Released
 
 **Date**: 2026-02-15

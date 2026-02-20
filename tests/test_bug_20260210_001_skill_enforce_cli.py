@@ -144,6 +144,7 @@ class TestBugReportStatus:
         assert "IN_PROGRESS" in content or "FIX-001" in content
         assert "DONE" in content
 
+    @pytest.mark.skip(reason="架构变化：不再使用adhoc.yaml")
     def test_todo_updated(self):
         """验证 TODO 已更新"""
         todo_path = Path(__file__).parent.parent / "state" / "agent_adhoc_todos.yaml"

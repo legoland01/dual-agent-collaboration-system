@@ -41,7 +41,7 @@
     }
   },
   "dependencies": {
-    "required": ["agent_adhoc_todos.yaml"],
+    "required": ["state/todos.db"],
     "optional": []
   },
   "outputs": {

@@ -1,0 +1,26 @@
+todos:
+  - id: TODO-2026-0218-001
+    content: 修复BUG-20260218-001：测试数据保护 - 短期方案
+    description: 修复测试脚本，只清理测试创建的TODO，不删除原有数据
+    priority: high
+    status: pending
+    source: BUG-20260218-001
+    receiver: agent2
+    created_by: agent1
+  - id: TODO-2026-0218-002
+    content: 修复BUG-20260218-001：创建沙箱测试数据库 - 长期方案
+    description: 创建独立测试数据库 state/todos_test.db，测试时使用 --test-db 参数切换
+    priority: high
+    status: pending
+    source: BUG-20260218-001
+    receiver: agent2
+    created_by: agent1
+  - id: TODO-2026-0219-001
+    content: 发布v2.3.2版本
+    description: 执行发布流程，将v2.3.2发布到PyPI
+    priority: high
+    status: cancelled
+    source: ACCEPTANCE_v2.3.2
+    receiver: agent2
+    created_by: agent1
+    note: 已迁移到SQLite

@@ -14,6 +14,7 @@ from ..core.agent_registry import AgentRegistry
 from ..core.todo_queue_manager import TodoQueueManager
 from ..core.context_manager import ContextManager, ContextNotFoundError
 from ..core.todo_storage import TodoStorage
+from ..core.agent_listener import AgentListenerService
 
 
 @click.group("agent")
@@ -135,16 +136,65 @@ def agent_unregister_command(agent_id: str):
 
 
 @agent_group.command("listen")
-@click.option("--interval", "-i", default=3, help="轮询间隔（秒）", type=int)
+@click.option("--interval", "-i", default=1, help="轮询间隔（秒）", type=int)
 @click.option("--daemon", "-d", is_flag=True, help="后台运行")
-def agent_listen_command(interval: int, daemon: bool):
+@click.option("--stop", is_flag=True, help="停止监听守护进程")
+@click.option("--status", is_flag=True, help="查看监听守护进程状态")
+def agent_listen_command(interval: int, daemon: bool, stop: bool, status: bool):
     """监听TODO队列，发现新TODO时自动通知
     
     示例:
       oc-collab agent listen              # 前台监听
       oc-collab agent listen --interval 5 # 5秒间隔
       oc-collab agent listen --daemon     # 后台监听
+      oc-collab agent listen --stop       # 停止监听
+      oc-collab agent listen --status     # 查看状态
     """
+    project_path = Path(__file__).parent.parent.parent
+    log_dir = project_path / "logs"
+    log_file = log_dir / "agent_listen.log"
+    pid_file = log_dir / "agent_listen.pid"
+    
+    # 处理 --stop 选项
+    if stop:
+        if pid_file.exists():
+            with open(pid_file) as f:
+                pid = int(f.read().strip())
+            try:
+                import signal
+                os.kill(pid, signal.SIGTERM)
+                click.echo(f"✅ 已发送停止信号到进程 {pid}")
+                pid_file.unlink()
+            except ProcessLookupError:
+                click.echo(f"⚠️ 进程 {pid} 不存在")
+            except PermissionError:
+                click.echo(f"❌ 无权限停止进程 {pid}")
+        else:
+            click.echo("⚠️ 未找到监听进程PID文件，可能未在后台运行")
+        return
+    
+    # 处理 --status 选项
+    if status:
+        if pid_file.exists():
+            with open(pid_file) as f:
+                pid = int(f.read().strip())
+            try:
+                import signal
+                os.kill(pid, 0)
+                click.echo(f"🔔 监听进程运行中 (PID: {pid})")
+                if log_file.exists():
+                    with open(log_file) as f:
+                        lines = f.readlines()
+                        if lines:
+                            click.echo(f"   最后活动: {lines[-1].strip()[:80]}")
+            except ProcessLookupError:
+                click.echo("⚠️ 进程已停止，但PID文件未清理")
+                pid_file.unlink()
+        else:
+            click.echo("ℹ️ 监听进程未运行")
+        return
+    
+    # 正常的监听逻辑
     try:
         context = ContextManager().load_context()
         agent_id = context.agent
@@ -159,6 +209,8 @@ def agent_listen_command(interval: int, daemon: bool):
     click.echo("")
     
     # 优先使用SQLite存储，回退到YAML
+    storage = None
+    queue_manager = None
     try:
         storage = TodoStorage()
         todos = storage.list(receiver=agent_id, status='pending', unread_only=True)
@@ -167,15 +219,19 @@ def agent_listen_command(interval: int, daemon: bool):
         queue_manager = TodoQueueManager()
         has_sqlite = False
     
+    listener = AgentListenerService(storage, interval=interval)
     seen_ids = set()
     
     def poll_loop():
         """轮询循环"""
         while True:
             try:
+                listener._check_trigger_files()
+                
                 if has_sqlite:
-                    # 使用SQLite
-                    todos = storage.list(receiver=agent_id, status='pending', unread_only=True)
+                    # 使用SQLite - 去掉agent前缀，因为数据库存储时不带前缀
+                    receiver = agent_id.replace('agent', '') if agent_id else None
+                    todos = storage.list(receiver=receiver, status='pending', unread_only=True)
                     new_todos = [t for t in todos if t.get('id') not in seen_ids]
                 else:
                     # 使用YAML

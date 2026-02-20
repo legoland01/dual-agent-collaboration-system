@@ -141,6 +141,6 @@
   },
   "outputs": {
     "documents": ["docs/"],
-    "artifacts": ["state/project_state.yaml", "state/agent_adhoc_todos.yaml"]
+    "artifacts": ["state/project_state.yaml", "state/todos.db"]
   }
 }

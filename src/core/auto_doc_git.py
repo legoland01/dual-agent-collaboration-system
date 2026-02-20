@@ -21,8 +21,7 @@ class AutoDocGitAddEngine:
             capture_output=True, text=True,
             cwd=self.project_path
         )
-        new_files = [f for f in result.stdout.strip().split('
-') if f and f.startswith('docs/')]
+        new_files = [f for f in result.stdout.strip().split('\n') if f and f.startswith('docs/')]
         return new_files
     
     def auto_add_docs(self) -> Dict[str, Any]:

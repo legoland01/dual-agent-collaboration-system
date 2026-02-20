@@ -93,7 +93,7 @@ oc-collab/
 |------|------|------|----------|
 | BUG-YYYYMMDD-XXX | Bug | 代码缺陷、功能错误 | docs/00-memos/ |
 | PROPOSAL-YYYY-MM-XXX | 提案 | 新功能提案 | docs/04-proposals/ |
-| TODO-XXX | 任务 | 待办任务 | state/agent_adhoc_todos.yaml |
+| TODO-XXX | 任务 | 待办任务 | state/todos.db (SQLite) |
 
 ---
 
@@ -311,7 +311,7 @@ oc-collab/
 |------|----------|-----------|
 | 来源 | 测试发现、用户反馈 | 产品规划 |
 | 性质 | 修复缺陷 | 新功能/优化 |
-| 模板 | BUG模板 | state/agent_adhoc_todos.yaml |
+| 模板 | BUG模板 | state/todos.db (SQLite) |
 | 触发 | bug_found, test_failure | new_requirement |
 
 **重要**: 修复BUG时，如果有优化建议，应该创建新的TODO，而不是混在一起。
@@ -349,15 +349,15 @@ ls docs/00-memos/BUG-*
 
 ## 八、与现有规范的集成
 
-### 8.1 与 agent_adhoc_todos.yaml 的关系
+### 8.1 与 state/todos.db 的关系 (v2.3.3+)
 
 | TODO 字段 | BUG 字段 | 说明 |
 |-----------|----------|------|
 | id | ID | 保持一致 |
-| status | 状态 | OPEN→IN_PROGRESS→COMPLETED |
-| priority | 优先级 | P0/P1/P2/P3 |
+| status | 状态 | pending→in_progress→completed |
+| priority | 优先级 | high/medium/low |
 | description | 问题描述 | 链接到BUG文件 |
-| agent_id | 负责人 | |
+| receiver | 负责人 | |
 
 ### 8.2 与 memos 的关系
 

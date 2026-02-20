@@ -62,6 +62,9 @@ class ConfigManager:
         for k in keys[:-1]:
             if k not in current:
                 current[k] = {}
+            elif not isinstance(current[k], dict):
+                # 如果键存在但不是字典，创建新的字典
+                current[k] = {}
             current = current[k]
         
         # 设置值

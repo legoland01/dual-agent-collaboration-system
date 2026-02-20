@@ -48,8 +48,11 @@ class OnlinePullerService:
         if not todos:
             return True
         
+        # 动态生成instruction文件，注入当前TODO信息
+        self._update_instruction_with_todos(todos)
+        
         # 打印通知信息
-        logger.info(f"您有 {len(todos)} 个待处理TODO:")
+        logger.info(f"🔔 您有 {len(todos)} 个待处理TODO:")
         for i, todo in enumerate(todos[:5], 1):
             content = todo.get('content') or ''
             logger.info(f"  {i}. [{todo.get('id')}] {content[:50]}")
@@ -58,6 +61,95 @@ class OnlinePullerService:
             logger.info(f"  ... 还有 {len(todos) - 5} 个")
         
         return True
+    
+    def _update_instruction_with_todos(self, todos: List[dict]):
+        """更新instruction文件，注入当前TODO列表"""
+        from pathlib import Path
+        
+        instruction_dir = Path("config/instructions")
+        instruction_dir.mkdir(parents=True, exist_ok=True)
+        instruction_path = instruction_dir / "TODO_NOTIFY.md"
+        
+        opencode_instruction_dir = Path("opencode_src/instructions")
+        opencode_instruction_path = opencode_instruction_dir / "TODO_NOTIFY.md"
+        
+        root_instruction_dir = Path("instructions")
+        root_instruction_path = root_instruction_dir / "TODO_NOTIFY.md"
+        
+        # 构建TODO列表
+        todo_list = []
+        for todo in todos[:10]:
+            todo_id = todo.get('id', 'N/A')
+            content = todo.get('content', '')[:60]
+            priority = todo.get('priority', 'medium')
+            todo_list.append(f"- **{todo_id}**: {content} [{priority}]")
+        
+        todos_text = "\n".join(todo_list)
+        
+        content = f"""# TODO通知处理规则
+
+## 当前待办 ({len(todos)}个)
+{todos_text}
+
+## 触发条件
+当用户告知"查看TODO"或"我有新TODO"时，执行以下操作：
+
+## 操作流程
+1. 读取 state/todos.db 中的未读TODO
+2. 查找当前用户的未处理TODO
+3. 使用 question tool 询问用户操作
+
+## Question Tool 调用示例
+当检测到用户有未读TODO时，应调用question tool：
+
+```json
+{{
+  "name": "question",
+  "arguments": {{
+    "questions": [{{
+      "header": "待办事项",
+      "question": "您有 {len(todos)} 个待处理TODO",
+      "options": [
+        {{"label": "立即执行", "description": "开始处理第一个TODO"}},
+        {{"label": "稍后处理", "description": "设置提醒，稍后处理"}},
+        {{"label": "查看详情", "description": "查看所有TODO详情"}},
+        {{"label": "忽略", "description": "暂时忽略"}}
+      ]
+    }}]
+  }}
+}}
+```
+
+## 可用操作
+- **立即执行**: 标记TODO为进行中，开始处理
+- **稍后处理**: 将TODO标记为延迟，设置提醒时间
+- **查看详情**: 显示TODO完整列表和内容
+- **忽略**: 关闭通知
+
+## TODO状态说明
+- pending: 待处理
+- in_progress: 进行中
+- completed: 已完成
+- cancelled: 已取消
+- deferred: 已延迟
+"""
+        
+        try:
+            with open(instruction_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            logger.info(f"✅ Instruction文件已更新: {instruction_path}")
+            
+            if opencode_instruction_dir.exists():
+                with open(opencode_instruction_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                logger.info(f"✅ OpenCode Instruction文件已更新: {opencode_instruction_path}")
+            
+            if root_instruction_dir.exists():
+                with open(root_instruction_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                logger.info(f"✅ 项目根目录Instruction文件已更新: {root_instruction_path}")
+        except Exception as e:
+            logger.error(f"❌ 更新Instruction文件失败: {e}")
     
     def get_deferred_todos(self, agent_id: str) -> List[dict]:
         """获取已到期的延迟TODO"""

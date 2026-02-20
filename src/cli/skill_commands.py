@@ -370,5 +370,96 @@ def skill_query_cmd(query, slice, verbose):
         console.print("[进入slice模式...]")
 
 
+@click.command(name="list")
+def skill_list_command():
+    """列出所有可用Skill"""
+    from ..core.skill_index import SkillIndex
+    index = SkillIndex("config/skill_index.yaml")
+    skills = index.get_all_skills()
+    
+    if not skills:
+        console.print("未找到任何Skill")
+        return
+    
+    console.print(f"\n可用Skill ({len(skills)}个):\n")
+    for s in skills:
+        info = index.get_skill_info(s)
+        desc = info.get('description', '') if info else ''
+        console.print(f"  • {s}")
+        if desc:
+            console.print(f"    {desc}")
+        console.print("")
+
+
+@click.command(name="init")
+@click.option("--auto-load", is_flag=True, help="自动加载所有Skill")
+def skill_init_command(auto_load: bool):
+    """初始化Skill系统"""
+    from ..core.skill_index import SkillIndex
+    from pathlib import Path
+    
+    index_file = Path("config/skill_index.yaml")
+    
+    if not index_file.exists():
+        console.print("❌ skill_index.yaml不存在，请先运行 oc-collab skill index")
+        return
+    
+    index = SkillIndex(str(index_file))
+    skills = index.get_all_skills()
+    
+    console.print(f"✅ Skill系统已初始化，共 {len(skills)} 个Skill")
+    
+    if auto_load:
+        console.print("自动加载所有Skill...")
+        for s in skills:
+            console.print(f"  加载: {s}")
+
+
 skill_group.add_command(skill_index_cmd, "index")
 skill_group.add_command(skill_query_cmd, "query")
+skill_group.add_command(skill_list_command, "list")
+skill_group.add_command(skill_init_command, "init")
+
+
+@click.command(name="verify")
+@click.argument("action")
+def skill_verify_command(action: str):
+    """验证执行特定操作前是否已加载相关Skill
+    
+    示例:
+      oc-collab skill verify todowrite
+    """
+    from ..core.skill_enforcer import SkillEnforcer
+    
+    enforcer = SkillEnforcer()
+    result = enforcer.check_before_action(action)
+    
+    console.print(f"\n🔍 执行 '{action}' 前的Skill检查")
+    console.print("=" * 60)
+    
+    if result["required_skills"]:
+        console.print(f"\n📌 必需Skill:")
+        for skill in result["required_skills"]:
+            if skill in result["missing"]:
+                console.print(f"   ❌ {skill} (未加载)")
+            else:
+                console.print(f"   ✅ {skill}")
+    else:
+        console.print(f"\n📌 必需Skill: (无)")
+    
+    if result["optional_skills"]:
+        console.print(f"\n📌 可选Skill:")
+        for skill in result["optional_skills"]:
+            console.print(f"   ⚪ {skill}")
+    
+    if result["missing"]:
+        console.print(f"\n⚠️  缺失 {len(result['missing'])} 个必需Skill")
+        for skill in result["missing"]:
+            console.print(f"   → 加载: oc-collab skill load {skill}")
+    else:
+        console.print(f"\n✅ 所有必需Skill已加载")
+    
+    console.print("=" * 60)
+
+
+skill_group.add_command(skill_verify_command, "verify")

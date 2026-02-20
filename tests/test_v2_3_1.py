@@ -10,6 +10,7 @@ import tempfile
 import shutil
 import pytest
 from pathlib import Path
+from src.core.todo_queue_manager import TodoQueueItem
 
 # 添加src到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -219,22 +220,25 @@ class TestAgentRegistry:
         assert registry.can_unregister("agent1") is True
     
     def test_can_unregister_with_pending_todos(self, temp_dir):
-        """TC-AGENT-005: 有pending TODO时不能注销"""
-        state_file = os.path.join(temp_dir, "project_state.yaml")
-        registry = AgentRegistry(state_file=state_file)
-        registry.register("agent1", "DEVELOPMENT_LEAD")
+        """TC-AGENT-005: 有pending TODO时不能注销
+        注意：此测试验证SQLite存储中的TODO，测试使用默认数据库路径"""
+        from datetime import datetime
+        from src.core.todo_sync_manager import TodoSyncManager
+        from src.core.todo_queue_manager import TodoQueueManager, TodoQueueItem
         
-        # 写入一个有pending TODO的状态
-        import yaml
-        with open(state_file, 'w') as f:
-            yaml.safe_dump({
-                "agents": {"agent1": {"id": "agent1", "role": "DEVELOPMENT_LEAD"}},
-                "todos": [{"id": "TODO-1-001", "receiver": "agent1", "status": "pending"}]
-            }, f)
+        queue_manager = TodoQueueManager()
+        item = TodoQueueItem(
+            id="TODO-test-001",
+            content="测试任务",
+            from_agent="1",
+            to_agent="1",
+            priority="medium",
+            created_at=datetime.now().isoformat()
+        )
+        queue_manager.add(item)
         
-        # 重新创建registry实例
-        registry = AgentRegistry(state_file=state_file)
-        assert registry.can_unregister("agent1") is False
+        registry = AgentRegistry()
+        assert registry.can_unregister("1") is False
 
 
 class TestComplianceChecker:
@@ -263,15 +267,30 @@ class TestComplianceChecker:
         assert "无效" in msg
     
     def test_check_creator_receiver_rule(self, checker):
-        """TC-COMP-004: 检查创建者/接收者规则"""
-        # Agent1只能创建给自己或Agent2
+        """TC-COMP-004: 检查创建者/接收者规则 - v2.3.3新功能：支持给agent3-9发送TODO"""
+        # v2.3.3: 任何Agent都可以创建TODO给任何人
+        
+        # Agent1可以创建给Agent1（自己）
         checker1 = ComplianceChecker(current_agent="1")
+        valid, _ = checker1.check_todo_create({"id": "TODO-1to1-001"})
+        assert valid is True
+        
+        # Agent1可以创建给Agent2
         valid, _ = checker1.check_todo_create({"id": "TODO-1to2-001"})
         assert valid is True
         
-        # Agent1不能创建给Agent3
-        valid, msg = checker1.check_todo_create({"id": "TODO-1to3-001"})
-        assert valid is False
+        # v2.3.3新功能: Agent1可以创建给Agent3
+        valid, _ = checker1.check_todo_create({"id": "TODO-1to3-001"})
+        assert valid is True, "v2.3.3: Agent1应该可以创建给Agent3"
+        
+        # Agent1可以创建给Agent9
+        valid, _ = checker1.check_todo_create({"id": "TODO-1to9-001"})
+        assert valid is True, "v2.3.3: Agent1应该可以创建给Agent9"
+        
+        # Agent2也可以创建给任何人
+        checker2 = ComplianceChecker(current_agent="2")
+        valid, _ = checker2.check_todo_create({"id": "TODO-2to3-001"})
+        assert valid is True
     
     def test_validate_source(self, checker):
         """TC-COMP-005: 验证来源"""

@@ -56,7 +56,7 @@ def show_context_command():
 @click.option("--content", help="待办内容")
 @click.option("--priority", type=click.Choice(["high", "medium", "low"]), default="medium")
 @click.option("--test-mode", is_flag=True, help="测试模式（不创建正式TODO，仅验证参数）")
-@click.option("--to", "--receiver", "receiver", help="接收者Agent ID (如 1, 2)")
+@click.option("--to", "--receiver", "--agent", "receiver", help="接收者Agent ID (如 1, 2)")
 @click.option("--source", "-s", "source", default="MANUAL", help="来源标签 (REQUIREMENT/BUG/FEEDBACK/MANUAL)")
 @click.option("--type", "template_type", help="模板类型 (REQUIREMENT/BUG_FIX/MANUAL)")
 def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_mode: bool, receiver: Optional[str], source: str, template_type: Optional[str]):
@@ -117,6 +117,12 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
         click.echo("❌ 请提供 --content 或导入 TODO 文件")
         sys.exit(1)
 
+    # v2.3.3: 必须指定接收者，禁止创建无接收者的TODO
+    if not receiver:
+        click.echo("❌ 必须指定接收者 (--to)，TODO必须明确发给某个Agent")
+        click.echo("   示例: oc-collab todowrite --content \"完成任务\" --to 2")
+        sys.exit(1)
+
     # 测试模式：只验证，不创建正式TODO
     if test_mode:
         click.echo(f"[TEST] 待办内容验证通过: {content}")
@@ -129,7 +135,17 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
     def _do_todowrite():
         if content:
             current_agent_id = None
-            # 从ContextManager获取当前Agent上下文
+            
+            # 优先从环境变量OC_AGENT_ID获取
+            import os
+            oc_agent_id = os.environ.get("OC_AGENT_ID")
+            if oc_agent_id:
+                try:
+                    current_agent_id = int(oc_agent_id)
+                except ValueError:
+                    pass
+            
+            # 如果环境变量没有，从ContextManager获取
             if not current_agent_id:
                 try:
                     from ..core.context_manager import ContextManager, ContextNotFoundError
@@ -148,17 +164,24 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
             # v2.3.1: 使用新格式生成TODO编号
             todo_content = content
             new_format_id = None
+            receiver_clean = receiver
             if receiver:
+                # 支持 "1", "2", "3"... "agent1", "agent2", "agent3"... 格式
+                receiver_clean = receiver.replace("agent", "")
+                # 验证必须是数字
+                if not receiver_clean.isdigit():
+                    click.echo(f"❌ 无效的接收者: {receiver}，接收者必须是数字")
+                    sys.exit(1)
+                # 生成新格式的ID
                 from ..core.todo_id_generator import TodoIdGenerator
                 id_gen = TodoIdGenerator()
-                new_format_id = id_gen.generate(str(agent_id), receiver)
+                new_format_id = id_gen.generate(str(agent_id), receiver_clean)
             
-            # v2.3.1: 来源标签处理（添加到内容前缀）
-            if source and source != "MANUAL":
-                todo_content = f"[{source}] {todo_content}"
+            # v2.3.1: 来源标签已保存到数据库，不再添加前缀
+            pass
             
             # v2.3.1: 传递new_format_id给add_todo
-            todo = sync_manager.add_todo(todo_content, agent_id=agent_id, priority=priority, todo_id=new_format_id)
+            todo = sync_manager.add_todo(todo_content, agent_id=agent_id, priority=priority, todo_id=new_format_id, receiver=receiver_clean, source=source)
             
             # v2.3.1: 合规检查 - 验证TODO格式和创建者/接收者关系
             try:
@@ -172,7 +195,7 @@ def todowrite_command(todos: tuple, content: Optional[str], priority: str, test_
                     "id": new_format_id or todo.id,
                     "content": todo.content,
                     "creator": str(current_agent_id),
-                    "receiver": receiver
+                    "receiver": receiver_clean
                 }
                 allowed, error_msg = checker.check_todo_create(todo_data)
                 if not allowed:

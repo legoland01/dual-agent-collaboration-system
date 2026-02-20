@@ -151,33 +151,15 @@ class SessionManager:
         todo_lines = []
 
         try:
-            import yaml
-            adhoc_file = Path(self.project_path) / "state" / "agent_adhoc_todos.yaml"
-            if adhoc_file.exists():
-                with open(adhoc_file) as f:
-                    data = yaml.safe_load(f) or {}
-                    todos = data.get("todos", [])
-                    pending_todos = [t for t in todos if t.get("status") == "pending"]
-                    if pending_todos:
-                        todo_lines.append("待办事项 (agent_adhoc_todos.yaml):")
-                        for item in pending_todos[:5]:
-                            task = item.get("content", "")
-                            todo_id = item.get("id", "")
-                            todo_lines.append(f"  [{todo_id}] {task}")
-        except Exception:
-            pass
-
-        try:
-            from .auto_engine import TodoCommandExecutor
-            executor = TodoCommandExecutor(self.project_path)
-            todo_list = executor.get_todo_list()
-
-            if todo_list:
-                if not todo_lines:
-                    todo_lines.append("待办事项:")
-                for item in todo_list[:5]:
-                    task = item.get("task", "")
-                    todo_lines.append(f"  [ ] {task}")
+            from .todo_storage import TodoStorage
+            storage = TodoStorage(str(Path(self.project_path) / "state" / "todos.db"))
+            todos = storage.list(status="pending")
+            if todos:
+                todo_lines.append("待办事项:")
+                for item in todos[:5]:
+                    todo_id = item.get("id", "")
+                    content = item.get("content", "")
+                    todo_lines.append(f"  [{todo_id}] {content}")
         except Exception:
             pass
 
@@ -216,18 +198,11 @@ class SessionManager:
         state = self.state_manager.load_state()
 
         try:
-            import yaml
             from .todo_sync_manager import TodoSyncManager
             todo_manager = TodoSyncManager(self.project_path)
 
-            adhoc_file = Path(self.project_path) / "state" / "agent_adhoc_todos.yaml"
-            if adhoc_file.exists():
-                with open(adhoc_file) as f:
-                    data = yaml.safe_load(f) or {}
-                    existing_todos = data.get("todos", [])
-                    pending_ids = [t.get("id") for t in existing_todos if t.get("status") == "pending"]
-            else:
-                pending_ids = []
+            todos = todo_manager.list_todos(status="pending")
+            pending_ids = [t.id for t in todos]
 
             phase = state.get("phase", "")
             if phase in ["requirements_review", "requirements_approved"]:

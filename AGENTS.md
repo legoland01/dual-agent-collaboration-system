@@ -1,11 +1,28 @@
-# oc-collab 核心规则（永不变）
+# oc-collab 核心规则
 
 ## Agent 分工
 
-| Agent | 职责 | 原则 |
-|-------|------|------|
-| **Agent1** | 发现问题 → 创建TODO → 记录文档 | 原则上不直接改代码 |
-| **Agent2** | 执行代码 → 修复Bug → 合并到分支 | 负责所有代码实现 |
+| Agent | 角色 | 团队 | 职责 |
+|-------|------|------|------|
+| **agent1** | 产品经理 | oc-collab | 发现问题 → 创建TODO → 记录文档 |
+| **agent2** | 架构师 | oc-collab | 执行代码 → 修复Bug → 技术评审 |
+
+---
+
+## 全局Agent注册表
+
+| Agent | 角色 | 团队 | 说明 |
+|-------|------|------|------|
+| agent1 | 产品经理 | oc-collab | oc-collab核心 |
+| agent2 | 架构师 | oc-collab | oc-collab核心 |
+| agent3 | 产品经理 | pm-agent | 项目管理 |
+| agent4 | 架构师 | pm-agent | 项目技术 |
+| agent5 | 顾问 | HQ | 协调/评审/研究 |
+| agent6 | 产品经理 | test-agent | 测试规划 |
+| agent7 | 架构师 | test-agent | 测试架构 |
+| agent8 | 产品经理 | conf-man | 版本管理 |
+| agent9 | 架构师 | conf-man | 版本技术 |
+| agent1t~10t | 测试工程师 | test-agent | 测试执行 |
 
 ---
 
@@ -21,14 +38,15 @@
 
 ## 关键规则（Compaction 后必须遵守）
 
-1. **Agent1 永远不直接改代码**，由 Agent2 执行
-2. 发现Bug后，Agent1 只做：
+1. **开发完成后立即git push** - 所有代码和文档必须即时推送，否则跨机器无法协同
+2. **Agent1 永远不直接改代码**，由 Agent2 执行
+3. 发现Bug后，Agent1 只做：
    - 创建 Bug 报告 (`docs/00-memos/`)
-   - 创建 TODO 任务 (`state/agent_adhoc_todos.yaml`)
+   - 创建 TODO 任务 (`state/todos.db`，使用 `oc-collab todo list` 查询)
    - 更新需求/设计文档
-3. **让 Agent2 执行修复**，不要自己动手
-4. Compaction 后立即重新读取此文件确认规则
-5. **用户身份声明**：当用户说"你是agentX"时，必须立即执行 `oc-collab switch X` 更新系统状态
+4. **让 Agent2 执行修复**，不要自己动手
+5. Compaction 后立即重新读取此文件确认规则
+6. **用户身份声明**：当用户说"你是agentX"时，必须立即执行 `oc-collab switch X` 更新系统状态
 
 ---
 
@@ -67,11 +85,11 @@
 ## 引用文件
 
 Agent1 需要定期检查：
-- `state/agent_adhoc_todos.yaml` - 待办任务列表
+- `state/todos.db` - 待办任务列表（使用 `oc-collab todo list` 查询）
 - `docs/00-memos/` - Bug 报告和备忘录
 
 Agent2 需要定期检查：
-- `state/agent_adhoc_todos.yaml` - 分配给自己的任务
+- `state/todos.db` - 分配给自己的任务（使用 `oc-collab todo list` 查询）
 - `docs/00-memos/` - 待修复的 Bug
 
 ---

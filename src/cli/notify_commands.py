@@ -8,17 +8,82 @@
 
 import click
 import sys
+import os
+import yaml
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from ..core.todo_queue_manager import TodoQueueManager
+from ..core.todo_storage import TodoStorage
 
 
 @click.group("notify")
 def notify_group():
     """通知管理命令组"""
     pass
+
+
+@notify_group.command("enable")
+def notify_enable_command():
+    """启用通知功能
+    
+    示例:
+      oc-collab notify enable
+    """
+    config_dir = Path("config")
+    config_dir.mkdir(exist_ok=True)
+    config_file = config_dir / "notification.yaml"
+    
+    config = {}
+    if config_file.exists():
+        with open(config_file) as f:
+            config = yaml.safe_load(f) or {}
+    
+    config['enabled'] = True
+    
+    with open(config_file, 'w') as f:
+        yaml.dump(config, f)
+    
+    click.echo("✅ 通知功能已启用")
+    click.echo(f"   配置文件: {config_file}")
+
+
+@notify_group.command("disable")
+def notify_disable_command():
+    """禁用通知功能
+    
+    示例:
+      oc-collab notify disable
+    """
+    config_dir = Path("config")
+    config_dir.mkdir(exist_ok=True)
+    config_file = config_dir / "notification.yaml"
+    
+    config = {}
+    if config_file.exists():
+        with open(config_file) as f:
+            config = yaml.safe_load(f) or {}
+    
+    config['enabled'] = False
+    
+    with open(config_file, 'w') as f:
+        yaml.dump(config, f)
+    
+    click.echo("✅ 通知功能已禁用")
+
+
+@notify_group.command("test")
+def notify_test_command():
+    """发送测试通知
+    
+    示例:
+      oc-collab notify test
+    """
+    script = 'display notification "测试通知" with title "oc-collab"'
+    os.system(f'/usr/bin/osascript -e \'{script}\' &')
+    
+    click.echo("✅ 测试通知已发送")
 
 
 @notify_group.command("reply")

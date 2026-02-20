@@ -328,12 +328,11 @@ Closes #BUG-YYYYMMDD-XXX
 ### 修复后必须更新TODO
 
 ```bash
-# 1. 更新TODO状态为pending
-# 2. 在标题标注"已修复"
-# 3. 提交TODO变更
-git add state/agent_adhoc_todos.yaml
-git commit -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
-oc-collab sync-all -m "chore: BUG-YYYYMMDD-XXX已修复，待Agent1验收"
+# v2.3.3+ 使用SQLite，无需git add YAML文件
+# 1. 标记TODO完成
+oc-collab todo complete TODO-X-XXX
+# 2. 或者更新状态
+oc-collab todo edit TODO-X-XXX --status completed
 ```
 
 ### 修复检查清单
